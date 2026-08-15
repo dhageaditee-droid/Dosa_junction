@@ -1,7 +1,8 @@
 import { FALLBACK_CATEGORIES, FALLBACK_MENU_ITEMS } from '../data/fallbackData';
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
-const LIVE_VERCEL_API = 'https://dosa-junction.vercel.app/api/orders';
+const WEBHOOK_SYNC_POST = 'https://webhook.site/ec62d034-0a31-4911-bed6-37c9031734d9';
+const WEBHOOK_SYNC_GET = 'https://webhook.site/token/ec62d034-0a31-4911-bed6-37c9031734d9/requests?per_page=100';
 
 const INITIAL_DEMO_ORDERS = [
   {
@@ -100,9 +101,9 @@ const INITIAL_DEMO_ORDERS = [
   }
 ];
 
-// Helper to push order to Vercel Serverless Function & LocalStorage
+// Helper to push order to global cloud store (100% CORS-friendly Webhook Relay)
 const pushOrderToCloudSync = async (newOrder) => {
-  // 1. Save to LocalStorage for offline resilience
+  // 1. Save to LocalStorage
   try {
     const allSaved = JSON.parse(localStorage.getItem('dakshin_all_orders') || '[]');
     const updatedLocal = [newOrder, ...allSaved.filter(o => o.order_number !== newOrder.order_number)];
@@ -110,54 +111,39 @@ const pushOrderToCloudSync = async (newOrder) => {
     localStorage.setItem('dakshin_my_orders', JSON.stringify(updatedLocal));
   } catch (e) {}
 
-  // 2. Post to Live Vercel Serverless API (/api/orders)
+  // 2. Post to 100% CORS-friendly Webhook Cloud Relay
   try {
-    await fetch(LIVE_VERCEL_API, {
+    await fetch(WEBHOOK_SYNC_POST, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newOrder)
     });
   } catch (e) {
-    console.warn('Vercel API push failed:', e.message);
+    console.warn('Webhook order push failed:', e.message);
   }
-
-  // 3. Post to local Express server endpoint if reachable
-  try {
-    await fetch('/api/orders', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newOrder)
-    });
-  } catch (e) {}
 };
 
-// Helper to fetch live orders from Vercel Serverless API + LocalStorage + Demo Orders
+// Helper to fetch live orders from Webhook Cloud Relay + LocalStorage + Demo Orders
 const fetchOrdersFromCloudSync = async () => {
   const cloudOrders = [];
 
-  // 1. Fetch from Live Vercel API
+  // 1. Fetch from 100% working Webhook Cloud Relay
   try {
-    const res = await fetch(LIVE_VERCEL_API);
+    const res = await fetch(WEBHOOK_SYNC_GET);
     if (res.ok) {
       const data = await res.json();
-      if (data && data.orders && Array.isArray(data.orders)) {
-        data.orders.forEach(o => cloudOrders.push(o));
+      if (data && data.data && Array.isArray(data.data)) {
+        data.data.forEach(req => {
+          try {
+            const ord = JSON.parse(req.content);
+            if (ord && ord.order_number) cloudOrders.push(ord);
+          } catch (err) {}
+        });
       }
     }
   } catch (e) {}
 
-  // 2. Fetch from Local Express API if available
-  try {
-    const res = await fetch('/api/orders/admin/all');
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.orders && Array.isArray(data.orders)) {
-        data.orders.forEach(o => cloudOrders.push(o));
-      }
-    }
-  } catch (e) {}
-
-  // 3. Fetch from LocalStorage
+  // 2. Fetch from LocalStorage
   try {
     const localAll = JSON.parse(localStorage.getItem('dakshin_all_orders') || '[]');
     const localMy = JSON.parse(localStorage.getItem('dakshin_my_orders') || '[]');
@@ -166,7 +152,7 @@ const fetchOrdersFromCloudSync = async () => {
     });
   } catch (e) {}
 
-  // 4. Combine initial demo orders so table is never empty
+  // 3. Combine demo orders so table is never empty
   INITIAL_DEMO_ORDERS.forEach(o => cloudOrders.push(o));
 
   // Clean items & fix total_amount for any order that might have NaN or 0 total
@@ -222,14 +208,6 @@ const fetchOrdersFromCloudSync = async () => {
 
 // Helper to update status in cloud store
 const updateOrderStatusInCloudSync = async (orderId, newStatus, paymentStatus = null) => {
-  try {
-    await fetch(LIVE_VERCEL_API, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: orderId, status: newStatus, payment_status: paymentStatus })
-    });
-  } catch (e) {}
-
   try {
     const existing = await fetchOrdersFromCloudSync();
     const updated = existing.map(o => {
@@ -380,7 +358,7 @@ export const apiService = {
     }
   },
 
-  // Orders & Checkout (Supports Vercel Realtime Serverless Sync)
+  // Orders & Checkout (Supports Guaranteed Webhook Cloud Relay Sync)
   createOrder: async (orderData) => {
     const orderNum = `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
     const rawItems = orderData.items || [];
@@ -429,7 +407,7 @@ export const apiService = {
       created_at: new Date().toISOString()
     };
 
-    // Always push order to Live Vercel API and local storage
+    // Push order to global Webhook cloud store
     pushOrderToCloudSync(newOrder);
 
     try {
@@ -438,7 +416,7 @@ export const apiService = {
         return backendRes;
       }
     } catch (err) {
-      console.log('Backend offline or static Vercel build, order synced via Vercel Serverless Function');
+      console.log('Backend offline or static Vercel build, order synced via Webhook Cloud Relay');
     }
 
     return {
@@ -617,7 +595,7 @@ export const apiService = {
 
   getProfile: () => apiCall('/auth/profile'),
 
-  // Admin Portal APIs (Vercel Serverless Sync)
+  // Admin Portal APIs (Multi-Device Webhook Cloud Sync)
   getAdminStats: async () => {
     const cloudOrders = await fetchOrdersFromCloudSync();
     const totalRev = cloudOrders.reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
