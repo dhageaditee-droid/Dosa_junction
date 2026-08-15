@@ -15,12 +15,12 @@ const StickyMobileCartBar = () => {
 
   return (
     <div
+      className="floating-cart-bar-wrapper"
       style={{
         position: 'fixed',
-        bottom: '16px',
-        left: '16px',
-        right: '16px',
-        zIndex: 90,
+        left: '12px',
+        right: '12px',
+        zIndex: 990,
         animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
       }}
     >
@@ -32,41 +32,52 @@ const StickyMobileCartBar = () => {
           justifyContent: 'space-between',
           backgroundColor: 'var(--color-emerald)',
           color: '#FFFFFF',
-          padding: '12px 20px',
+          padding: '10px 16px',
           borderRadius: '16px',
           boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.4), 0 8px 10px -6px rgba(15, 23, 42, 0.2)',
           textDecoration: 'none',
           border: '1px solid rgba(255,255,255,0.15)'
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{
-            width: '36px',
-            height: '36px',
+            width: '34px',
+            height: '34px',
             borderRadius: '50%',
             backgroundColor: 'rgba(255,255,255,0.18)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center'
           }}>
-            <ShoppingBag size={20} color="#F59E0B" />
+            <ShoppingBag size={18} color="#F59E0B" />
           </div>
 
           <div>
-            <span style={{ fontSize: '0.95rem', fontWeight: 800, display: 'block', lineHeight: 1.2 }}>
+            <span style={{ fontSize: '0.9rem', fontWeight: 800, display: 'block', lineHeight: 1.2 }}>
               {cartCount} {cartCount === 1 ? 'Item' : 'Items'} | ₹{grandTotal.toFixed(2)}
             </span>
-            <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.85)', letterSpacing: '0.3px' }}>
-              Extra discounts applied
+            <span style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.85)', letterSpacing: '0.3px' }}>
+              Tap to View Cart & Checkout
             </span>
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 800, fontSize: '0.95rem', color: '#F59E0B' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 800, fontSize: '0.85rem', color: '#F59E0B' }}>
           <span>View Cart</span>
-          <ArrowRight size={18} />
+          <ArrowRight size={16} />
         </div>
       </Link>
+
+      <style>{`
+        .floating-cart-bar-wrapper {
+          bottom: 16px;
+        }
+        @media (max-width: 768px) {
+          .floating-cart-bar-wrapper {
+            bottom: 70px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

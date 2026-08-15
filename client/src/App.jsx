@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Outlet, Navigate } from 'react-
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import StickyMobileCartBar from './components/StickyMobileCartBar';
+import MobileBottomNav from './components/MobileBottomNav';
 import CustomerAuthModal from './components/CustomerAuthModal';
 
 import Home from './pages/Home';
@@ -40,6 +41,7 @@ const CustomerLayout = () => {
         <Outlet />
       </main>
       <StickyMobileCartBar />
+      <MobileBottomNav onOpenAuthModal={() => setShowAuthModal(true)} />
       <Footer />
       
       <CustomerAuthModal
