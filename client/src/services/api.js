@@ -1,8 +1,7 @@
 import { FALLBACK_CATEGORIES, FALLBACK_MENU_ITEMS } from '../data/fallbackData';
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
-const RESTFUL_API_STORE = 'https://api.restful-api.dev/objects';
-const KVDB_STORE = 'https://kvdb.io/8D4G77Z9S29X1P/dosa_junction_global_orders';
+const LIVE_VERCEL_API = 'https://dosa-junction.vercel.app/api/orders';
 
 const INITIAL_DEMO_ORDERS = [
   {
@@ -77,9 +76,9 @@ const INITIAL_DEMO_ORDERS = [
   }
 ];
 
-// Helper to push order to shared cloud store for cross-device sync
+// Helper to push order to Vercel Serverless Function & LocalStorage
 const pushOrderToCloudSync = async (newOrder) => {
-  // 1. Save to local storage for current browser
+  // 1. Save to LocalStorage for offline resilience
   try {
     const allSaved = JSON.parse(localStorage.getItem('dakshin_all_orders') || '[]');
     const updatedLocal = [newOrder, ...allSaved.filter(o => o.order_number !== newOrder.order_number)];
@@ -87,73 +86,49 @@ const pushOrderToCloudSync = async (newOrder) => {
     localStorage.setItem('dakshin_my_orders', JSON.stringify(updatedLocal));
   } catch (e) {}
 
-  // 2. Post to restful-api.dev (CORS-friendly public REST store)
+  // 2. Post to Live Vercel Serverless API (/api/orders)
   try {
-    await fetch(RESTFUL_API_STORE, {
+    await fetch(LIVE_VERCEL_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: `DJ_ORDER_${newOrder.order_number}`,
-        data: newOrder
-      })
+      body: JSON.stringify(newOrder)
     });
   } catch (e) {
-    console.warn('restful-api.dev push failed:', e.message);
+    console.warn('Vercel API push failed:', e.message);
   }
 
-  // 3. Post to kvdb.io store
+  // 3. Post to local Express server endpoint if reachable
   try {
-    let existing = [];
-    try {
-      const res = await fetch(KVDB_STORE);
-      if (res.ok) {
-        const text = await res.text();
-        if (text) existing = JSON.parse(text);
-      }
-    } catch (err) {}
-
-    const updated = [newOrder, ...(Array.isArray(existing) ? existing.filter(o => o.order_number !== newOrder.order_number) : [])].slice(0, 100);
-    await fetch(KVDB_STORE, {
+    await fetch('/api/orders', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updated)
+      body: JSON.stringify(newOrder)
     });
-  } catch (err) {
-    console.warn('kvdb push failed:', err.message);
-  }
+  } catch (e) {}
 };
 
-// Helper to fetch orders from shared cloud store for cross-device sync
+// Helper to fetch live orders from Vercel Serverless API + LocalStorage + Demo Orders
 const fetchOrdersFromCloudSync = async () => {
   const cloudOrders = [];
 
-  // 1. Fetch from restful-api.dev
+  // 1. Fetch from Live Vercel API
   try {
-    const res = await fetch(RESTFUL_API_STORE);
+    const res = await fetch(LIVE_VERCEL_API);
     if (res.ok) {
-      const list = await res.json();
-      if (Array.isArray(list)) {
-        list.forEach(item => {
-          if (item.name && item.name.startsWith('DJ_ORDER_') && item.data && item.data.order_number) {
-            cloudOrders.push(item.data);
-          }
-        });
+      const data = await res.json();
+      if (data && data.orders && Array.isArray(data.orders)) {
+        data.orders.forEach(o => cloudOrders.push(o));
       }
     }
   } catch (e) {}
 
-  // 2. Fetch from kvdb.io
+  // 2. Fetch from Local Express API if available
   try {
-    const res = await fetch(KVDB_STORE);
+    const res = await fetch('/api/orders/admin/all');
     if (res.ok) {
-      const text = await res.text();
-      if (text) {
-        const data = JSON.parse(text);
-        if (Array.isArray(data)) {
-          data.forEach(o => {
-            if (o && o.order_number) cloudOrders.push(o);
-          });
-        }
+      const data = await res.json();
+      if (data && data.orders && Array.isArray(data.orders)) {
+        data.orders.forEach(o => cloudOrders.push(o));
       }
     }
   } catch (e) {}
@@ -167,7 +142,7 @@ const fetchOrdersFromCloudSync = async () => {
     });
   } catch (e) {}
 
-  // Combine demo orders so table is never empty
+  // 4. Combine initial demo orders so table is never empty
   INITIAL_DEMO_ORDERS.forEach(o => cloudOrders.push(o));
 
   // Deduplicate by order_number
@@ -184,30 +159,28 @@ const fetchOrdersFromCloudSync = async () => {
 // Helper to update status in cloud store
 const updateOrderStatusInCloudSync = async (orderId, newStatus, paymentStatus = null) => {
   try {
+    await fetch(LIVE_VERCEL_API, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: orderId, status: newStatus, payment_status: paymentStatus })
+    });
+  } catch (e) {}
+
+  try {
     const existing = await fetchOrdersFromCloudSync();
-    if (existing.length > 0) {
-      const updated = existing.map(o => {
-        if (String(o.id) === String(orderId) || String(o.order_number) === String(orderId)) {
-          return {
-            ...o,
-            status: newStatus || o.status,
-            payment_status: paymentStatus || o.payment_status,
-            updated_at: new Date().toISOString()
-          };
-        }
-        return o;
-      });
+    const updated = existing.map(o => {
+      if (String(o.id) === String(orderId) || String(o.order_number) === String(orderId)) {
+        return {
+          ...o,
+          status: newStatus || o.status,
+          payment_status: paymentStatus || o.payment_status,
+          updated_at: new Date().toISOString()
+        };
+      }
+      return o;
+    });
 
-      // Update LocalStorage
-      localStorage.setItem('dakshin_all_orders', JSON.stringify(updated));
-
-      // Push to KV store
-      await fetch(KVDB_STORE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updated)
-      });
-    }
+    localStorage.setItem('dakshin_all_orders', JSON.stringify(updated));
   } catch (e) {}
 };
 
@@ -343,7 +316,7 @@ export const apiService = {
     }
   },
 
-  // Orders & Checkout (Supports Multi-Cloud Real-Time Sync)
+  // Orders & Checkout (Supports Vercel Realtime Serverless Sync)
   createOrder: async (orderData) => {
     const orderNum = `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
     const formattedItems = (orderData.items || []).map(i => ({
@@ -357,12 +330,12 @@ export const apiService = {
     const newOrder = {
       id: Date.now(),
       order_number: orderNum,
-      customer_name: orderData.customerName || 'Customer',
-      customer_phone: orderData.phone || orderData.customerPhone || '',
+      customer_name: orderData.customerName || orderData.customer_name || 'Customer',
+      customer_phone: orderData.phone || orderData.customerPhone || orderData.customer_phone || '',
       customer_email: orderData.email || orderData.customerEmail || '',
       delivery_address: orderData.deliveryAddress || orderData.address || '',
-      order_type: orderData.orderType || 'Home Delivery',
-      payment_method: orderData.paymentMethod || 'Cash on Delivery',
+      order_type: orderData.orderType || orderData.order_type || 'Home Delivery',
+      payment_method: orderData.paymentMethod || orderData.payment_method || 'Cash on Delivery',
       payment_status: 'PENDING',
       status: 'Pending',
       subtotal: orderData.subtotal || 0,
@@ -375,7 +348,7 @@ export const apiService = {
       created_at: new Date().toISOString()
     };
 
-    // Always push order to shared cloud store for cross-device admin visibility
+    // Always push order to Live Vercel API and local storage
     pushOrderToCloudSync(newOrder);
 
     try {
@@ -384,7 +357,7 @@ export const apiService = {
         return backendRes;
       }
     } catch (err) {
-      console.log('Backend offline or static Vercel build, order synced via cloud relay');
+      console.log('Backend offline or static Vercel build, order synced via Vercel Serverless Function');
     }
 
     return {
@@ -505,42 +478,11 @@ export const apiService = {
   adminLogin: (data) => apiCall('/auth/login', 'POST', data),
   getProfile: () => apiCall('/auth/profile'),
 
-  // Admin Portal APIs (Multi-Source Cross-Device Merged Orders)
+  // Admin Portal APIs (Vercel Serverless Sync)
   getAdminStats: async () => {
-    let backendStats = null;
-    try {
-      const res = await apiCall('/orders/admin/dashboard-stats', 'GET', null, localStorage.getItem('dakshin_admin_token'));
-      if (res && res.stats) backendStats = res;
-    } catch (err) {}
-
     const cloudOrders = await fetchOrdersFromCloudSync();
-    
-    if (backendStats) {
-      const existingOrderNums = new Set((backendStats.recentOrders || []).map(o => o.order_number));
-      const newCloudOrders = cloudOrders.filter(o => !existingOrderNums.has(o.order_number));
-
-      if (newCloudOrders.length > 0) {
-        const mergedRecent = [...newCloudOrders, ...backendStats.recentOrders].sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 10);
-        const addedRevenue = newCloudOrders.reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
-
-        return {
-          success: true,
-          stats: {
-            ...backendStats.stats,
-            todayOrders: (backendStats.stats.todayOrders || 0) + newCloudOrders.length,
-            todayRevenue: (backendStats.stats.todayRevenue || 0) + addedRevenue,
-            totalOrders: (backendStats.stats.totalOrders || 0) + newCloudOrders.length,
-            totalRevenue: (backendStats.stats.totalRevenue || 0) + addedRevenue,
-            pendingOrders: (backendStats.stats.pendingOrders || 0) + newCloudOrders.filter(o => o.status === 'Pending').length
-          },
-          recentOrders: mergedRecent
-        };
-      }
-      return backendStats;
-    }
-
-    // Static fallback stats from cloud orders
     const totalRev = cloudOrders.reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
+
     return {
       success: true,
       stats: {
@@ -558,22 +500,8 @@ export const apiService = {
   },
 
   getAdminOrders: async (paramsStr = '') => {
-    let backendOrders = [];
-    try {
-      const res = await apiCall(`/orders/admin/all${paramsStr ? `?${paramsStr}` : ''}`, 'GET', null, localStorage.getItem('dakshin_admin_token'));
-      if (res && res.orders && res.orders.length > 0) backendOrders = res.orders;
-    } catch (err) {}
+    let allOrders = await fetchOrdersFromCloudSync();
 
-    const cloudOrders = await fetchOrdersFromCloudSync();
-
-    // Merge backend & cloud orders by order_number
-    const orderMap = new Map();
-    cloudOrders.forEach(o => orderMap.set(o.order_number, o));
-    backendOrders.forEach(o => orderMap.set(o.order_number, o));
-
-    let allOrders = Array.from(orderMap.values()).sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
-
-    // Filter cloud orders if search / status filters apply
     const searchParams = new URLSearchParams(paramsStr);
     const status = searchParams.get('status');
     const orderType = searchParams.get('orderType');
