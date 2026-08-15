@@ -83,7 +83,7 @@ const MenuPage = () => {
 
   return (
     <div style={{ backgroundColor: 'var(--color-cream)', minHeight: '90vh', padding: '2rem 0 4rem 0' }}>
-      <SEOHead title="South Indian Menu | Dakshin Bhavan" />
+      <SEOHead title="South Indian Menu | Dosa Junction" />
 
       <div className="container">
         

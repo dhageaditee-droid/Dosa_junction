@@ -167,7 +167,7 @@ const AdminMenu = () => {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--color-cream-alt)' }}>
-      <SEOHead title="Admin Menu Management | Dakshin Bhavan" />
+      <SEOHead title="Admin Menu Management | Dosa Junction" />
       <AdminSidebar />
 
       <main style={{ flexGrow: 1, padding: '2rem', overflowY: 'auto' }}>

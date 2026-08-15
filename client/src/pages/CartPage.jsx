@@ -32,7 +32,7 @@ const CartPage = () => {
   if (cartItems.length === 0) {
     return (
       <div style={{ backgroundColor: 'var(--color-cream)', padding: '3rem 0', minHeight: '80vh' }}>
-        <SEOHead title="Your Cart | Dakshin Bhavan" />
+        <SEOHead title="Your Cart | Dosa Junction" />
         <div className="container">
           <EmptyState
             title="Your Shopping Cart is Empty"

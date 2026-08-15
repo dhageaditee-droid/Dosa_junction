@@ -96,7 +96,7 @@ const AdminOrders = () => {
           </style>
         </head>
         <body>
-          <h2>DAKSHIN BHAVAN</h2>
+          <h2>DOSA JUNCTION</h2>
           <p style="text-align:center; font-size: 11px; margin:0;">Authentic South Indian Restaurant</p>
           <div class="line"></div>
           <div class="row"><span>Order:</span><span>${ord.order_number}</span></div>
@@ -119,7 +119,7 @@ const AdminOrders = () => {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--color-cream-alt)' }}>
-      <SEOHead title="Admin Order Management | Dakshin Bhavan" />
+      <SEOHead title="Admin Order Management | Dosa Junction" />
       <AdminSidebar />
 
       <main style={{ flexGrow: 1, padding: '2rem', overflowY: 'auto' }}>

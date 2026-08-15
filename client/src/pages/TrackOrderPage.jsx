@@ -58,7 +58,7 @@ const TrackOrderPage = () => {
 
   return (
     <div style={{ backgroundColor: 'var(--color-cream)', padding: '3rem 0 5rem 0', minHeight: '85vh' }}>
-      <SEOHead title="Track Order Status | Dakshin Bhavan" />
+      <SEOHead title="Track Order Status | Dosa Junction" />
 
       <div className="container" style={{ maxWidth: '750px' }}>
         

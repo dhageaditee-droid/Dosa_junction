@@ -29,7 +29,7 @@ const OffersPage = () => {
 
   return (
     <div style={{ backgroundColor: 'var(--color-cream)', padding: '3rem 0 5rem 0', minHeight: '85vh' }}>
-      <SEOHead title="Special Offers & Promo Codes | Dakshin Bhavan" />
+      <SEOHead title="Special Offers & Promo Codes | Dosa Junction" />
 
       <div className="container">
         

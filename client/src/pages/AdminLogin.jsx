@@ -50,7 +50,7 @@ const AdminLogin = () => {
       justifyContent: 'center',
       padding: '1.5rem'
     }}>
-      <SEOHead title="Admin Login | Dakshin Bhavan" />
+      <SEOHead title="Admin Login | Dosa Junction" />
 
       <div style={{
         backgroundColor: '#fff',

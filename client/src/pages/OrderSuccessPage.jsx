@@ -67,7 +67,7 @@ const OrderSuccessPage = () => {
             Order Placed Successfully! 🎉
           </h1>
           <p style={{ fontSize: '1rem', color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>
-            Thank you for ordering with Dakshin Bhavan. Your order has been registered in our kitchen queue.
+            Thank you for ordering with Dosa Junction. Your order has been registered in our kitchen queue.
           </p>
 
           <div style={{

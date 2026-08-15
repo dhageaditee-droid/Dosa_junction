@@ -49,7 +49,7 @@ const AdminSidebar = () => {
       {/* Brand Header */}
       <div style={{ padding: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
         <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', color: '#FFFFFF', margin: 0 }}>
-          Dakshin Bhavan <span style={{ color: 'var(--color-gold)' }}>Admin</span>
+          Dosa Junction <span style={{ color: 'var(--color-gold)' }}>Admin</span>
         </h2>
         <span style={{ fontSize: '0.7rem', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600 }}>
           Management Portal

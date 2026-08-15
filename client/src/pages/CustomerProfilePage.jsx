@@ -49,7 +49,7 @@ const CustomerProfilePage = () => {
 
   return (
     <div style={{ backgroundColor: 'var(--color-cream)', padding: '3rem 0 5rem 0', minHeight: '85vh' }}>
-      <SEOHead title="My Profile & Orders | Dakshin Bhavan" />
+      <SEOHead title="My Profile & Orders | Dosa Junction" />
 
       <div className="container" style={{ maxWidth: '900px' }}>
         

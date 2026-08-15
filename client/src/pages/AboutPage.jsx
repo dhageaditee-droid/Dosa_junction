@@ -14,7 +14,7 @@ const AboutPage = () => {
 
   return (
     <div>
-      <SEOHead title="About Us | Dakshin Bhavan South Indian Restaurant" />
+      <SEOHead title="About Us | Dosa Junction South Indian Restaurant" />
 
       {/* Hero Header */}
       <section style={{
@@ -31,7 +31,7 @@ const AboutPage = () => {
             Rooted in South Indian Culinary Tradition
           </h1>
           <p style={{ maxWidth: '700px', margin: '0 auto', fontSize: '1.1rem', color: '#E2E8F0', lineHeight: 1.6 }}>
-            At Dakshin Bhavan, food is a celebration of culture and hospitality. We bring the rich, authentic flavors of South India straight to your table.
+            At Dosa Junction, food is a celebration of culture and hospitality. We bring the rich, authentic flavors of South India straight to your table.
           </p>
         </div>
       </section>
@@ -95,51 +95,56 @@ const AboutPage = () => {
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
             <span style={{ fontSize: '0.85rem', color: 'var(--color-gold)', fontWeight: 700, textTransform: 'uppercase' }}>
-              Why Guests Love Dakshin Bhavan
+              Why Guests Love Dosa Junction
             </span>
             <h2 style={{ fontSize: '2.2rem', fontFamily: 'var(--font-heading)', color: 'var(--color-emerald)', margin: '4px 0' }}>
-              Quality, Hygiene & Customer Satisfaction
+              Purity, Tradition & Excellence
             </h2>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
-            {featureCards.map((card, idx) => {
-              const Icon = card.icon;
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: '1.5rem'
+          }}>
+            {featureCards.map((feat) => {
+              const Icon = feat.icon;
               return (
-                <div key={idx} style={{
-                  padding: '2rem 1.5rem',
-                  borderRadius: '20px',
-                  backgroundColor: 'var(--color-cream-alt)',
-                  border: '1px solid var(--color-border)',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
-                  transition: 'transform 0.2s'
-                }}>
-                  <div style={{
-                    width: '52px',
-                    height: '52px',
+                <div
+                  key={feat.title}
+                  style={{
+                    backgroundColor: 'var(--color-cream)',
+                    padding: '1.5rem',
                     borderRadius: '16px',
-                    backgroundColor: 'var(--color-emerald)',
-                    color: 'var(--color-gold)',
+                    border: '1px solid var(--color-border)'
+                  }}
+                >
+                  <div style={{
+                    width: '42px',
+                    height: '42px',
+                    borderRadius: '12px',
+                    backgroundColor: '#FEF3C7',
+                    color: '#B45309',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     marginBottom: '1rem'
                   }}>
-                    <Icon size={26} />
+                    <Icon size={22} />
                   </div>
-                  <h3 style={{ fontSize: '1.2rem', fontFamily: 'var(--font-heading)', color: 'var(--color-emerald)', marginBottom: '0.5rem', fontWeight: 800 }}>
-                    {card.title}
+                  <h3 style={{ fontSize: '1.1rem', color: 'var(--color-emerald)', fontWeight: 800, marginBottom: '0.4rem' }}>
+                    {feat.title}
                   </h3>
-                  <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', lineHeight: 1.6, margin: 0 }}>
-                    {card.desc}
+                  <p style={{ fontSize: '0.88rem', color: 'var(--color-text-muted)', margin: 0, lineHeight: 1.5 }}>
+                    {feat.desc}
                   </p>
                 </div>
               );
             })}
           </div>
+
         </div>
       </section>
-
     </div>
   );
 };

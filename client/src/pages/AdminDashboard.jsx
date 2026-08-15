@@ -64,7 +64,7 @@ const AdminDashboard = () => {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--color-cream-alt)' }}>
-      <SEOHead title="Admin Dashboard | Dakshin Bhavan" />
+      <SEOHead title="Admin Dashboard | Dosa Junction" />
       
       <AdminSidebar />
 

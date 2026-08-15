@@ -64,7 +64,7 @@ export const AuthProvider = ({ children }) => {
         setCustomerUser(response.customer);
         localStorage.setItem('dakshin_customer_token', response.token);
         localStorage.setItem('dakshin_customer_user', JSON.stringify(response.customer));
-        if (addToast) addToast(`Welcome to Dakshin Bhavan, ${response.customer.name}!`, 'success');
+        if (addToast) addToast(`Welcome to Dosa Junction, ${response.customer.name}!`, 'success');
         return { success: true };
       }
     } catch (err) {

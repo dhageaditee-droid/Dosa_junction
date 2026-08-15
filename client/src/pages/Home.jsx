@@ -82,7 +82,7 @@ const Home = () => {
 
   return (
     <div>
-      <SEOHead title="Dakshin Bhavan - Authentic South Indian Food & Filter Coffee" />
+      <SEOHead title="Dosa Junction - Authentic South Indian Food & Filter Coffee" />
 
       {/* Hero Section */}
       <section style={{

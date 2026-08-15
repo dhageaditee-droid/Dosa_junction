@@ -52,7 +52,7 @@ const Navbar = ({ onOpenAuthModal }) => {
               display: 'block',
               lineHeight: 1.1
             }}>
-              Dakshin <span style={{ color: 'var(--color-gold)' }}>Bhavan</span>
+              Dosa <span style={{ color: 'var(--color-gold)' }}>Junction</span>
             </span>
             <span style={{ fontSize: '0.62rem', color: 'var(--color-text-muted)', letterSpacing: '0.8px', textTransform: 'uppercase', fontWeight: 600 }}>
               South Indian Flavours

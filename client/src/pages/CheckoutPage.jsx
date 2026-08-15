@@ -129,7 +129,7 @@ const CheckoutPage = () => {
 
   return (
     <div style={{ backgroundColor: 'var(--color-cream)', padding: '2.5rem 0 5rem 0', minHeight: '85vh' }}>
-      <SEOHead title="Checkout & Place Order | Dakshin Bhavan" />
+      <SEOHead title="Checkout & Place Order | Dosa Junction" />
 
       <div className="container">
         
@@ -311,7 +311,7 @@ const CheckoutPage = () => {
                     </div>
                   ) : (
                     <div style={{ padding: '0.8rem 1rem', backgroundColor: '#ECFDF5', borderRadius: '12px', color: '#065F46', fontSize: '0.85rem', fontWeight: 600 }}>
-                      ✓ Delivery address is not required for {formData.orderType} orders. Please collect/dine at Dakshin Bhavan restaurant counter.
+                      ✓ Delivery address is not required for {formData.orderType} orders. Please collect/dine at Dosa Junction restaurant counter.
                     </div>
                   )}
 

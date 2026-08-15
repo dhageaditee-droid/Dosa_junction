@@ -126,7 +126,7 @@ const CustomerAuthModal = ({ isOpen, onClose }) => {
             {isLoginView ? 'Welcome Back!' : 'Create Customer Account'}
           </h2>
           <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
-            {isLoginView ? 'Sign in to order your favorite South Indian food' : 'Join Dakshin Bhavan for fast food ordering & rewards'}
+            {isLoginView ? 'Sign in to order your favorite South Indian food' : 'Join Dosa Junction for fast food ordering & rewards'}
           </p>
         </div>
 
