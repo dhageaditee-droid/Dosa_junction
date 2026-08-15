@@ -61,8 +61,21 @@ export const apiService = {
 
       let filtered = [...FALLBACK_MENU_ITEMS];
 
+      const categorySlugToId = {
+        'beverages': 1,
+        'dosa': 2,
+        'special-dosa': 3,
+        'uttapam': 4,
+        'idli': 5,
+        'vada': 6,
+        'desserts': 7,
+        'rice': 8,
+        'extras': 9
+      };
+
       if (category && category !== 'all') {
-        filtered = filtered.filter(i => i.category_slug === category);
+        const catId = categorySlugToId[category];
+        filtered = filtered.filter(i => i.category_slug === category || i.category_id === catId);
       }
 
       if (search && search.trim()) {
@@ -70,7 +83,7 @@ export const apiService = {
         filtered = filtered.filter(i => 
           i.name.toLowerCase().includes(q) || 
           i.description.toLowerCase().includes(q) ||
-          i.category_slug.toLowerCase().includes(q)
+          (i.category_slug && i.category_slug.toLowerCase().includes(q))
         );
       }
 
