@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MapPin, Phone, Mail, Clock, Send, CheckCircle2, MessageCircle, Instagram, Facebook } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Send, CheckCircle2, MessageCircle, Navigation } from 'lucide-react';
 import SEOHead from '../components/SEOHead';
 import { useToast } from '../context/ToastContext';
 import { apiService } from '../services/api';
@@ -60,27 +60,90 @@ const ContactPage = () => {
   };
 
   return (
-    <div style={{ backgroundColor: 'var(--color-cream)', padding: '3rem 0 5rem 0', minHeight: '85vh' }}>
-      <SEOHead title="Contact Us & Location | Dakshin Bhavan" />
+    <div style={{ backgroundColor: 'var(--color-cream)', padding: '2rem 0 5rem 0', minHeight: '85vh' }}>
+      <SEOHead title="Contact Us & Location | Dosa Junction" />
 
       <div className="container">
         
-        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+        {/* Header */}
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <span style={{ fontSize: '0.85rem', color: 'var(--color-gold)', fontWeight: 700, textTransform: 'uppercase' }}>
             We'd Love to Hear From You
           </span>
           <h1 style={{ fontSize: '2.4rem', fontWeight: 800, color: 'var(--color-emerald)', fontFamily: 'var(--font-heading)', margin: '4px 0' }}>
-            Contact Us
+            Contact Us & Restaurant Location
           </h1>
           <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem', maxWidth: '600px', margin: '0 auto' }}>
-            Have a question about catering, private dining, orders, or feedback? Reach out to Dakshin Bhavan!
+            Call us directly, send a message on WhatsApp, or get instant GPS driving directions to our restaurant!
           </p>
+        </div>
+
+        {/* Quick Action Mobile Call & Direction Buttons */}
+        <div style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '12px',
+          justifyContent: 'center',
+          marginBottom: '2rem'
+        }}>
+          <a
+            href="tel:+917020758779"
+            className="btn btn-primary"
+            style={{
+              flex: 1,
+              minWidth: '160px',
+              padding: '0.85rem 1.2rem',
+              borderRadius: '16px',
+              fontWeight: 800,
+              fontSize: '0.95rem',
+              boxShadow: '0 4px 14px rgba(217, 119, 6, 0.25)'
+            }}
+          >
+            <Phone size={20} /> Call +91 70207 58779
+          </a>
+
+          <a
+            href="https://wa.me/917020758779?text=Hello%20Dosa%20Junction,%20I%20want%20to%20place%20an%20order!"
+            target="_blank"
+            rel="noreferrer"
+            className="btn"
+            style={{
+              flex: 1,
+              minWidth: '160px',
+              backgroundColor: '#25D366',
+              color: '#FFFFFF',
+              padding: '0.85rem 1.2rem',
+              borderRadius: '16px',
+              fontWeight: 800,
+              fontSize: '0.95rem',
+              boxShadow: '0 4px 14px rgba(37, 211, 102, 0.25)'
+            }}
+          >
+            <MessageCircle size={20} /> WhatsApp Order
+          </a>
+
+          <a
+            href="https://maps.google.com/?q=Sinnar+Gaurav,+Near+Panchvati+Hotel,+Sinnar"
+            target="_blank"
+            rel="noreferrer"
+            className="btn btn-emerald"
+            style={{
+              flex: 1,
+              minWidth: '160px',
+              padding: '0.85rem 1.2rem',
+              borderRadius: '16px',
+              fontWeight: 800,
+              fontSize: '0.95rem'
+            }}
+          >
+            <Navigation size={20} /> Get GPS Directions
+          </a>
         </div>
 
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-          gap: '2.5rem',
+          gap: '2rem',
           maxWidth: '1100px',
           margin: '0 auto'
         }}>
@@ -88,7 +151,7 @@ const ContactPage = () => {
           {/* Left Column: Info Cards & Map */}
           <div>
             <div style={{
-              backgroundColor: '#0F172A',
+              backgroundColor: '#0B3C26',
               color: '#FFFFFF',
               padding: '2rem',
               borderRadius: '24px',
@@ -96,90 +159,28 @@ const ContactPage = () => {
               boxShadow: '0 8px 24px rgba(0,0,0,0.1)'
             }}>
               <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1.25rem', color: 'var(--color-gold)' }}>
-                Dakshin Bhavan
+                Dosa Junction
               </h3>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', fontSize: '0.95rem', color: '#E2E8F0' }}>
                 <div style={{ display: 'flex', gap: '0.75rem' }}>
                   <MapPin size={22} color="var(--color-gold)" style={{ flexShrink: 0 }} />
-                  <span>108 Indiranagar 100 Feet Road, Bengaluru, Karnataka 560038</span>
+                  <span>Sinnar Gaurav, Near Panchvati Hotel, Sinnar</span>
                 </div>
                 <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                   <Phone size={22} color="var(--color-gold)" style={{ flexShrink: 0 }} />
-                  <span>+91 98765 43210</span>
+                  <a href="tel:+917020758779" style={{ color: '#E2E8F0', fontWeight: 700 }}>+91 70207 58779</a>
                 </div>
                 <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                   <Mail size={22} color="var(--color-gold)" style={{ flexShrink: 0 }} />
-                  <span>info@dakshinbhavan.com</span>
+                  <span>info@dosajunction.com</span>
                 </div>
                 <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                   <Clock size={22} color="var(--color-gold)" style={{ flexShrink: 0 }} />
-                  <span>Opening Hours: 7:00 AM – 11:00 PM Daily</span>
+                  <span>Opening Hours: 7:00 AM – 10:30 PM Daily</span>
                 </div>
               </div>
 
-              {/* WhatsApp & Social Media Links */}
-              <div style={{ marginTop: '1.8rem', paddingTop: '1.2rem', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                <a
-                  href="https://wa.me/919876543210"
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    backgroundColor: '#25D366',
-                    color: '#FFFFFF',
-                    padding: '8px 14px',
-                    borderRadius: '20px',
-                    textDecoration: 'none',
-                    fontWeight: 700,
-                    fontSize: '0.82rem'
-                  }}
-                >
-                  <MessageCircle size={16} /> WhatsApp Us
-                </a>
-
-                <a
-                  href="https://instagram.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    backgroundColor: 'rgba(255,255,255,0.15)',
-                    color: '#FFFFFF',
-                    padding: '8px 14px',
-                    borderRadius: '20px',
-                    textDecoration: 'none',
-                    fontWeight: 700,
-                    fontSize: '0.82rem'
-                  }}
-                >
-                  <Instagram size={16} /> Instagram
-                </a>
-
-                <a
-                  href="https://facebook.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    backgroundColor: 'rgba(255,255,255,0.15)',
-                    color: '#FFFFFF',
-                    padding: '8px 14px',
-                    borderRadius: '20px',
-                    textDecoration: 'none',
-                    fontWeight: 700,
-                    fontSize: '0.82rem'
-                  }}
-                >
-                  <Facebook size={16} /> Facebook
-                </a>
-              </div>
             </div>
 
             {/* Google Maps Location Embed */}
@@ -192,24 +193,33 @@ const ContactPage = () => {
               padding: '1.25rem',
               textAlign: 'center'
             }}>
-              <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--color-emerald)', marginBottom: '0.8rem' }}>
-                Restaurant Location Map
-              </h4>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.8rem' }}>
+                <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--color-emerald)', margin: 0 }}>
+                  📍 Restaurant Google Maps Location
+                </h4>
+                <a
+                  href="https://maps.google.com/?q=Sinnar+Gaurav,+Near+Panchvati+Hotel,+Sinnar"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-gold)' }}
+                >
+                  Open Maps ➔
+                </a>
+              </div>
               <div style={{
-                height: '220px',
+                height: '240px',
                 borderRadius: '16px',
                 overflow: 'hidden',
-                marginBottom: '1rem',
                 border: '1px solid var(--color-border)'
               }}>
                 <iframe
-                  title="Dakshin Bhavan Google Maps Location"
+                  title="Dosa Junction Sinnar Google Maps Location"
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}
                   loading="lazy"
                   allowFullScreen
-                  src="https://maps.google.com/maps?q=Indiranagar+100+Feet+Road+Bengaluru&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                  src="https://maps.google.com/maps?q=Sinnar+Gaurav,+Near+Panchvati+Hotel,+Sinnar&t=&z=15&ie=UTF8&iwloc=&output=embed"
                 />
               </div>
             </div>
@@ -218,16 +228,16 @@ const ContactPage = () => {
           {/* Right Column: Contact Form */}
           <div style={{
             backgroundColor: '#FFFFFF',
-            padding: '2.25rem',
+            padding: '2rem',
             borderRadius: '24px',
             boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
             border: '1px solid var(--color-border)'
           }}>
             <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.6rem', color: 'var(--color-emerald)', marginBottom: '0.4rem' }}>
-              Send Us an Enquiry
+              Send Us a Message
             </h3>
             <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>
-              Fill out the form below to reach our restaurant management directly.
+              Have questions about bulk orders, party catering, or feedback? Send us a quick note.
             </p>
 
             {submitted ? (
@@ -240,8 +250,8 @@ const ContactPage = () => {
                 color: '#065F46'
               }}>
                 <CheckCircle2 size={48} color="#059669" style={{ margin: '0 auto 0.75rem auto' }} />
-                <h4 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '0.5rem' }}>Enquiry Saved!</h4>
-                <p style={{ fontSize: '0.9rem' }}>Thank you for reaching out. We will call or email you shortly.</p>
+                <h4 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '0.5rem' }}>Enquiry Sent!</h4>
+                <p style={{ fontSize: '0.9rem' }}>Thank you for reaching out. We will get back to you shortly.</p>
                 <button
                   onClick={() => setSubmitted(false)}
                   className="btn btn-primary btn-sm"
@@ -263,7 +273,7 @@ const ContactPage = () => {
                     className="form-input"
                     style={{ borderColor: errors.name ? '#EF4444' : undefined }}
                   />
-                  {errors.name && <span className="form-error">{errors.name}</span>}
+                  {errors.name && <span style={{ color: '#EF4444', fontSize: '0.78rem', display: 'block', marginTop: '4px' }}>{errors.name}</span>}
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
@@ -277,7 +287,7 @@ const ContactPage = () => {
                       className="form-input"
                       style={{ borderColor: errors.phone ? '#EF4444' : undefined }}
                     />
-                    {errors.phone && <span className="form-error">{errors.phone}</span>}
+                    {errors.phone && <span style={{ color: '#EF4444', fontSize: '0.78rem', display: 'block', marginTop: '4px' }}>{errors.phone}</span>}
                   </div>
 
                   <div>
@@ -290,7 +300,7 @@ const ContactPage = () => {
                       className="form-input"
                       style={{ borderColor: errors.email ? '#EF4444' : undefined }}
                     />
-                    {errors.email && <span className="form-error">{errors.email}</span>}
+                    {errors.email && <span style={{ color: '#EF4444', fontSize: '0.78rem', display: 'block', marginTop: '4px' }}>{errors.email}</span>}
                   </div>
                 </div>
 
@@ -300,11 +310,11 @@ const ContactPage = () => {
                     type="text"
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                    placeholder="e.g. Party Catering / Table Reservation"
+                    placeholder="e.g. Catering / Order Enquiry"
                     className="form-input"
                     style={{ borderColor: errors.subject ? '#EF4444' : undefined }}
                   />
-                  {errors.subject && <span className="form-error">{errors.subject}</span>}
+                  {errors.subject && <span style={{ color: '#EF4444', fontSize: '0.78rem', display: 'block', marginTop: '4px' }}>{errors.subject}</span>}
                 </div>
 
                 <div>
@@ -317,7 +327,7 @@ const ContactPage = () => {
                     className="form-input"
                     style={{ borderColor: errors.message ? '#EF4444' : undefined }}
                   />
-                  {errors.message && <span className="form-error">{errors.message}</span>}
+                  {errors.message && <span style={{ color: '#EF4444', fontSize: '0.78rem', display: 'block', marginTop: '4px' }}>{errors.message}</span>}
                 </div>
 
                 <button
@@ -326,7 +336,7 @@ const ContactPage = () => {
                   className="btn btn-primary"
                   style={{ width: '100%', padding: '0.85rem', fontWeight: 800, marginTop: '0.4rem' }}
                 >
-                  {submitting ? 'Submitting...' : 'Submit Enquiry'} <Send size={18} />
+                  {submitting ? 'Submitting...' : 'Submit Message'} <Send size={18} />
                 </button>
 
               </form>

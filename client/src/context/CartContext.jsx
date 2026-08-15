@@ -1,49 +1,15 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { useToast } from './ToastContext';
 import { apiService } from '../services/api';
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState(() => {
-    try {
-      const saved = localStorage.getItem('dakshin_cart');
-      return saved ? JSON.parse(saved) : [];
-    } catch (e) {
-      return [];
-    }
-  });
-
-  const [appliedCoupon, setAppliedCoupon] = useState(() => {
-    try {
-      const saved = localStorage.getItem('dakshin_coupon');
-      return saved ? JSON.parse(saved) : null;
-    } catch (e) {
-      return null;
-    }
-  });
+  // Do not persist old added cart items across page refresh as requested by user
+  const [cartItems, setCartItems] = useState([]);
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
 
   const { addToast } = useToast();
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('dakshin_cart', JSON.stringify(cartItems));
-    } catch (e) {
-      console.error('Failed to sync cart to localStorage', e);
-    }
-  }, [cartItems]);
-
-  useEffect(() => {
-    try {
-      if (appliedCoupon) {
-        localStorage.setItem('dakshin_coupon', JSON.stringify(appliedCoupon));
-      } else {
-        localStorage.removeItem('dakshin_coupon');
-      }
-    } catch (e) {
-      console.error('Failed to sync coupon to localStorage', e);
-    }
-  }, [appliedCoupon]);
 
   const addToCart = (item, quantity = 1) => {
     setCartItems((prev) => {
