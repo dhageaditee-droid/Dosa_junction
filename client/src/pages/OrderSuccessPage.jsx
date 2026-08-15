@@ -88,6 +88,18 @@ const OrderSuccessPage = () => {
 
           {/* Action Buttons */}
           <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+            <a
+              href={`https://wa.me/917020758779?text=${encodeURIComponent(
+                `Hello Dosa Junction! 🥞 I just placed a new order!\n\n📋 Order #${orderNumber}\n👤 Customer Name: ${order?.customer_name || 'Customer'}\n📞 Mobile: ${order?.customer_phone || ''}\n🚚 Order Type: ${order?.order_type || 'Home Delivery'}\n💰 Total Bill: ₹${parseFloat(order?.total_amount || 0).toFixed(2)}\n\nPlease confirm my order! Thank you!`
+              )}`}
+              target="_blank"
+              rel="noreferrer"
+              className="btn"
+              style={{ backgroundColor: '#25D366', color: '#FFFFFF', padding: '0.75rem 1.6rem', fontWeight: 800, borderRadius: '12px' }}
+            >
+              📲 Send Order to Kitchen on WhatsApp
+            </a>
+
             <button
               onClick={() => navigate(`/track-order?orderNumber=${orderNumber}`)}
               className="btn btn-primary"

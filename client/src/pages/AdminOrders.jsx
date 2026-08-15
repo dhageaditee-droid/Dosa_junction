@@ -43,7 +43,22 @@ const AdminOrders = () => {
       if (search.trim()) params.append('search', search.trim());
 
       const res = await apiService.getAdminOrders(params.toString());
-      if (res.orders) setOrders(res.orders);
+      let fetchedOrders = res.orders || [];
+
+      // If searching for a specific order number like ORD-171676
+      if (search.trim() && search.trim().toUpperCase().startsWith('ORD-')) {
+        const foundLocal = fetchedOrders.find(o => o.order_number && o.order_number.toUpperCase() === search.trim().toUpperCase());
+        if (!foundLocal) {
+          try {
+            const trackRes = await apiService.trackOrder(search.trim().toUpperCase());
+            if (trackRes && trackRes.order) {
+              fetchedOrders = [trackRes.order, ...fetchedOrders];
+            }
+          } catch (err) {}
+        }
+      }
+
+      setOrders(fetchedOrders);
     } catch (e) {
       if (showLoading && addToast) addToast('Failed to load admin orders list', 'error');
     } finally {
