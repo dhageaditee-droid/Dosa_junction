@@ -1,11 +1,9 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Utensils, Tag, ShoppingBag, PackageCheck } from 'lucide-react';
-import { useCart } from '../context/CartContext';
+import { Home, Utensils, Tag, PhoneCall, PackageCheck } from 'lucide-react';
 
 const MobileBottomNav = () => {
   const location = useLocation();
-  const { cartCount } = useCart();
 
   // Hide on admin routes
   if (location.pathname.startsWith('/admin')) {
@@ -16,7 +14,7 @@ const MobileBottomNav = () => {
     { label: 'Home', path: '/', icon: Home },
     { label: 'Menu', path: '/menu', icon: Utensils },
     { label: 'Offers', path: '/offers', icon: Tag },
-    { label: 'Cart', path: '/cart', icon: ShoppingBag, badge: cartCount },
+    { label: 'Contact', path: '/contact', icon: PhoneCall },
     { label: 'Orders', path: '/my-orders', icon: PackageCheck }
   ];
 
@@ -56,29 +54,8 @@ const MobileBottomNav = () => {
                 width: '20%'
               }}
             >
-              <div style={{ position: 'relative' }}>
+              <div>
                 <Icon size={20} color={isActive ? 'var(--color-gold)' : 'var(--color-emerald)'} />
-                {item.badge > 0 && (
-                  <span
-                    style={{
-                      position: 'absolute',
-                      top: '-5px',
-                      right: '-8px',
-                      backgroundColor: 'var(--color-saffron)',
-                      color: '#FFF',
-                      fontSize: '0.62rem',
-                      fontWeight: 800,
-                      width: '16px',
-                      height: '16px',
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}
-                  >
-                    {item.badge}
-                  </span>
-                )}
               </div>
               <span style={{ fontSize: '0.7rem', fontWeight: isActive ? 700 : 500 }}>
                 {item.label}
