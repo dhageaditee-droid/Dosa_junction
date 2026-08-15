@@ -180,15 +180,29 @@ const AdminDashboard = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {recentOrders.map((ord) => {
+                      {recentOrders.map((ord, index) => {
                         const isExpanded = expandedOrders[ord.id];
                         const itemsList = ord.items || [];
                         const itemCount = itemsList.length;
 
+                        // Format Order Time
+                        const orderDateObj = ord.created_at ? new Date(ord.created_at) : new Date();
+                        const orderTimeStr = orderDateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+                        const orderDateStr = orderDateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+
                         return (
                           <tr key={ord.id}>
-                            <td style={{ fontFamily: 'monospace', fontWeight: 800, color: 'var(--color-emerald)', whiteSpace: 'nowrap' }}>
-                              {ord.order_number}
+                            <td style={{ whiteSpace: 'nowrap' }}>
+                              <div style={{ fontWeight: 800, color: 'var(--color-emerald)', fontSize: '1rem' }}>
+                                #{index + 1}
+                              </div>
+                              <div style={{ fontFamily: 'monospace', fontSize: '0.75rem', color: 'var(--color-gold)', fontWeight: 700 }}>
+                                {ord.order_number}
+                              </div>
+                              <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '3px', marginTop: '2px' }}>
+                                <Clock size={12} color="var(--color-gold)" />
+                                <span>{orderTimeStr} ({orderDateStr})</span>
+                              </div>
                             </td>
                             <td>{ord.customer_name}</td>
                             <td>{ord.customer_phone}</td>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingBag, Search, Filter, RefreshCw, Eye, X, Printer, CheckCircle, Ban, DollarSign, ChevronDown, ChevronUp, Package, MessageCircle } from 'lucide-react';
+import { ShoppingBag, Search, Filter, RefreshCw, Eye, X, Printer, CheckCircle, Ban, DollarSign, ChevronDown, ChevronUp, Package, Clock } from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
 import StatusBadge from '../components/StatusBadge';
 import SkeletonLoader from '../components/SkeletonLoader';
@@ -43,22 +43,7 @@ const AdminOrders = () => {
       if (search.trim()) params.append('search', search.trim());
 
       const res = await apiService.getAdminOrders(params.toString());
-      let fetchedOrders = res.orders || [];
-
-      // If searching for a specific order number like ORD-171676
-      if (search.trim() && search.trim().toUpperCase().startsWith('ORD-')) {
-        const foundLocal = fetchedOrders.find(o => o.order_number && o.order_number.toUpperCase() === search.trim().toUpperCase());
-        if (!foundLocal) {
-          try {
-            const trackRes = await apiService.trackOrder(search.trim().toUpperCase());
-            if (trackRes && trackRes.order) {
-              fetchedOrders = [trackRes.order, ...fetchedOrders];
-            }
-          } catch (err) {}
-        }
-      }
-
-      setOrders(fetchedOrders);
+      if (res.orders) setOrders(res.orders);
     } catch (e) {
       if (showLoading && addToast) addToast('Failed to load admin orders list', 'error');
     } finally {
@@ -73,31 +58,11 @@ const AdminOrders = () => {
     }));
   };
 
-  const sendWhatsAppConfirmation = (ord, statusName = 'Confirmed') => {
-    if (!ord) return;
-    const rawPhone = (ord.customer_phone || '').replace(/[^0-9]/g, '');
-    if (!rawPhone) return;
-    const phoneNum = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone;
-
-    const message = `Hello ${ord.customer_name || 'Customer'}! 🎉 Your Dosa Junction order *#${ord.order_number}* is now *${statusName.toUpperCase()}*!\n\n📋 Ordered Items:\n` +
-      (ord.items ? ord.items.map(i => `• ${i.quantity}x ${cleanDishName(i.item_name)}`).join('\n') : '') +
-      `\n\n💰 Total Bill: ₹${parseFloat(ord.total_amount || 0).toFixed(2)}\n🚚 Order Type: ${ord.order_type || 'Home Delivery'}\n\nTrack your order live status here: https://dosa-junction.vercel.app/track/${ord.order_number}\n\nThank you for ordering with Dosa Junction! 🥞☕`;
-
-    const waUrl = `https://wa.me/${phoneNum}?text=${encodeURIComponent(message)}`;
-    window.open(waUrl, '_blank');
-  };
-
   const handleStatusUpdate = async (orderId, newStatus) => {
     try {
       const res = await apiService.updateOrderStatus(orderId, newStatus);
       if (res.success) {
         if (addToast) addToast(`Order status updated to "${newStatus}"`, 'success');
-        
-        const targetOrder = orders.find(o => String(o.id) === String(orderId) || o.order_number === orderId);
-        if (targetOrder) {
-          sendWhatsAppConfirmation(targetOrder, newStatus);
-        }
-
         fetchOrders();
         if (selectedOrder && selectedOrder.id === orderId) {
           setSelectedOrder(prev => ({ ...prev, status: newStatus }));
@@ -176,25 +141,9 @@ const AdminOrders = () => {
             </p>
           </div>
 
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <input
-              type="text"
-              placeholder="Enter Order # (e.g. ORD-921219)"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={{
-                padding: '0.45rem 0.85rem',
-                borderRadius: '8px',
-                border: '1px solid var(--color-border)',
-                fontSize: '0.85rem',
-                outline: 'none',
-                backgroundColor: '#FFFFFF'
-              }}
-            />
-            <button onClick={() => fetchOrders(true)} className="btn btn-primary btn-sm" style={{ padding: '0.45rem 1rem' }}>
-              <RefreshCw size={16} /> Sync Live Orders
-            </button>
-          </div>
+          <button onClick={fetchOrders} className="btn btn-outline btn-sm" style={{ backgroundColor: '#FFFFFF' }}>
+            <RefreshCw size={16} /> Sync Live Orders
+          </button>
         </div>
 
         {/* Filter Controls */}
@@ -304,15 +253,29 @@ const AdminOrders = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {orders.map((ord) => {
+                  {orders.map((ord, index) => {
                     const isExpanded = expandedOrders[ord.id];
                     const itemsList = ord.items || [];
                     const itemCount = itemsList.length;
 
+                    // Format Order Time
+                    const orderDateObj = ord.created_at ? new Date(ord.created_at) : new Date();
+                    const orderTimeStr = orderDateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+                    const orderDateStr = orderDateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+
                     return (
                       <tr key={ord.id}>
-                        <td style={{ fontFamily: 'monospace', fontWeight: 800, color: 'var(--color-emerald)', whiteSpace: 'nowrap' }}>
-                          {ord.order_number}
+                        <td style={{ whiteSpace: 'nowrap' }}>
+                          <div style={{ fontWeight: 800, color: 'var(--color-emerald)', fontSize: '1.05rem' }}>
+                            #{index + 1}
+                          </div>
+                          <div style={{ fontFamily: 'monospace', fontSize: '0.75rem', color: 'var(--color-gold)', fontWeight: 700 }}>
+                            {ord.order_number}
+                          </div>
+                          <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '3px', marginTop: '2px' }}>
+                            <Clock size={12} color="var(--color-gold)" />
+                            <span>{orderTimeStr} ({orderDateStr})</span>
+                          </div>
                         </td>
                         <td>
                           <div style={{ fontWeight: 800, color: 'var(--color-emerald)' }}>{ord.customer_name}</div>
@@ -441,14 +404,6 @@ const AdminOrders = () => {
                               style={{ padding: '4px 8px', backgroundColor: '#F1F5F9', borderRadius: '6px', color: '#475569', border: 'none', cursor: 'pointer' }}
                             >
                               <Printer size={15} />
-                            </button>
-
-                            <button
-                              onClick={() => sendWhatsAppConfirmation(ord, ord.status || 'Confirmed')}
-                              title="Send WhatsApp Confirmation to Customer"
-                              style={{ padding: '4px 8px', backgroundColor: '#DCFCE7', borderRadius: '6px', color: '#16A34A', border: 'none', cursor: 'pointer' }}
-                            >
-                              <MessageCircle size={15} />
                             </button>
 
                             {ord.payment_status !== 'PAID' && (

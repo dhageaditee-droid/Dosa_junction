@@ -1,129 +1,11 @@
 import { FALLBACK_CATEGORIES, FALLBACK_MENU_ITEMS } from '../data/fallbackData';
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
-const WEBHOOK_SYNC_POST = 'https://webhook.site/ec62d034-0a31-4911-bed6-37c9031734d9';
-const WEBHOOK_SYNC_GET = 'https://webhook.site/token/ec62d034-0a31-4911-bed6-37c9031734d9/requests?per_page=100';
-const CRUDCRUD_API = 'https://crudcrud.com/api/d7859bc94403407b978b67acd4623a5d/orders';
+const LIVE_VERCEL_API = 'https://dosa-junction.vercel.app/api/orders';
 
 const INITIAL_DEMO_ORDERS = [
   {
-    id: 106,
-    order_number: 'ORD-921219',
-    customer_name: 'Satvik dhage',
-    customer_phone: '+91 98234 56789',
-    customer_email: 'satvik@example.com',
-    delivery_address: 'Sinnar Gaurav, Near Panchvati Hotel, Sinnar',
-    order_type: 'Home Delivery',
-    payment_method: 'Cash on Delivery',
-    payment_status: 'PENDING',
-    status: 'Pending',
-    subtotal: 160.00,
-    tax: 8.00,
-    packing_charge: 15.00,
-    delivery_charge: 30.00,
-    discount_amount: 0.00,
-    total_amount: 213.00,
-    items: [
-      { menuItemId: 10, item_name: 'Masala Dosa', price: 80.00, quantity: 2, subtotal: 160.00 }
-    ],
-    created_at: new Date().toISOString()
-  },
-  {
-    id: 105,
-    order_number: 'ORD-862943',
-    customer_name: 'Aditee Dhage',
-    customer_phone: '+91 91580 75480',
-    customer_email: 'aditee@example.com',
-    delivery_address: 'Sinnar Gaurav, Near Panchvati Hotel, Sinnar',
-    order_type: 'Home Delivery',
-    payment_method: 'Cash on Delivery',
-    payment_status: 'PENDING',
-    status: 'Confirmed',
-    subtotal: 215.50,
-    tax: 10.00,
-    packing_charge: 15.00,
-    delivery_charge: 25.00,
-    discount_amount: 0.00,
-    total_amount: 265.50,
-    items: [
-      { menuItemId: 2, item_name: 'Filter Coffee', price: 25.00, quantity: 1, subtotal: 25.00 },
-      { menuItemId: 10, item_name: 'Ghee Masala Dosa', price: 110.00, quantity: 1, subtotal: 110.00 },
-      { menuItemId: 15, item_name: 'Loni Sponge Dosa', price: 80.00, quantity: 1, subtotal: 80.00 }
-    ],
-    created_at: new Date(Date.now() - 10 * 60 * 1000).toISOString()
-  },
-  {
     id: 104,
-    order_number: 'ORD-214207',
-    customer_name: 'Aditee Dhage',
-    customer_phone: '+91 91580 75480',
-    customer_email: 'aditee@example.com',
-    delivery_address: 'Sinnar Gaurav, Near Panchvati Hotel, Sinnar',
-    order_type: 'Home Delivery',
-    payment_method: 'Cash on Delivery',
-    payment_status: 'PENDING',
-    status: 'Confirmed',
-    subtotal: 145.00,
-    tax: 6.75,
-    packing_charge: 15.00,
-    delivery_charge: 20.00,
-    discount_amount: 0.00,
-    total_amount: 186.75,
-    items: [
-      { menuItemId: 25, item_name: 'Ghee Mysore Masala Dosa', price: 115.00, quantity: 1, subtotal: 115.00 },
-      { menuItemId: 1, item_name: 'Chaha', price: 30.00, quantity: 1, subtotal: 30.00 }
-    ],
-    created_at: new Date(Date.now() - 25 * 60 * 1000).toISOString()
-  },
-  {
-    id: 103,
-    order_number: 'ORD-374466',
-    customer_name: 'Pramod',
-    customer_phone: '+91 91462 57405',
-    customer_email: 'pramod@example.com',
-    delivery_address: 'Main Road, Sinnar',
-    order_type: 'Home Delivery',
-    payment_method: 'Pay at Restaurant',
-    payment_status: 'PENDING',
-    status: 'Confirmed',
-    subtotal: 110.00,
-    tax: 5.50,
-    packing_charge: 15.00,
-    delivery_charge: 14.50,
-    discount_amount: 0.00,
-    total_amount: 145.00,
-    items: [
-      { menuItemId: 1, item_name: 'South Indian Dish', price: 25.00, quantity: 1, subtotal: 25.00 },
-      { menuItemId: 2, item_name: 'Filter Coffee', price: 25.00, quantity: 1, subtotal: 25.00 },
-      { menuItemId: 3, item_name: 'Medu Vada (2 Pcs)', price: 60.00, quantity: 1, subtotal: 60.00 }
-    ],
-    created_at: new Date(Date.now() - 40 * 60 * 1000).toISOString()
-  },
-  {
-    id: 102,
-    order_number: 'ORD-617706',
-    customer_name: 'Pramod',
-    customer_phone: '+91 91462 57405',
-    customer_email: 'pramod@example.com',
-    delivery_address: 'Main Road, Sinnar',
-    order_type: 'Home Delivery',
-    payment_method: 'Pay at Restaurant',
-    payment_status: 'PENDING',
-    status: 'Pending',
-    subtotal: 90.00,
-    tax: 5.00,
-    packing_charge: 15.00,
-    delivery_charge: 5.00,
-    discount_amount: 0.00,
-    total_amount: 115.00,
-    items: [
-      { menuItemId: 4, item_name: 'Black Tea', price: 15.00, quantity: 1, subtotal: 15.00 },
-      { menuItemId: 5, item_name: 'Plain Dosa', price: 75.00, quantity: 1, subtotal: 75.00 }
-    ],
-    created_at: new Date(Date.now() - 60 * 60 * 1000).toISOString()
-  },
-  {
-    id: 101,
     order_number: 'ORD-924536',
     customer_name: 'Dhanshri Wale',
     customer_phone: '+91 91580 75480',
@@ -144,13 +26,83 @@ const INITIAL_DEMO_ORDERS = [
       { menuItemId: 10, item_name: 'Ghee Masala Dosa', price: 110.00, quantity: 1, subtotal: 110.00 },
       { menuItemId: 15, item_name: 'Loni Sponge Dosa (3 Pcs)', price: 80.00, quantity: 1, subtotal: 80.00 }
     ],
-    created_at: new Date(Date.now() - 90 * 60 * 1000).toISOString()
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 101,
+    order_number: 'ORD-20260815-4829',
+    customer_name: 'Aditee Kumar',
+    customer_phone: '+91 70207 58779',
+    customer_email: 'aditee@example.com',
+    delivery_address: 'Sinnar Gaurav, Near Panchvati Hotel, Sinnar',
+    order_type: 'Home Delivery',
+    payment_method: 'Cash on Delivery',
+    payment_status: 'PAID',
+    status: 'Confirmed',
+    subtotal: 185.00,
+    tax: 9.25,
+    packing_charge: 15.00,
+    delivery_charge: 0.00,
+    discount_amount: 0.00,
+    total_amount: 209.25,
+    items: [
+      { menuItemId: 10, item_name: 'Ghee Masala Dosa', price: 110.00, quantity: 1, subtotal: 110.00 },
+      { menuItemId: 1, item_name: 'Chaha', price: 15.00, quantity: 1, subtotal: 15.00 },
+      { menuItemId: 2, item_name: 'Filter Coffee', price: 25.00, quantity: 2, subtotal: 50.00 }
+    ],
+    created_at: new Date(Date.now() - 15 * 60 * 1000).toISOString()
+  },
+  {
+    id: 102,
+    order_number: 'ORD-20260815-5912',
+    customer_name: 'Rohan Sharma',
+    customer_phone: '+91 98234 56789',
+    customer_email: 'rohan@example.com',
+    delivery_address: 'Main Market, Sinnar',
+    order_type: 'Takeaway',
+    payment_method: 'UPI / Online',
+    payment_status: 'PAID',
+    status: 'Preparing',
+    subtotal: 140.00,
+    tax: 7.00,
+    packing_charge: 15.00,
+    delivery_charge: 0.00,
+    discount_amount: 0.00,
+    total_amount: 162.00,
+    items: [
+      { menuItemId: 20, item_name: 'Paper Masala Dosa', price: 100.00, quantity: 1, subtotal: 100.00 },
+      { menuItemId: 30, item_name: 'Sambar Vada (2 Pcs)', price: 40.00, quantity: 1, subtotal: 40.00 }
+    ],
+    created_at: new Date(Date.now() - 45 * 60 * 1000).toISOString()
+  },
+  {
+    id: 103,
+    order_number: 'ORD-20260815-6301',
+    customer_name: 'Priya Patel',
+    customer_phone: '+91 91580 12345',
+    customer_email: 'priya@example.com',
+    delivery_address: 'Panchvati Hotel Lane, Sinnar',
+    order_type: 'Dine-In',
+    payment_method: 'Cash / Pay at Restaurant',
+    payment_status: 'PENDING',
+    status: 'Pending',
+    subtotal: 210.00,
+    tax: 10.50,
+    packing_charge: 0.00,
+    delivery_charge: 0.00,
+    discount_amount: 0.00,
+    total_amount: 220.50,
+    items: [
+      { menuItemId: 15, item_name: 'Loni Sponge Dosa (3 Pcs)', price: 90.00, quantity: 1, subtotal: 90.00 },
+      { menuItemId: 25, item_name: 'Special Mysore Masala Dosa', price: 120.00, quantity: 1, subtotal: 120.00 }
+    ],
+    created_at: new Date(Date.now() - 5 * 60 * 1000).toISOString()
   }
 ];
 
-// Helper to push order to global cloud store (100% CORS-friendly Cloud DB + Webhook Relay)
+// Helper to push order to Vercel Serverless Function & LocalStorage
 const pushOrderToCloudSync = async (newOrder) => {
-  // 1. Save to LocalStorage
+  // 1. Save to LocalStorage for offline resilience
   try {
     const allSaved = JSON.parse(localStorage.getItem('dakshin_all_orders') || '[]');
     const updatedLocal = [newOrder, ...allSaved.filter(o => o.order_number !== newOrder.order_number)];
@@ -158,61 +110,54 @@ const pushOrderToCloudSync = async (newOrder) => {
     localStorage.setItem('dakshin_my_orders', JSON.stringify(updatedLocal));
   } catch (e) {}
 
-  // 2. Post to CrudCrud Cloud DB
+  // 2. Post to Live Vercel Serverless API (/api/orders)
   try {
-    await fetch(CRUDCRUD_API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newOrder)
-    });
-  } catch (e) {}
-
-  // 3. Post to 100% CORS-friendly Webhook Cloud Relay
-  try {
-    await fetch(WEBHOOK_SYNC_POST, {
+    await fetch(LIVE_VERCEL_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newOrder)
     });
   } catch (e) {
-    console.warn('Webhook order push failed:', e.message);
+    console.warn('Vercel API push failed:', e.message);
   }
+
+  // 3. Post to local Express server endpoint if reachable
+  try {
+    await fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newOrder)
+    });
+  } catch (e) {}
 };
 
-// Helper to fetch live orders from CrudCrud Cloud DB + Webhook Cloud Relay + LocalStorage + Demo Orders
+// Helper to fetch live orders from Vercel Serverless API + LocalStorage + Demo Orders
 const fetchOrdersFromCloudSync = async () => {
   const cloudOrders = [];
 
-  // 1. Fetch from CrudCrud Cloud DB
+  // 1. Fetch from Live Vercel API
   try {
-    const res = await fetch(CRUDCRUD_API);
+    const res = await fetch(LIVE_VERCEL_API);
     if (res.ok) {
       const data = await res.json();
-      if (Array.isArray(data)) {
-        data.forEach(ord => {
-          if (ord && ord.order_number) cloudOrders.push(ord);
-        });
+      if (data && data.orders && Array.isArray(data.orders)) {
+        data.orders.forEach(o => cloudOrders.push(o));
       }
     }
   } catch (e) {}
 
-  // 2. Fetch from 100% working Webhook Cloud Relay
+  // 2. Fetch from Local Express API if available
   try {
-    const res = await fetch(WEBHOOK_SYNC_GET);
+    const res = await fetch('/api/orders/admin/all');
     if (res.ok) {
       const data = await res.json();
-      if (data && data.data && Array.isArray(data.data)) {
-        data.data.forEach(req => {
-          try {
-            const ord = JSON.parse(req.content);
-            if (ord && ord.order_number) cloudOrders.push(ord);
-          } catch (err) {}
-        });
+      if (data && data.orders && Array.isArray(data.orders)) {
+        data.orders.forEach(o => cloudOrders.push(o));
       }
     }
   } catch (e) {}
 
-  // 2. Fetch from LocalStorage
+  // 3. Fetch from LocalStorage
   try {
     const localAll = JSON.parse(localStorage.getItem('dakshin_all_orders') || '[]');
     const localMy = JSON.parse(localStorage.getItem('dakshin_my_orders') || '[]');
@@ -221,7 +166,7 @@ const fetchOrdersFromCloudSync = async () => {
     });
   } catch (e) {}
 
-  // 3. Combine demo orders so table is never empty
+  // 4. Combine initial demo orders so table is never empty
   INITIAL_DEMO_ORDERS.forEach(o => cloudOrders.push(o));
 
   // Clean items & fix total_amount for any order that might have NaN or 0 total
@@ -277,6 +222,14 @@ const fetchOrdersFromCloudSync = async () => {
 
 // Helper to update status in cloud store
 const updateOrderStatusInCloudSync = async (orderId, newStatus, paymentStatus = null) => {
+  try {
+    await fetch(LIVE_VERCEL_API, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: orderId, status: newStatus, payment_status: paymentStatus })
+    });
+  } catch (e) {}
+
   try {
     const existing = await fetchOrdersFromCloudSync();
     const updated = existing.map(o => {
@@ -427,7 +380,7 @@ export const apiService = {
     }
   },
 
-  // Orders & Checkout (Supports Guaranteed Webhook Cloud Relay Sync)
+  // Orders & Checkout (Supports Vercel Realtime Serverless Sync)
   createOrder: async (orderData) => {
     const orderNum = `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
     const rawItems = orderData.items || [];
@@ -476,7 +429,7 @@ export const apiService = {
       created_at: new Date().toISOString()
     };
 
-    // Push order to global Webhook cloud store
+    // Always push order to Live Vercel API and local storage
     pushOrderToCloudSync(newOrder);
 
     try {
@@ -485,7 +438,7 @@ export const apiService = {
         return backendRes;
       }
     } catch (err) {
-      console.log('Backend offline or static Vercel build, order synced via Webhook Cloud Relay');
+      console.log('Backend offline or static Vercel build, order synced via Vercel Serverless Function');
     }
 
     return {
@@ -664,7 +617,7 @@ export const apiService = {
 
   getProfile: () => apiCall('/auth/profile'),
 
-  // Admin Portal APIs (Multi-Device Webhook Cloud Sync)
+  // Admin Portal APIs (Vercel Serverless Sync)
   getAdminStats: async () => {
     const cloudOrders = await fetchOrdersFromCloudSync();
     const totalRev = cloudOrders.reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
