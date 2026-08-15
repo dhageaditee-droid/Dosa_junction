@@ -6,19 +6,19 @@ import FoodDetailsModal from '../components/FoodDetailsModal';
 import SkeletonLoader from '../components/SkeletonLoader';
 import EmptyState from '../components/EmptyState';
 import SEOHead from '../components/SEOHead';
-import { apiService } from '../services/api';
+import { apiService, cleanDishName } from '../services/api';
 
 const DEFAULT_CATEGORIES = [
   { id: 'all', name: 'All Dishes', slug: 'all' },
-  { id: 'beverages', name: 'Tea & Beverages (चहा)', slug: 'beverages' },
-  { id: 'dosa', name: 'Dosa (डोसा)', slug: 'dosa' },
-  { id: 'special-dosa', name: 'Special Dosa (स्पेशल डोसा)', slug: 'special-dosa' },
-  { id: 'uttapam', name: 'Uttapam (उत्तापा)', slug: 'uttapam' },
-  { id: 'idli', name: 'Idli (इटली)', slug: 'idli' },
-  { id: 'vada', name: 'Vada (वडा)', slug: 'vada' },
-  { id: 'desserts', name: 'Sheera & Desserts (शिरा)', slug: 'desserts' },
-  { id: 'rice', name: 'Rice (राईस)', slug: 'rice' },
-  { id: 'extras', name: 'Extras (एक्स्ट्रा)', slug: 'extras' }
+  { id: 'beverages', name: 'Tea & Beverages', slug: 'beverages' },
+  { id: 'dosa', name: 'Dosa', slug: 'dosa' },
+  { id: 'special-dosa', name: 'Special Dosa', slug: 'special-dosa' },
+  { id: 'uttapam', name: 'Uttapam', slug: 'uttapam' },
+  { id: 'idli', name: 'Idli', slug: 'idli' },
+  { id: 'vada', name: 'Vada', slug: 'vada' },
+  { id: 'desserts', name: 'Sheera & Desserts', slug: 'desserts' },
+  { id: 'rice', name: 'Rice', slug: 'rice' },
+  { id: 'extras', name: 'Extras', slug: 'extras' }
 ];
 
 const POPULAR_SEARCH_TAGS = ['Masala Dosa', 'Ghee Special Dosa', 'Loni Sponge Dosa', 'Thatte Idli', 'Uttapam', 'Pineapple Sheera', 'Coffee'];
@@ -153,7 +153,7 @@ const MenuPage = () => {
       <div className="container">
         
         {/* Header & Search Bar */}
-        <div style={{ marginBottom: '2rem' }}>
+        <div style={{ marginBottom: '1.5rem' }}>
           <h1 style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--color-emerald)', fontFamily: 'var(--font-heading)', marginBottom: '0.4rem' }}>
             Our South Indian Menu
           </h1>
@@ -229,34 +229,11 @@ const MenuPage = () => {
                 {tag}
               </button>
             ))}
-
-            {recentSearches.length > 0 && (
-              <>
-                <span style={{ color: 'var(--color-text-muted)', fontWeight: 600, marginLeft: '8px' }}>Recent:</span>
-                {recentSearches.map((rec) => (
-                  <button
-                    key={rec}
-                    onClick={() => { setSearchQuery(rec); }}
-                    style={{
-                      backgroundColor: 'var(--color-cream-alt)',
-                      border: '1px solid var(--color-border)',
-                      color: 'var(--color-gold)',
-                      borderRadius: '12px',
-                      padding: '3px 10px',
-                      cursor: 'pointer',
-                      fontWeight: 600
-                    }}
-                  >
-                    {rec}
-                  </button>
-                ))}
-              </>
-            )}
           </div>
         </div>
 
         {/* Mobile Horizontally Scrollable Category Tabs */}
-        <div className="mobile-category-tabs" style={{ display: 'none', gap: '8px', overflowX: 'auto', paddingBottom: '1rem', marginBottom: '1rem' }}>
+        <div className="mobile-category-tabs" style={{ display: 'none', gap: '8px', overflowX: 'auto', paddingBottom: '0.8rem', marginBottom: '1.2rem' }}>
           {categories.map((cat) => (
             <button
               key={cat.slug}
@@ -275,7 +252,7 @@ const MenuPage = () => {
                 whiteSpace: 'nowrap'
               }}
             >
-              {cat.name}
+              {cleanDishName(cat.name)}
             </button>
           ))}
         </div>
@@ -321,7 +298,7 @@ const MenuPage = () => {
                         justifyContent: 'space-between'
                       }}
                     >
-                      <span>{cat.name}</span>
+                      <span>{cleanDishName(cat.name)}</span>
                       {isActiveCat && <Check size={16} color="#FFFFFF" />}
                     </button>
                   );
@@ -451,23 +428,6 @@ const MenuPage = () => {
                   Under ₹100
                 </button>
 
-                <button
-                  onClick={() => setPricePreset(prev => prev === 'under200' ? 'all' : 'under200')}
-                  style={{
-                    padding: '6px 12px',
-                    borderRadius: '20px',
-                    border: '1px solid',
-                    borderColor: pricePreset === 'under200' ? 'var(--color-emerald)' : 'var(--color-border)',
-                    backgroundColor: pricePreset === 'under200' ? 'var(--color-cream-alt)' : '#FFFFFF',
-                    color: pricePreset === 'under200' ? 'var(--color-emerald)' : 'var(--color-text)',
-                    fontWeight: 700,
-                    fontSize: '0.8rem',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Under ₹200
-                </button>
-
                 {/* Clear Filters Button */}
                 {activeFilterCount > 0 && (
                   <button
@@ -522,7 +482,7 @@ const MenuPage = () => {
             {loading ? (
               <SkeletonLoader count={6} type="card" />
             ) : items.length > 0 ? (
-              <div style={{
+              <div className="food-menu-grid" style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
                 gap: '1.5rem'
@@ -566,6 +526,15 @@ const MenuPage = () => {
           }
           .mobile-category-tabs {
             display: flex !important;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+          }
+          .mobile-category-tabs::-webkit-scrollbar {
+            display: none;
+          }
+          .food-menu-grid {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
+            gap: 0.85rem !important;
           }
         }
       `}</style>
