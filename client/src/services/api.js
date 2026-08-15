@@ -1,4 +1,6 @@
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import { FALLBACK_CATEGORIES, FALLBACK_MENU_ITEMS } from '../data/fallbackData';
+
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
 export const cleanDishName = (name) => {
   if (!name) return '';
@@ -36,17 +38,75 @@ export const apiCall = async (endpoint, method = 'GET', data = null, customToken
     }
     return result;
   } catch (error) {
-    console.error(`API_ERROR [${method} ${endpoint}]:`, error.message);
+    console.warn(`API Call failed [${method} ${endpoint}], attempting fallback:`, error.message);
     throw error;
   }
 };
 
-// Convenience API Service Methods
+// Convenience API Service Methods with Static Fallbacks for Vercel Deployment
 export const apiService = {
   // Menu & Categories
-  getMenu: (params = '') => apiCall(`/menu${params ? `?${params}` : ''}`),
-  getMenuItem: (id) => apiCall(`/menu/${id}`),
-  getCategories: () => apiCall('/categories'),
+  getMenu: async (paramsStr = '') => {
+    try {
+      return await apiCall(`/menu${paramsStr ? `?${paramsStr}` : ''}`);
+    } catch (err) {
+      console.log('Serving fallback menu data for Vercel static environment');
+      
+      const searchParams = new URLSearchParams(paramsStr);
+      const category = searchParams.get('category');
+      const search = searchParams.get('search');
+      const veg = searchParams.get('veg');
+      const bestseller = searchParams.get('bestseller');
+      const maxPrice = searchParams.get('maxPrice');
+
+      let filtered = [...FALLBACK_MENU_ITEMS];
+
+      if (category && category !== 'all') {
+        filtered = filtered.filter(i => i.category_slug === category);
+      }
+
+      if (search && search.trim()) {
+        const q = search.trim().toLowerCase();
+        filtered = filtered.filter(i => 
+          i.name.toLowerCase().includes(q) || 
+          i.description.toLowerCase().includes(q) ||
+          i.category_slug.toLowerCase().includes(q)
+        );
+      }
+
+      if (veg === 'true') {
+        filtered = filtered.filter(i => i.is_veg === true);
+      }
+
+      if (bestseller === 'true') {
+        filtered = filtered.filter(i => i.is_bestseller === true);
+      }
+
+      if (maxPrice) {
+        const maxP = parseFloat(maxPrice);
+        filtered = filtered.filter(i => i.price <= maxP);
+      }
+
+      return { success: true, count: filtered.length, items: filtered };
+    }
+  },
+
+  getMenuItem: async (id) => {
+    try {
+      return await apiCall(`/menu/${id}`);
+    } catch (err) {
+      const found = FALLBACK_MENU_ITEMS.find(i => i.id === parseInt(id, 10));
+      return { success: true, item: found || FALLBACK_MENU_ITEMS[0] };
+    }
+  },
+
+  getCategories: async () => {
+    try {
+      return await apiCall('/categories');
+    } catch (err) {
+      return { success: true, count: FALLBACK_CATEGORIES.length, categories: FALLBACK_CATEGORIES };
+    }
+  },
 
   // Orders & Coupons
   createOrder: (orderData) => apiCall('/orders', 'POST', orderData),
