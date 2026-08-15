@@ -241,17 +241,26 @@ export const apiService = {
   // Offers & Enquiries
   getOffers: async () => {
     try {
-      return await apiCall('/offers');
-    } catch (err) {
-      return {
-        success: true,
-        offers: [
-          { id: 1, title: 'Morning Special', description: 'Get 10% OFF on all Chaha, Idli & Medu Vada orders', code: 'BREAKFAST10', discount_percentage: 10, image_url: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80' },
-          { id: 2, title: 'Grand Dosa Festival', description: 'Flat 20% OFF on orders above ₹300', code: 'SOUTH20', discount_percentage: 20, image_url: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=600&q=80' },
-          { id: 3, title: 'Free Delivery Offer', description: 'Free home delivery on orders above ₹250', code: 'FREEDEL', discount_amount: 30, image_url: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=600&q=80' }
-        ]
-      };
-    }
+      const res = await apiCall('/offers');
+      if (res.offers && res.offers.length > 0) return res;
+    } catch (err) {}
+
+    return {
+      success: true,
+      offers: [
+        {
+          id: 1,
+          title: 'Buy 5 Masala Dosa & Get 1 Plain Dosa Free!',
+          description: 'Order 5 Masala Dosa and get 1 Plain Dosa (Worth ₹60) absolutely FREE!',
+          code: 'FREEPLAIN1',
+          discount_percentage: 0,
+          discount_amount: 60,
+          min_order_amount: 350,
+          image_url: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=800&q=80',
+          end_date: '2026-12-31'
+        }
+      ]
+    };
   },
 
   sendContactEnquiry: async (data) => {

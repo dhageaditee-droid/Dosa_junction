@@ -93,11 +93,9 @@ SELECT setval('menu_items_id_seq', 51, true);
 
 -- 4. Insert Offers
 INSERT INTO offers (id, title, description, code, discount_percentage, discount_amount, min_order_amount, image_url, start_date, end_date, is_active) VALUES
-(1, 'Morning Special', 'Get 10% OFF on all Chaha, Idli & Medu Vada orders', 'BREAKFAST10', 10.00, 0.00, 100.00, 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80', '2026-01-01', '2026-12-31', TRUE),
-(2, 'Grand Dosa Festival', 'Flat 20% OFF on orders above ₹300', 'SOUTH20', 20.00, 0.00, 300.00, 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=600&q=80', '2026-01-01', '2026-12-31', TRUE),
-(3, 'Free Delivery Offer', 'Free home delivery on orders above ₹250', 'FREEDEL', 0.00, 30.00, 250.00, 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=600&q=80', '2026-01-01', '2026-12-31', TRUE);
+(1, 'Buy 5 Masala Dosa & Get 1 Plain Dosa Free!', 'Order 5 Masala Dosa and get 1 Plain Dosa (Worth ₹60) absolutely FREE!', 'FREEPLAIN1', 0.00, 60.00, 350.00, 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=800&q=80', '2026-01-01', '2026-12-31', TRUE);
 
-SELECT setval('offers_id_seq', 3, true);
+SELECT setval('offers_id_seq', 1, true);
 
 -- 5. Insert Coupons
 INSERT INTO coupons (id, code, description, discount_type, discount_value, min_order_amount, max_discount_amount, start_date, expiry_date, is_active) VALUES
