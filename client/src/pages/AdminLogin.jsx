@@ -5,8 +5,8 @@ import { useAuth } from '../context/AuthContext';
 import SEOHead from '../components/SEOHead';
 
 const AdminLogin = () => {
-  const [email, setEmail] = useState('admin@dosajunction.com');
-  const [password, setPassword] = useState('Admin@123456');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 

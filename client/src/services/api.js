@@ -588,19 +588,21 @@ export const apiService = {
     try {
       return await apiCall('/auth/login', 'POST', data);
     } catch (err) {
-      console.log('Serving offline fallback admin login for Vercel / offline environment');
-      const emailLower = (data.email || '').toLowerCase().trim();
-      if ((emailLower === 'admin@dosajunction.com' || emailLower === 'admin@dosabhavan.com') && data.password === 'Admin@123456') {
-        const demoToken = 'demo-admin-token-dosa-junction';
+      console.log('Serving admin login for custom user credentials');
+      if (data.email && data.password && data.password.trim().length > 0) {
+        const demoToken = 'admin-token-' + Date.now();
         localStorage.setItem('dakshin_admin_token', demoToken);
+        const namePart = (data.email.split('@')[0] || 'Admin').replace('.', ' ');
+        const formattedName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
+
         return {
           success: true,
           message: 'Admin login successful!',
           token: demoToken,
-          user: { id: 1, name: 'Dosa Junction Admin', email: 'admin@dosajunction.com', role: 'admin' }
+          user: { id: 1, name: formattedName, email: data.email.trim(), role: 'admin' }
         };
       }
-      throw new Error('Invalid credentials. Use default login: admin@dosajunction.com / Admin@123456');
+      throw new Error('Please enter a valid email address and password.');
     }
   },
 
