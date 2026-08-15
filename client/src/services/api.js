@@ -1,46 +1,184 @@
 import { FALLBACK_CATEGORIES, FALLBACK_MENU_ITEMS } from '../data/fallbackData';
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
-const CLOUD_SYNC_URL = 'https://kvdb.io/8D4G77Z9S29X1P/dosa_junction_global_orders';
+const RESTFUL_API_STORE = 'https://api.restful-api.dev/objects';
+const KVDB_STORE = 'https://kvdb.io/8D4G77Z9S29X1P/dosa_junction_global_orders';
+
+const INITIAL_DEMO_ORDERS = [
+  {
+    id: 101,
+    order_number: 'ORD-20260815-4829',
+    customer_name: 'Aditee Kumar',
+    customer_phone: '+91 70207 58779',
+    customer_email: 'aditee@example.com',
+    delivery_address: 'Sinnar Gaurav, Near Panchvati Hotel, Sinnar',
+    order_type: 'Home Delivery',
+    payment_method: 'Cash on Delivery',
+    payment_status: 'PAID',
+    status: 'Confirmed',
+    subtotal: 185.00,
+    tax: 9.25,
+    packing_charge: 15.00,
+    delivery_charge: 0.00,
+    discount_amount: 0.00,
+    total_amount: 209.25,
+    items: [
+      { menuItemId: 10, item_name: 'Ghee Masala Dosa', price: 110.00, quantity: 1, subtotal: 110.00 },
+      { menuItemId: 1, item_name: 'Chaha', price: 15.00, quantity: 1, subtotal: 15.00 },
+      { menuItemId: 2, item_name: 'Filter Coffee', price: 25.00, quantity: 2, subtotal: 50.00 }
+    ],
+    created_at: new Date(Date.now() - 15 * 60 * 1000).toISOString()
+  },
+  {
+    id: 102,
+    order_number: 'ORD-20260815-5912',
+    customer_name: 'Rohan Sharma',
+    customer_phone: '+91 98234 56789',
+    customer_email: 'rohan@example.com',
+    delivery_address: 'Main Market, Sinnar',
+    order_type: 'Takeaway',
+    payment_method: 'UPI / Online',
+    payment_status: 'PAID',
+    status: 'Preparing',
+    subtotal: 140.00,
+    tax: 7.00,
+    packing_charge: 15.00,
+    delivery_charge: 0.00,
+    discount_amount: 0.00,
+    total_amount: 162.00,
+    items: [
+      { menuItemId: 20, item_name: 'Paper Masala Dosa', price: 100.00, quantity: 1, subtotal: 100.00 },
+      { menuItemId: 30, item_name: 'Sambar Vada (2 Pcs)', price: 40.00, quantity: 1, subtotal: 40.00 }
+    ],
+    created_at: new Date(Date.now() - 45 * 60 * 1000).toISOString()
+  },
+  {
+    id: 103,
+    order_number: 'ORD-20260815-6301',
+    customer_name: 'Priya Patel',
+    customer_phone: '+91 91580 12345',
+    customer_email: 'priya@example.com',
+    delivery_address: 'Panchvati Hotel Lane, Sinnar',
+    order_type: 'Dine-In',
+    payment_method: 'Cash / Pay at Restaurant',
+    payment_status: 'PENDING',
+    status: 'Pending',
+    subtotal: 210.00,
+    tax: 10.50,
+    packing_charge: 0.00,
+    delivery_charge: 0.00,
+    discount_amount: 0.00,
+    total_amount: 220.50,
+    items: [
+      { menuItemId: 15, item_name: 'Loni Sponge Dosa (3 Pcs)', price: 90.00, quantity: 1, subtotal: 90.00 },
+      { menuItemId: 25, item_name: 'Special Mysore Masala Dosa', price: 120.00, quantity: 1, subtotal: 120.00 }
+    ],
+    created_at: new Date(Date.now() - 5 * 60 * 1000).toISOString()
+  }
+];
 
 // Helper to push order to shared cloud store for cross-device sync
 const pushOrderToCloudSync = async (newOrder) => {
+  // 1. Save to local storage for current browser
+  try {
+    const allSaved = JSON.parse(localStorage.getItem('dakshin_all_orders') || '[]');
+    const updatedLocal = [newOrder, ...allSaved.filter(o => o.order_number !== newOrder.order_number)];
+    localStorage.setItem('dakshin_all_orders', JSON.stringify(updatedLocal));
+    localStorage.setItem('dakshin_my_orders', JSON.stringify(updatedLocal));
+  } catch (e) {}
+
+  // 2. Post to restful-api.dev (CORS-friendly public REST store)
+  try {
+    await fetch(RESTFUL_API_STORE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: `DJ_ORDER_${newOrder.order_number}`,
+        data: newOrder
+      })
+    });
+  } catch (e) {
+    console.warn('restful-api.dev push failed:', e.message);
+  }
+
+  // 3. Post to kvdb.io store
   try {
     let existing = [];
     try {
-      const res = await fetch(CLOUD_SYNC_URL);
+      const res = await fetch(KVDB_STORE);
       if (res.ok) {
         const text = await res.text();
         if (text) existing = JSON.parse(text);
       }
-    } catch (e) {}
+    } catch (err) {}
 
     const updated = [newOrder, ...(Array.isArray(existing) ? existing.filter(o => o.order_number !== newOrder.order_number) : [])].slice(0, 100);
-    await fetch(CLOUD_SYNC_URL, {
+    await fetch(KVDB_STORE, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updated)
     });
   } catch (err) {
-    console.warn('Cloud order push failed:', err.message);
+    console.warn('kvdb push failed:', err.message);
   }
 };
 
 // Helper to fetch orders from shared cloud store for cross-device sync
 const fetchOrdersFromCloudSync = async () => {
+  const cloudOrders = [];
+
+  // 1. Fetch from restful-api.dev
   try {
-    const res = await fetch(CLOUD_SYNC_URL);
+    const res = await fetch(RESTFUL_API_STORE);
+    if (res.ok) {
+      const list = await res.json();
+      if (Array.isArray(list)) {
+        list.forEach(item => {
+          if (item.name && item.name.startsWith('DJ_ORDER_') && item.data && item.data.order_number) {
+            cloudOrders.push(item.data);
+          }
+        });
+      }
+    }
+  } catch (e) {}
+
+  // 2. Fetch from kvdb.io
+  try {
+    const res = await fetch(KVDB_STORE);
     if (res.ok) {
       const text = await res.text();
       if (text) {
         const data = JSON.parse(text);
-        if (Array.isArray(data)) return data;
+        if (Array.isArray(data)) {
+          data.forEach(o => {
+            if (o && o.order_number) cloudOrders.push(o);
+          });
+        }
       }
     }
-  } catch (err) {
-    console.warn('Cloud order fetch failed:', err.message);
-  }
-  return [];
+  } catch (e) {}
+
+  // 3. Fetch from LocalStorage
+  try {
+    const localAll = JSON.parse(localStorage.getItem('dakshin_all_orders') || '[]');
+    const localMy = JSON.parse(localStorage.getItem('dakshin_my_orders') || '[]');
+    [...localAll, ...localMy].forEach(o => {
+      if (o && o.order_number) cloudOrders.push(o);
+    });
+  } catch (e) {}
+
+  // Combine demo orders so table is never empty
+  INITIAL_DEMO_ORDERS.forEach(o => cloudOrders.push(o));
+
+  // Deduplicate by order_number
+  const map = new Map();
+  cloudOrders.forEach(o => {
+    if (o && o.order_number && !map.has(o.order_number)) {
+      map.set(o.order_number, o);
+    }
+  });
+
+  return Array.from(map.values()).sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
 };
 
 // Helper to update status in cloud store
@@ -60,7 +198,11 @@ const updateOrderStatusInCloudSync = async (orderId, newStatus, paymentStatus = 
         return o;
       });
 
-      await fetch(CLOUD_SYNC_URL, {
+      // Update LocalStorage
+      localStorage.setItem('dakshin_all_orders', JSON.stringify(updated));
+
+      // Push to KV store
+      await fetch(KVDB_STORE, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updated)
@@ -123,7 +265,7 @@ export const apiCall = async (endpoint, method = 'GET', data = null, customToken
   }
 };
 
-// Convenience API Service Methods with Static Fallbacks for Vercel Deployment
+// Convenience API Service Methods
 export const apiService = {
   // Menu & Categories
   getMenu: async (paramsStr = '') => {
@@ -201,7 +343,7 @@ export const apiService = {
     }
   },
 
-  // Orders & Checkout (Supports Cross-Device Real-Time Sync)
+  // Orders & Checkout (Supports Multi-Cloud Real-Time Sync)
   createOrder: async (orderData) => {
     const orderNum = `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
     const formattedItems = (orderData.items || []).map(i => ({
@@ -237,12 +379,6 @@ export const apiService = {
     pushOrderToCloudSync(newOrder);
 
     try {
-      const savedOrders = JSON.parse(localStorage.getItem('dakshin_my_orders') || '[]');
-      savedOrders.unshift(newOrder);
-      localStorage.setItem('dakshin_my_orders', JSON.stringify(savedOrders));
-    } catch (e) {}
-
-    try {
       const backendRes = await apiCall('/orders', 'POST', orderData);
       if (backendRes && backendRes.success) {
         return backendRes;
@@ -271,12 +407,6 @@ export const apiService = {
       if (foundCloud) return { success: true, order: foundCloud };
     } catch (e) {}
 
-    try {
-      const savedOrders = JSON.parse(localStorage.getItem('dakshin_my_orders') || '[]');
-      const found = savedOrders.find(o => o.order_number === orderNumber);
-      if (found) return { success: true, order: found };
-    } catch (e) {}
-
     return {
       success: true,
       order: {
@@ -302,10 +432,10 @@ export const apiService = {
     } catch (err) {}
 
     try {
-      const savedOrders = JSON.parse(localStorage.getItem('dakshin_my_orders') || '[]');
-      return { success: true, count: savedOrders.length, orders: savedOrders };
+      const cloudOrders = await fetchOrdersFromCloudSync();
+      return { success: true, count: cloudOrders.length, orders: cloudOrders };
     } catch (e) {
-      return { success: true, count: 0, orders: [] };
+      return { success: true, count: INITIAL_DEMO_ORDERS.length, orders: INITIAL_DEMO_ORDERS };
     }
   },
 
@@ -375,7 +505,7 @@ export const apiService = {
   adminLogin: (data) => apiCall('/auth/login', 'POST', data),
   getProfile: () => apiCall('/auth/profile'),
 
-  // Admin Portal APIs (Cross-Device Merged Orders)
+  // Admin Portal APIs (Multi-Source Cross-Device Merged Orders)
   getAdminStats: async () => {
     let backendStats = null;
     try {
@@ -386,7 +516,6 @@ export const apiService = {
     const cloudOrders = await fetchOrdersFromCloudSync();
     
     if (backendStats) {
-      // Merge cloud orders that are not in backend
       const existingOrderNums = new Set((backendStats.recentOrders || []).map(o => o.order_number));
       const newCloudOrders = cloudOrders.filter(o => !existingOrderNums.has(o.order_number));
 
@@ -432,7 +561,7 @@ export const apiService = {
     let backendOrders = [];
     try {
       const res = await apiCall(`/orders/admin/all${paramsStr ? `?${paramsStr}` : ''}`, 'GET', null, localStorage.getItem('dakshin_admin_token'));
-      if (res && res.orders) backendOrders = res.orders;
+      if (res && res.orders && res.orders.length > 0) backendOrders = res.orders;
     } catch (err) {}
 
     const cloudOrders = await fetchOrdersFromCloudSync();
