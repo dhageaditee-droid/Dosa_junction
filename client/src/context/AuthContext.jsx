@@ -33,12 +33,13 @@ export const AuthProvider = ({ children }) => {
   const loginAdmin = async (email, password) => {
     try {
       const response = await apiService.adminLogin({ email, password });
-      if (response.success) {
+      if (response && response.success) {
+        const adminObj = response.admin || response.user || { name: 'Admin', email: email };
         setAdminToken(response.token);
-        setAdminUser(response.admin);
+        setAdminUser(adminObj);
         localStorage.setItem('dakshin_admin_token', response.token);
-        localStorage.setItem('dakshin_admin_user', JSON.stringify(response.admin));
-        if (addToast) addToast(`Welcome back, ${response.admin.name}!`, 'success');
+        localStorage.setItem('dakshin_admin_user', JSON.stringify(adminObj));
+        if (addToast) addToast(`Welcome back, ${adminObj.name || 'Admin'}!`, 'success');
         return { success: true };
       }
     } catch (err) {

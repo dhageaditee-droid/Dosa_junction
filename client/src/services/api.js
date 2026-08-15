@@ -586,7 +586,14 @@ export const apiService = {
 
   adminLogin: async (data) => {
     try {
-      return await apiCall('/auth/login', 'POST', data);
+      const res = await apiCall('/auth/login', 'POST', data);
+      if (res && res.success) {
+        return {
+          ...res,
+          admin: res.admin || res.user || { name: 'Admin', email: data.email }
+        };
+      }
+      return res;
     } catch (err) {
       console.log('Serving admin login for custom user credentials');
       if (data.email && data.password && data.password.trim().length > 0) {
@@ -594,12 +601,14 @@ export const apiService = {
         localStorage.setItem('dakshin_admin_token', demoToken);
         const namePart = (data.email.split('@')[0] || 'Admin').replace('.', ' ');
         const formattedName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
+        const adminObject = { id: 1, name: formattedName, email: data.email.trim(), role: 'admin' };
 
         return {
           success: true,
           message: 'Admin login successful!',
           token: demoToken,
-          user: { id: 1, name: formattedName, email: data.email.trim(), role: 'admin' }
+          admin: adminObject,
+          user: adminObject
         };
       }
       throw new Error('Please enter a valid email address and password.');
