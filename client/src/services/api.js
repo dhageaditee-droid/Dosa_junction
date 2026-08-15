@@ -6,7 +6,123 @@ const WEBHOOK_SYNC_GET = 'https://webhook.site/token/ec62d034-0a31-4911-bed6-37c
 
 const INITIAL_DEMO_ORDERS = [
   {
+    id: 106,
+    order_number: 'ORD-921219',
+    customer_name: 'Satvik dhage',
+    customer_phone: '+91 98234 56789',
+    customer_email: 'satvik@example.com',
+    delivery_address: 'Sinnar Gaurav, Near Panchvati Hotel, Sinnar',
+    order_type: 'Home Delivery',
+    payment_method: 'Cash on Delivery',
+    payment_status: 'PENDING',
+    status: 'Pending',
+    subtotal: 160.00,
+    tax: 8.00,
+    packing_charge: 15.00,
+    delivery_charge: 30.00,
+    discount_amount: 0.00,
+    total_amount: 213.00,
+    items: [
+      { menuItemId: 10, item_name: 'Masala Dosa', price: 80.00, quantity: 2, subtotal: 160.00 }
+    ],
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 105,
+    order_number: 'ORD-862943',
+    customer_name: 'Aditee Dhage',
+    customer_phone: '+91 91580 75480',
+    customer_email: 'aditee@example.com',
+    delivery_address: 'Sinnar Gaurav, Near Panchvati Hotel, Sinnar',
+    order_type: 'Home Delivery',
+    payment_method: 'Cash on Delivery',
+    payment_status: 'PENDING',
+    status: 'Confirmed',
+    subtotal: 215.50,
+    tax: 10.00,
+    packing_charge: 15.00,
+    delivery_charge: 25.00,
+    discount_amount: 0.00,
+    total_amount: 265.50,
+    items: [
+      { menuItemId: 2, item_name: 'Filter Coffee', price: 25.00, quantity: 1, subtotal: 25.00 },
+      { menuItemId: 10, item_name: 'Ghee Masala Dosa', price: 110.00, quantity: 1, subtotal: 110.00 },
+      { menuItemId: 15, item_name: 'Loni Sponge Dosa', price: 80.00, quantity: 1, subtotal: 80.00 }
+    ],
+    created_at: new Date(Date.now() - 10 * 60 * 1000).toISOString()
+  },
+  {
     id: 104,
+    order_number: 'ORD-214207',
+    customer_name: 'Aditee Dhage',
+    customer_phone: '+91 91580 75480',
+    customer_email: 'aditee@example.com',
+    delivery_address: 'Sinnar Gaurav, Near Panchvati Hotel, Sinnar',
+    order_type: 'Home Delivery',
+    payment_method: 'Cash on Delivery',
+    payment_status: 'PENDING',
+    status: 'Confirmed',
+    subtotal: 145.00,
+    tax: 6.75,
+    packing_charge: 15.00,
+    delivery_charge: 20.00,
+    discount_amount: 0.00,
+    total_amount: 186.75,
+    items: [
+      { menuItemId: 25, item_name: 'Ghee Mysore Masala Dosa', price: 115.00, quantity: 1, subtotal: 115.00 },
+      { menuItemId: 1, item_name: 'Chaha', price: 30.00, quantity: 1, subtotal: 30.00 }
+    ],
+    created_at: new Date(Date.now() - 25 * 60 * 1000).toISOString()
+  },
+  {
+    id: 103,
+    order_number: 'ORD-374466',
+    customer_name: 'Pramod',
+    customer_phone: '+91 91462 57405',
+    customer_email: 'pramod@example.com',
+    delivery_address: 'Main Road, Sinnar',
+    order_type: 'Home Delivery',
+    payment_method: 'Pay at Restaurant',
+    payment_status: 'PENDING',
+    status: 'Confirmed',
+    subtotal: 110.00,
+    tax: 5.50,
+    packing_charge: 15.00,
+    delivery_charge: 14.50,
+    discount_amount: 0.00,
+    total_amount: 145.00,
+    items: [
+      { menuItemId: 1, item_name: 'South Indian Dish', price: 25.00, quantity: 1, subtotal: 25.00 },
+      { menuItemId: 2, item_name: 'Filter Coffee', price: 25.00, quantity: 1, subtotal: 25.00 },
+      { menuItemId: 3, item_name: 'Medu Vada (2 Pcs)', price: 60.00, quantity: 1, subtotal: 60.00 }
+    ],
+    created_at: new Date(Date.now() - 40 * 60 * 1000).toISOString()
+  },
+  {
+    id: 102,
+    order_number: 'ORD-617706',
+    customer_name: 'Pramod',
+    customer_phone: '+91 91462 57405',
+    customer_email: 'pramod@example.com',
+    delivery_address: 'Main Road, Sinnar',
+    order_type: 'Home Delivery',
+    payment_method: 'Pay at Restaurant',
+    payment_status: 'PENDING',
+    status: 'Pending',
+    subtotal: 90.00,
+    tax: 5.00,
+    packing_charge: 15.00,
+    delivery_charge: 5.00,
+    discount_amount: 0.00,
+    total_amount: 115.00,
+    items: [
+      { menuItemId: 4, item_name: 'Black Tea', price: 15.00, quantity: 1, subtotal: 15.00 },
+      { menuItemId: 5, item_name: 'Plain Dosa', price: 75.00, quantity: 1, subtotal: 75.00 }
+    ],
+    created_at: new Date(Date.now() - 60 * 60 * 1000).toISOString()
+  },
+  {
+    id: 101,
     order_number: 'ORD-924536',
     customer_name: 'Dhanshri Wale',
     customer_phone: '+91 91580 75480',
@@ -27,77 +143,7 @@ const INITIAL_DEMO_ORDERS = [
       { menuItemId: 10, item_name: 'Ghee Masala Dosa', price: 110.00, quantity: 1, subtotal: 110.00 },
       { menuItemId: 15, item_name: 'Loni Sponge Dosa (3 Pcs)', price: 80.00, quantity: 1, subtotal: 80.00 }
     ],
-    created_at: new Date().toISOString()
-  },
-  {
-    id: 101,
-    order_number: 'ORD-20260815-4829',
-    customer_name: 'Aditee Kumar',
-    customer_phone: '+91 70207 58779',
-    customer_email: 'aditee@example.com',
-    delivery_address: 'Sinnar Gaurav, Near Panchvati Hotel, Sinnar',
-    order_type: 'Home Delivery',
-    payment_method: 'Cash on Delivery',
-    payment_status: 'PAID',
-    status: 'Confirmed',
-    subtotal: 185.00,
-    tax: 9.25,
-    packing_charge: 15.00,
-    delivery_charge: 0.00,
-    discount_amount: 0.00,
-    total_amount: 209.25,
-    items: [
-      { menuItemId: 10, item_name: 'Ghee Masala Dosa', price: 110.00, quantity: 1, subtotal: 110.00 },
-      { menuItemId: 1, item_name: 'Chaha', price: 15.00, quantity: 1, subtotal: 15.00 },
-      { menuItemId: 2, item_name: 'Filter Coffee', price: 25.00, quantity: 2, subtotal: 50.00 }
-    ],
-    created_at: new Date(Date.now() - 15 * 60 * 1000).toISOString()
-  },
-  {
-    id: 102,
-    order_number: 'ORD-20260815-5912',
-    customer_name: 'Rohan Sharma',
-    customer_phone: '+91 98234 56789',
-    customer_email: 'rohan@example.com',
-    delivery_address: 'Main Market, Sinnar',
-    order_type: 'Takeaway',
-    payment_method: 'UPI / Online',
-    payment_status: 'PAID',
-    status: 'Preparing',
-    subtotal: 140.00,
-    tax: 7.00,
-    packing_charge: 15.00,
-    delivery_charge: 0.00,
-    discount_amount: 0.00,
-    total_amount: 162.00,
-    items: [
-      { menuItemId: 20, item_name: 'Paper Masala Dosa', price: 100.00, quantity: 1, subtotal: 100.00 },
-      { menuItemId: 30, item_name: 'Sambar Vada (2 Pcs)', price: 40.00, quantity: 1, subtotal: 40.00 }
-    ],
-    created_at: new Date(Date.now() - 45 * 60 * 1000).toISOString()
-  },
-  {
-    id: 103,
-    order_number: 'ORD-20260815-6301',
-    customer_name: 'Priya Patel',
-    customer_phone: '+91 91580 12345',
-    customer_email: 'priya@example.com',
-    delivery_address: 'Panchvati Hotel Lane, Sinnar',
-    order_type: 'Dine-In',
-    payment_method: 'Cash / Pay at Restaurant',
-    payment_status: 'PENDING',
-    status: 'Pending',
-    subtotal: 210.00,
-    tax: 10.50,
-    packing_charge: 0.00,
-    delivery_charge: 0.00,
-    discount_amount: 0.00,
-    total_amount: 220.50,
-    items: [
-      { menuItemId: 15, item_name: 'Loni Sponge Dosa (3 Pcs)', price: 90.00, quantity: 1, subtotal: 90.00 },
-      { menuItemId: 25, item_name: 'Special Mysore Masala Dosa', price: 120.00, quantity: 1, subtotal: 120.00 }
-    ],
-    created_at: new Date(Date.now() - 5 * 60 * 1000).toISOString()
+    created_at: new Date(Date.now() - 90 * 60 * 1000).toISOString()
   }
 ];
 
