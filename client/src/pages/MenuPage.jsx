@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, Filter, X, RotateCcw, Star, Check, Award, Flame } from 'lucide-react';
+import { Search, Filter, X, RotateCcw, Star, Check, Award, BookOpen, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
 import FoodCard from '../components/FoodCard';
 import FoodDetailsModal from '../components/FoodDetailsModal';
 import SkeletonLoader from '../components/SkeletonLoader';
@@ -33,6 +33,10 @@ const MenuPage = () => {
   const [loading, setLoading] = useState(true);
   const [selectedFoodModal, setSelectedFoodModal] = useState(null);
 
+  // Menu Card Modal State
+  const [showMenuCardModal, setShowMenuCardModal] = useState(false);
+  const [activeMenuPage, setActiveMenuPage] = useState(1); // 1 or 2
+
   // Filters State
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [searchQuery, setSearchQuery] = useState(initialSearch);
@@ -45,12 +49,12 @@ const MenuPage = () => {
     }
   });
 
-  const [vegFilter, setVegFilter] = useState('all'); // 'all', 'veg', 'nonveg'
+  const [vegFilter, setVegFilter] = useState('all');
   const [bestsellerOnly, setBestsellerOnly] = useState(false);
   const [availableOnly, setAvailableOnly] = useState(false);
   const [rating4Plus, setRating4Plus] = useState(false);
-  const [pricePreset, setPricePreset] = useState('all'); // 'all', 'under100', 'under200'
-  const [sortOption, setSortOption] = useState('featured'); // 'featured', 'price_asc', 'price_desc', 'rating'
+  const [pricePreset, setPricePreset] = useState('all');
+  const [sortOption, setSortOption] = useState('featured');
 
   useEffect(() => {
     fetchDynamicCategories();
@@ -152,14 +156,40 @@ const MenuPage = () => {
 
       <div className="container">
         
-        {/* Header & Search Bar */}
+        {/* Header & Search Bar & Physical Menu Banner */}
         <div style={{ marginBottom: '1.5rem' }}>
-          <h1 style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--color-emerald)', fontFamily: 'var(--font-heading)', marginBottom: '0.4rem' }}>
-            Our South Indian Menu
-          </h1>
-          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem' }}>
-            Explore authentic crisp dosas, ghee specials, uttapam, soft idli, pineapple sheera, and filter coffee.
-          </p>
+          
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+            <div>
+              <h1 style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--color-emerald)', fontFamily: 'var(--font-heading)', marginBottom: '0.4rem' }}>
+                Our South Indian Menu
+              </h1>
+              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem' }}>
+                Explore authentic crisp dosas, ghee specials, uttapam, soft idli, pineapple sheera, and filter coffee.
+              </p>
+            </div>
+
+            {/* Button to View Physical Printed Menu Card */}
+            <button
+              onClick={() => setShowMenuCardModal(true)}
+              className="btn btn-outline"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                backgroundColor: '#FFFFFF',
+                borderColor: 'var(--color-gold)',
+                color: 'var(--color-gold)',
+                fontWeight: 800,
+                borderRadius: '14px',
+                padding: '0.7rem 1.2rem',
+                boxShadow: '0 4px 12px rgba(217, 119, 6, 0.15)'
+              }}
+            >
+              <BookOpen size={20} color="var(--color-gold)" />
+              <span>📖 View Physical Menu Card (फिजिकल मेनू कार्ड)</span>
+            </button>
+          </div>
 
           {/* Search Box */}
           <form 
@@ -410,24 +440,6 @@ const MenuPage = () => {
                   <Star size={13} fill="#B45309" color="#B45309" /> 4.0+ Rating
                 </button>
 
-                {/* Price Presets */}
-                <button
-                  onClick={() => setPricePreset(prev => prev === 'under100' ? 'all' : 'under100')}
-                  style={{
-                    padding: '6px 12px',
-                    borderRadius: '20px',
-                    border: '1px solid',
-                    borderColor: pricePreset === 'under100' ? 'var(--color-emerald)' : 'var(--color-border)',
-                    backgroundColor: pricePreset === 'under100' ? 'var(--color-cream-alt)' : '#FFFFFF',
-                    color: pricePreset === 'under100' ? 'var(--color-emerald)' : 'var(--color-text)',
-                    fontWeight: 700,
-                    fontSize: '0.8rem',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Under ₹100
-                </button>
-
                 {/* Clear Filters Button */}
                 {activeFilterCount > 0 && (
                   <button
@@ -513,6 +525,124 @@ const MenuPage = () => {
           onClose={() => setSelectedFoodModal(null)}
           onSelectRelated={(rel) => handleOpenDetailModal(rel)}
         />
+      )}
+
+      {/* Physical Printed Menu Card Lightbox Modal */}
+      {showMenuCardModal && (
+        <div className="modal-overlay" onClick={() => setShowMenuCardModal(false)} style={{ zIndex: 10000 }}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '750px', width: '92%', borderRadius: '24px', padding: '1.5rem' }}>
+            
+            {/* Modal Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.8rem' }}>
+              <div>
+                <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.4rem', color: 'var(--color-emerald)', margin: 0 }}>
+                  Dakshin Bhavan Printed Menu Card
+                </h3>
+                <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+                  Authentic South Indian Restaurant Menu & Rates
+                </span>
+              </div>
+              <button onClick={() => setShowMenuCardModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+                <X size={24} color="#64748B" />
+              </button>
+            </div>
+
+            {/* Page Selection Tabs */}
+            <div style={{ display: 'flex', gap: '0.6rem', marginBottom: '1rem' }}>
+              <button
+                onClick={() => setActiveMenuPage(1)}
+                style={{
+                  flex: 1,
+                  padding: '0.75rem',
+                  borderRadius: '12px',
+                  fontWeight: 800,
+                  fontSize: '0.85rem',
+                  backgroundColor: activeMenuPage === 1 ? 'var(--color-emerald)' : '#F1F5F9',
+                  color: activeMenuPage === 1 ? '#FFFFFF' : 'var(--color-emerald)',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                Page 1: Beverages & Special Dosas
+              </button>
+              <button
+                onClick={() => setActiveMenuPage(2)}
+                style={{
+                  flex: 1,
+                  padding: '0.75rem',
+                  borderRadius: '12px',
+                  fontWeight: 800,
+                  fontSize: '0.85rem',
+                  backgroundColor: activeMenuPage === 2 ? 'var(--color-emerald)' : '#F1F5F9',
+                  color: activeMenuPage === 2 ? '#FFFFFF' : 'var(--color-emerald)',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                Page 2: Uttapam, Idli, Vada, Rice
+              </button>
+            </div>
+
+            {/* Menu Card Image Container */}
+            <div style={{ position: 'relative', textAlign: 'center', backgroundColor: '#0F172A', borderRadius: '16px', overflow: 'hidden', minHeight: '380px' }}>
+              <img
+                src={activeMenuPage === 1 ? '/images/menu-card-1.png' : '/images/menu-card-2.png'}
+                alt={`Dakshin Bhavan Menu Card Page ${activeMenuPage}`}
+                style={{ width: '100%', maxHeight: '70vh', objectFit: 'contain', display: 'block' }}
+              />
+
+              {/* Prev / Next Page Overlay Arrows */}
+              <button
+                onClick={() => setActiveMenuPage(prev => prev === 1 ? 2 : 1)}
+                style={{
+                  position: 'absolute',
+                  left: '10px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  backgroundColor: 'rgba(0,0,0,0.6)',
+                  color: '#FFF',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '40px',
+                  height: '40px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer'
+                }}
+              >
+                <ChevronLeft size={24} />
+              </button>
+
+              <button
+                onClick={() => setActiveMenuPage(prev => prev === 1 ? 2 : 1)}
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  backgroundColor: 'rgba(0,0,0,0.6)',
+                  color: '#FFF',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '40px',
+                  height: '40px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer'
+                }}
+              >
+                <ChevronRight size={24} />
+              </button>
+            </div>
+
+            <div style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+              💡 Pinch or zoom on your mobile screen to view exact menu prices.
+            </div>
+
+          </div>
+        </div>
       )}
 
       {/* Responsive Layout Rules */}
