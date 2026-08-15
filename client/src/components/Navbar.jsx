@@ -94,73 +94,26 @@ const Navbar = ({ onOpenAuthModal }) => {
           ))}
         </nav>
 
-        {/* Right Action Controls */}
+        {/* Right Action Controls: Cart Icon */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
           
-          {/* Customer Profile / Login */}
-          {isCustomerAuthenticated ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Link
-                to="/my-orders"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.4rem',
-                  fontSize: '0.85rem',
-                  fontWeight: 600,
-                  color: 'var(--color-emerald)',
-                  backgroundColor: 'var(--color-cream-alt)',
-                  padding: '6px 12px',
-                  borderRadius: '20px',
-                  textDecoration: 'none'
-                }}
-              >
-                <User size={16} />
-                <span>{customerUser?.name?.split(' ')[0] || 'Profile'}</span>
-              </Link>
-              <button
-                onClick={logoutCustomer}
-                title="Logout"
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#EF4444',
-                  cursor: 'pointer',
-                  padding: '6px'
-                }}
-              >
-                <LogOut size={18} />
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={onOpenAuthModal}
-              className="btn btn-outline btn-sm desktop-only"
-              style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}
-            >
-              <User size={16} />
-              <span>Login</span>
-            </button>
-          )}
-
           {/* Cart Icon Button */}
           <Link
             to="/cart"
             style={{
               position: 'relative',
-              padding: '0.6rem',
+              width: '42px',
+              height: '42px',
               borderRadius: '50%',
               backgroundColor: 'var(--color-cream-alt)',
               color: 'var(--color-emerald)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              transition: 'var(--transition-fast)',
               textDecoration: 'none'
             }}
-            aria-label="View Shopping Cart"
           >
-            <ShoppingBag size={22} />
+            <ShoppingBag size={20} />
             {cartCount > 0 && (
               <span
                 style={{
@@ -168,8 +121,8 @@ const Navbar = ({ onOpenAuthModal }) => {
                   top: '-4px',
                   right: '-4px',
                   backgroundColor: 'var(--color-saffron)',
-                  color: '#fff',
-                  fontSize: '0.75rem',
+                  color: '#FFFFFF',
+                  fontSize: '0.72rem',
                   fontWeight: 800,
                   width: '20px',
                   height: '20px',
@@ -252,47 +205,27 @@ const Navbar = ({ onOpenAuthModal }) => {
             );
           })}
 
-          <div style={{ margin: '0.8rem 0', borderTop: '1px solid var(--color-border)' }} />
-          
-          {!isCustomerAuthenticated ? (
-            <button
-              onClick={() => { setMobileOpen(false); onOpenAuthModal(); }}
-              className="btn btn-outline"
-              style={{ width: '100%', padding: '0.8rem', fontSize: '1rem', fontWeight: 700 }}
-            >
-              <User size={18} /> Customer Login / Register
-            </button>
-          ) : (
-            <button
-              onClick={() => { setMobileOpen(false); logoutCustomer(); }}
-              className="btn btn-outline"
-              style={{ width: '100%', padding: '0.8rem', fontSize: '1rem', fontWeight: 700, borderColor: '#EF4444', color: '#EF4444' }}
-            >
-              <LogOut size={18} /> Logout ({customerUser?.name})
-            </button>
-          )}
+          <div style={{ margin: '0.4rem 0' }} />
 
           <Link
             to="/menu"
             onClick={() => setMobileOpen(false)}
             className="btn btn-primary"
-            style={{ width: '100%', padding: '0.9rem', fontSize: '1.05rem', fontWeight: 800, textAlign: 'center', borderRadius: '12px', marginTop: '0.4rem', textDecoration: 'none' }}
+            style={{ width: '100%', padding: '0.9rem', fontSize: '1.05rem', fontWeight: 800, textAlign: 'center', borderRadius: '12px', textDecoration: 'none' }}
           >
-            Explore Menu & Order Now 🍲
+            Explore Menu & Order Now
           </Link>
         </div>
       )}
 
-      {/* Responsive Inline CSS Media Queries */}
+      {/* Responsive Breakpoint CSS */}
       <style>{`
-        @media (max-width: 900px) {
-          .desktop-nav, .desktop-only {
+        @media (max-width: 880px) {
+          .desktop-nav {
             display: none !important;
           }
           .mobile-toggle-btn {
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
+            display: block !important;
           }
         }
       `}</style>

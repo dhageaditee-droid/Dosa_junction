@@ -1,13 +1,11 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Utensils, Tag, ShoppingBag, User } from 'lucide-react';
+import { Home, Utensils, Tag, ShoppingBag, PackageCheck } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { useAuth } from '../context/AuthContext';
 
-const MobileBottomNav = ({ onOpenAuthModal }) => {
+const MobileBottomNav = () => {
   const location = useLocation();
   const { cartCount } = useCart();
-  const { isCustomerAuthenticated } = useAuth();
 
   // Hide on admin routes
   if (location.pathname.startsWith('/admin')) {
@@ -19,7 +17,7 @@ const MobileBottomNav = ({ onOpenAuthModal }) => {
     { label: 'Menu', path: '/menu', icon: Utensils },
     { label: 'Offers', path: '/offers', icon: Tag },
     { label: 'Cart', path: '/cart', icon: ShoppingBag, badge: cartCount },
-    { label: 'Account', path: isCustomerAuthenticated ? '/my-orders' : '#', icon: User, isAuthTrigger: !isCustomerAuthenticated }
+    { label: 'Orders', path: '/my-orders', icon: PackageCheck }
   ];
 
   return (
@@ -41,31 +39,6 @@ const MobileBottomNav = ({ onOpenAuthModal }) => {
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.path;
-
-          if (item.isAuthTrigger) {
-            return (
-              <button
-                key={item.label}
-                onClick={onOpenAuthModal}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '2px',
-                  background: 'none',
-                  border: 'none',
-                  color: isActive ? 'var(--color-gold)' : 'var(--color-emerald)',
-                  cursor: 'pointer',
-                  padding: '4px 0'
-                }}
-              >
-                <Icon size={20} color={isActive ? 'var(--color-gold)' : 'var(--color-emerald)'} />
-                <span style={{ fontSize: '0.7rem', fontWeight: isActive ? 700 : 500 }}>
-                  {item.label}
-                </span>
-              </button>
-            );
-          }
 
           return (
             <Link
