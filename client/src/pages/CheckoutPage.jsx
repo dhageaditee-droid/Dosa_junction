@@ -110,7 +110,19 @@ const CheckoutPage = () => {
         paymentMethod: formData.paymentMethod,
         couponCode: appliedCoupon ? appliedCoupon.code : null,
         notes: formData.notes.trim(),
-        items: cartItems.map(i => ({ id: i.id, quantity: i.quantity }))
+        subtotal: parseFloat(subtotal.toFixed(2)),
+        tax: parseFloat(tax.toFixed(2)),
+        packingFee: parseFloat(packingFee.toFixed(2)),
+        deliveryFee: parseFloat(deliveryFee.toFixed(2)),
+        discountAmount: parseFloat(discountAmount.toFixed(2)),
+        totalAmount: parseFloat(grandTotal.toFixed(2)),
+        items: cartItems.map(i => ({
+          id: i.id,
+          name: i.name,
+          price: parseFloat(i.price),
+          quantity: parseInt(i.quantity, 10),
+          subtotal: parseFloat(i.price) * parseInt(i.quantity, 10)
+        }))
       };
 
       const res = await apiService.createOrder(payload);

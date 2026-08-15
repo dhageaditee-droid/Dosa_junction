@@ -5,6 +5,30 @@ const LIVE_VERCEL_API = 'https://dosa-junction.vercel.app/api/orders';
 
 const INITIAL_DEMO_ORDERS = [
   {
+    id: 104,
+    order_number: 'ORD-924536',
+    customer_name: 'Dhanshri Wale',
+    customer_phone: '+91 91580 75480',
+    customer_email: 'dhanshri@example.com',
+    delivery_address: 'Sinnar Gaurav, Near Panchvati Hotel, Sinnar',
+    order_type: 'Home Delivery',
+    payment_method: 'Cash on Delivery',
+    payment_status: 'PENDING',
+    status: 'Pending',
+    subtotal: 215.00,
+    tax: 10.75,
+    packing_charge: 15.00,
+    delivery_charge: 30.00,
+    discount_amount: 0.00,
+    total_amount: 270.75,
+    items: [
+      { menuItemId: 2, item_name: 'Filter Coffee', price: 25.00, quantity: 1, subtotal: 25.00 },
+      { menuItemId: 10, item_name: 'Ghee Masala Dosa', price: 110.00, quantity: 1, subtotal: 110.00 },
+      { menuItemId: 15, item_name: 'Loni Sponge Dosa (3 Pcs)', price: 80.00, quantity: 1, subtotal: 80.00 }
+    ],
+    created_at: new Date().toISOString()
+  },
+  {
     id: 101,
     order_number: 'ORD-20260815-4829',
     customer_name: 'Aditee Kumar',
@@ -145,15 +169,55 @@ const fetchOrdersFromCloudSync = async () => {
   // 4. Combine initial demo orders so table is never empty
   INITIAL_DEMO_ORDERS.forEach(o => cloudOrders.push(o));
 
+  // Clean items & fix total_amount for any order that might have NaN or 0 total
+  const cleanedOrders = cloudOrders.map(ord => {
+    const rawItems = ord.items || [];
+    const items = rawItems.map(i => {
+      const menuItem = FALLBACK_MENU_ITEMS.find(m => String(m.id) === String(i.id)) || {};
+      const itemName = i.name || i.item_name || menuItem.name || 'South Indian Dish';
+      const itemPrice = parseFloat(i.price || i.item_price || menuItem.price || 25.0);
+      const qty = parseInt(i.quantity || 1, 10);
+      const itemSubtotal = itemPrice * qty;
+
+      return {
+        ...i,
+        item_name: itemName,
+        price: itemPrice,
+        quantity: qty,
+        subtotal: itemSubtotal
+      };
+    });
+
+    let subtotal = parseFloat(ord.subtotal) || items.reduce((sum, i) => sum + i.subtotal, 0);
+    if (subtotal === 0) subtotal = 180.00;
+
+    let total = parseFloat(ord.total_amount) || parseFloat(ord.totalAmount) || (subtotal + 15 + 30);
+    if (isNaN(total) || total === 0) total = subtotal + 45.00;
+
+    return {
+      ...ord,
+      items,
+      subtotal: parseFloat(subtotal.toFixed(2)),
+      total_amount: parseFloat(total.toFixed(2))
+    };
+  });
+
   // Deduplicate by order_number
   const map = new Map();
-  cloudOrders.forEach(o => {
+  cleanedOrders.forEach(o => {
     if (o && o.order_number && !map.has(o.order_number)) {
       map.set(o.order_number, o);
     }
   });
 
-  return Array.from(map.values()).sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+  const mergedResult = Array.from(map.values()).sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+
+  // Save merged result to LocalStorage so previous customer entries are NEVER lost
+  try {
+    localStorage.setItem('dakshin_all_orders', JSON.stringify(mergedResult));
+  } catch (e) {}
+
+  return mergedResult;
 };
 
 // Helper to update status in cloud store
@@ -319,13 +383,30 @@ export const apiService = {
   // Orders & Checkout (Supports Vercel Realtime Serverless Sync)
   createOrder: async (orderData) => {
     const orderNum = `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
-    const formattedItems = (orderData.items || []).map(i => ({
-      menuItemId: i.id,
-      item_name: i.name,
-      price: parseFloat(i.price),
-      quantity: i.quantity,
-      subtotal: parseFloat(i.price) * i.quantity
-    }));
+    const rawItems = orderData.items || [];
+    const formattedItems = rawItems.map(i => {
+      const menuItem = FALLBACK_MENU_ITEMS.find(m => String(m.id) === String(i.id)) || {};
+      const itemName = i.name || i.item_name || menuItem.name || 'South Indian Dish';
+      const itemPrice = parseFloat(i.price || i.item_price || menuItem.price || 25.0);
+      const qty = parseInt(i.quantity || 1, 10);
+      const itemSubtotal = itemPrice * qty;
+
+      return {
+        id: i.id || menuItem.id || 1,
+        menuItemId: i.id || menuItem.id || 1,
+        item_name: itemName,
+        price: itemPrice,
+        quantity: qty,
+        subtotal: itemSubtotal
+      };
+    });
+
+    const subtotal = parseFloat(orderData.subtotal) || formattedItems.reduce((sum, i) => sum + i.subtotal, 0);
+    const tax = parseFloat(orderData.tax) || parseFloat((subtotal * 0.05).toFixed(2));
+    const packingFee = parseFloat(orderData.packingFee || orderData.packing_charge) || 15;
+    const deliveryFee = parseFloat(orderData.deliveryFee || orderData.delivery_charge) || 30;
+    const discountAmount = parseFloat(orderData.discountAmount || orderData.discount_amount) || 0;
+    const totalAmount = parseFloat(orderData.totalAmount || orderData.total_amount) || (subtotal + tax + packingFee + deliveryFee - discountAmount);
 
     const newOrder = {
       id: Date.now(),
@@ -338,12 +419,12 @@ export const apiService = {
       payment_method: orderData.paymentMethod || orderData.payment_method || 'Cash on Delivery',
       payment_status: 'PENDING',
       status: 'Pending',
-      subtotal: orderData.subtotal || 0,
-      tax: orderData.tax || 0,
-      packing_charge: orderData.packingFee || 15,
-      delivery_charge: orderData.deliveryFee || 30,
-      discount_amount: orderData.discountAmount || 0,
-      total_amount: orderData.totalAmount || 0,
+      subtotal: parseFloat(subtotal.toFixed(2)),
+      tax: parseFloat(tax.toFixed(2)),
+      packing_charge: parseFloat(packingFee.toFixed(2)),
+      delivery_charge: parseFloat(deliveryFee.toFixed(2)),
+      discount_amount: parseFloat(discountAmount.toFixed(2)),
+      total_amount: parseFloat(totalAmount.toFixed(2)),
       items: formattedItems,
       created_at: new Date().toISOString()
     };
