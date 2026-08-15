@@ -132,44 +132,7 @@ const Home = () => {
               Traditional recipes, fresh ingredients and unforgettable South Indian flavours. Experience golden crispy dosas, fluffy idlis, and authentic filter coffee delivered hot to your doorstep.
             </p>
 
-            {/* Search Bar */}
-            <form 
-              onSubmit={handleSearchSubmit} 
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                backgroundColor: '#FFFFFF',
-                borderRadius: '16px',
-                padding: '6px 8px 6px 18px',
-                boxShadow: '0 12px 30px rgba(0,0,0,0.3)',
-                maxWidth: '560px',
-                marginBottom: '1.8rem'
-              }}
-            >
-              <Search size={22} color="#64748B" style={{ flexShrink: 0 }} />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search for dosa, idli, vada, coffee..."
-                style={{
-                  flex: 1,
-                  border: 'none',
-                  outline: 'none',
-                  padding: '10px 12px',
-                  fontSize: '1rem',
-                  color: '#0F172A',
-                  backgroundColor: 'transparent'
-                }}
-              />
-              <button
-                type="submit"
-                className="btn btn-primary"
-                style={{ padding: '0.65rem 1.4rem', borderRadius: '12px', fontWeight: 800 }}
-              >
-                Search
-              </button>
-            </form>
+
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
               <Link to="/menu" className="btn btn-primary" style={{ padding: '0.75rem 1.8rem' }}>
