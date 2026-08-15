@@ -1,0 +1,21 @@
+{
+  "name": "south-indian-restaurant-system",
+  "version": "1.0.0",
+  "description": "Production-grade South Indian Restaurant Website and Management System",
+  "main": "server/server.js",
+  "scripts": {
+    "setup": "npm install --prefix server && npm install --prefix client",
+    "db:setup": "node server/scripts/setupDb.js",
+    "server": "npm start --prefix server",
+    "client": "npm run dev --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "build": "npm run build --prefix client",
+    "test": "npm test --prefix server"
+  },
+  "keywords": ["react", "express", "postgresql", "restaurant-management", "south-indian-food"],
+  "author": "Dakshin Bhavan",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
