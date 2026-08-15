@@ -79,27 +79,34 @@ const ContactPage = () => {
         </div>
 
         {/* Quick Action Mobile Call & Direction Buttons */}
-        <div style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: '12px',
-          justifyContent: 'center',
-          marginBottom: '2rem'
-        }}>
+        <div 
+          className="contact-quick-actions"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+            gap: '12px',
+            maxWidth: '900px',
+            margin: '0 auto 2rem auto'
+          }}
+        >
           <a
             href="tel:+917020758779"
             className="btn btn-primary"
             style={{
-              flex: 1,
-              minWidth: '160px',
-              padding: '0.85rem 1.2rem',
+              padding: '0.85rem 1rem',
               borderRadius: '16px',
               fontWeight: 800,
-              fontSize: '0.95rem',
-              boxShadow: '0 4px 14px rgba(217, 119, 6, 0.25)'
+              fontSize: '0.9rem',
+              whiteSpace: 'nowrap',
+              boxShadow: '0 4px 14px rgba(217, 119, 6, 0.25)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px'
             }}
           >
-            <Phone size={20} /> Call +91 70207 58779
+            <Phone size={18} style={{ flexShrink: 0 }} />
+            <span>Call +91 70207 58779</span>
           </a>
 
           <a
@@ -108,18 +115,22 @@ const ContactPage = () => {
             rel="noreferrer"
             className="btn"
             style={{
-              flex: 1,
-              minWidth: '160px',
               backgroundColor: '#25D366',
               color: '#FFFFFF',
-              padding: '0.85rem 1.2rem',
+              padding: '0.85rem 1rem',
               borderRadius: '16px',
               fontWeight: 800,
-              fontSize: '0.95rem',
-              boxShadow: '0 4px 14px rgba(37, 211, 102, 0.25)'
+              fontSize: '0.9rem',
+              whiteSpace: 'nowrap',
+              boxShadow: '0 4px 14px rgba(37, 211, 102, 0.25)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px'
             }}
           >
-            <MessageCircle size={20} /> WhatsApp Order
+            <MessageCircle size={18} style={{ flexShrink: 0 }} />
+            <span>WhatsApp Order</span>
           </a>
 
           <a
@@ -128,15 +139,19 @@ const ContactPage = () => {
             rel="noreferrer"
             className="btn btn-emerald"
             style={{
-              flex: 1,
-              minWidth: '160px',
-              padding: '0.85rem 1.2rem',
+              padding: '0.85rem 1rem',
               borderRadius: '16px',
               fontWeight: 800,
-              fontSize: '0.95rem'
+              fontSize: '0.9rem',
+              whiteSpace: 'nowrap',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px'
             }}
           >
-            <Navigation size={20} /> Get GPS Directions
+            <Navigation size={18} style={{ flexShrink: 0 }} />
+            <span>Get GPS Directions</span>
           </a>
         </div>
 
