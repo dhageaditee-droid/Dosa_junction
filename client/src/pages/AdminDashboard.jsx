@@ -27,19 +27,25 @@ const AdminDashboard = () => {
   const { addToast } = useToast();
 
   useEffect(() => {
-    fetchDashboardData();
+    fetchDashboardData(true);
+
+    const intervalId = setInterval(() => {
+      fetchDashboardData(false);
+    }, 5000);
+
+    return () => clearInterval(intervalId);
   }, []);
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = async (showLoading = false) => {
     try {
-      setLoading(true);
+      if (showLoading) setLoading(true);
       const res = await apiService.getAdminStats();
       if (res.stats) setStats(res.stats);
       if (res.recentOrders) setRecentOrders(res.recentOrders);
     } catch (e) {
       console.error(e);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 

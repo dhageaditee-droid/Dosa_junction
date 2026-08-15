@@ -23,12 +23,18 @@ const AdminOrders = () => {
   const { addToast } = useToast();
 
   useEffect(() => {
-    fetchOrders();
+    fetchOrders(true);
+
+    const intervalId = setInterval(() => {
+      fetchOrders(false);
+    }, 5000);
+
+    return () => clearInterval(intervalId);
   }, [statusFilter, typeFilter, paymentStatusFilter, todayOnly, search]);
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (showLoading = false) => {
     try {
-      setLoading(true);
+      if (showLoading) setLoading(true);
       const params = new URLSearchParams();
       if (statusFilter !== 'all') params.append('status', statusFilter);
       if (typeFilter !== 'all') params.append('orderType', typeFilter);
@@ -39,9 +45,9 @@ const AdminOrders = () => {
       const res = await apiService.getAdminOrders(params.toString());
       if (res.orders) setOrders(res.orders);
     } catch (e) {
-      if (addToast) addToast('Failed to load admin orders list', 'error');
+      if (showLoading && addToast) addToast('Failed to load admin orders list', 'error');
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 

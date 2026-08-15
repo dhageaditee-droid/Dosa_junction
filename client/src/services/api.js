@@ -1,6 +1,73 @@
 import { FALLBACK_CATEGORIES, FALLBACK_MENU_ITEMS } from '../data/fallbackData';
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
+const CLOUD_SYNC_URL = 'https://kvdb.io/8D4G77Z9S29X1P/dosa_junction_global_orders';
+
+// Helper to push order to shared cloud store for cross-device sync
+const pushOrderToCloudSync = async (newOrder) => {
+  try {
+    let existing = [];
+    try {
+      const res = await fetch(CLOUD_SYNC_URL);
+      if (res.ok) {
+        const text = await res.text();
+        if (text) existing = JSON.parse(text);
+      }
+    } catch (e) {}
+
+    const updated = [newOrder, ...(Array.isArray(existing) ? existing.filter(o => o.order_number !== newOrder.order_number) : [])].slice(0, 100);
+    await fetch(CLOUD_SYNC_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updated)
+    });
+  } catch (err) {
+    console.warn('Cloud order push failed:', err.message);
+  }
+};
+
+// Helper to fetch orders from shared cloud store for cross-device sync
+const fetchOrdersFromCloudSync = async () => {
+  try {
+    const res = await fetch(CLOUD_SYNC_URL);
+    if (res.ok) {
+      const text = await res.text();
+      if (text) {
+        const data = JSON.parse(text);
+        if (Array.isArray(data)) return data;
+      }
+    }
+  } catch (err) {
+    console.warn('Cloud order fetch failed:', err.message);
+  }
+  return [];
+};
+
+// Helper to update status in cloud store
+const updateOrderStatusInCloudSync = async (orderId, newStatus, paymentStatus = null) => {
+  try {
+    const existing = await fetchOrdersFromCloudSync();
+    if (existing.length > 0) {
+      const updated = existing.map(o => {
+        if (String(o.id) === String(orderId) || String(o.order_number) === String(orderId)) {
+          return {
+            ...o,
+            status: newStatus || o.status,
+            payment_status: paymentStatus || o.payment_status,
+            updated_at: new Date().toISOString()
+          };
+        }
+        return o;
+      });
+
+      await fetch(CLOUD_SYNC_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated)
+      });
+    }
+  } catch (e) {}
+};
 
 export const cleanDishName = (name) => {
   if (!name) return '';
@@ -134,89 +201,111 @@ export const apiService = {
     }
   },
 
-  // Orders & Checkout
+  // Orders & Checkout (Supports Cross-Device Real-Time Sync)
   createOrder: async (orderData) => {
+    const orderNum = `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
+    const formattedItems = (orderData.items || []).map(i => ({
+      menuItemId: i.id,
+      item_name: i.name,
+      price: parseFloat(i.price),
+      quantity: i.quantity,
+      subtotal: parseFloat(i.price) * i.quantity
+    }));
+
+    const newOrder = {
+      id: Date.now(),
+      order_number: orderNum,
+      customer_name: orderData.customerName || 'Customer',
+      customer_phone: orderData.phone || orderData.customerPhone || '',
+      customer_email: orderData.email || orderData.customerEmail || '',
+      delivery_address: orderData.deliveryAddress || orderData.address || '',
+      order_type: orderData.orderType || 'Home Delivery',
+      payment_method: orderData.paymentMethod || 'Cash on Delivery',
+      payment_status: 'PENDING',
+      status: 'Pending',
+      subtotal: orderData.subtotal || 0,
+      tax: orderData.tax || 0,
+      packing_charge: orderData.packingFee || 15,
+      delivery_charge: orderData.deliveryFee || 30,
+      discount_amount: orderData.discountAmount || 0,
+      total_amount: orderData.totalAmount || 0,
+      items: formattedItems,
+      created_at: new Date().toISOString()
+    };
+
+    // Always push order to shared cloud store for cross-device admin visibility
+    pushOrderToCloudSync(newOrder);
+
     try {
-      return await apiCall('/orders', 'POST', orderData);
-    } catch (err) {
-      console.log('Serving static fallback order placement for Vercel environment');
-      const orderNum = `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
-      const newOrder = {
-        id: Date.now(),
-        order_number: orderNum,
-        customer_name: orderData.customerName || 'Customer',
-        phone: orderData.phone || '',
-        delivery_address: orderData.deliveryAddress || '',
-        payment_method: orderData.paymentMethod || 'COD',
-        payment_status: 'pending',
-        status: 'pending',
-        subtotal: orderData.subtotal || 0,
-        tax: orderData.tax || 0,
-        packing_fee: orderData.packingFee || 15,
-        delivery_fee: orderData.deliveryFee || 30,
-        discount_amount: orderData.discountAmount || 0,
-        total_amount: orderData.totalAmount || 0,
-        items: orderData.items || [],
-        created_at: new Date().toISOString()
-      };
+      const savedOrders = JSON.parse(localStorage.getItem('dakshin_my_orders') || '[]');
+      savedOrders.unshift(newOrder);
+      localStorage.setItem('dakshin_my_orders', JSON.stringify(savedOrders));
+    } catch (e) {}
 
-      try {
-        const savedOrders = JSON.parse(localStorage.getItem('dakshin_my_orders') || '[]');
-        savedOrders.unshift(newOrder);
-        localStorage.setItem('dakshin_my_orders', JSON.stringify(savedOrders));
-      } catch (e) {
-        console.error(e);
+    try {
+      const backendRes = await apiCall('/orders', 'POST', orderData);
+      if (backendRes && backendRes.success) {
+        return backendRes;
       }
-
-      return {
-        success: true,
-        message: 'Order placed successfully!',
-        orderNumber: orderNum,
-        order: newOrder
-      };
+    } catch (err) {
+      console.log('Backend offline or static Vercel build, order synced via cloud relay');
     }
+
+    return {
+      success: true,
+      message: 'Order placed successfully!',
+      orderNumber: orderNum,
+      order: newOrder
+    };
   },
 
   trackOrder: async (orderNumber) => {
     try {
-      return await apiCall(`/orders/track/${orderNumber}`);
-    } catch (err) {
-      try {
-        const savedOrders = JSON.parse(localStorage.getItem('dakshin_my_orders') || '[]');
-        const found = savedOrders.find(o => o.order_number === orderNumber);
-        if (found) {
-          return { success: true, order: found };
-        }
-      } catch (e) {}
+      const backendRes = await apiCall(`/orders/track/${orderNumber}`);
+      if (backendRes && backendRes.success) return backendRes;
+    } catch (err) {}
 
-      return {
-        success: true,
-        order: {
-          order_number: orderNumber,
-          customer_name: 'Customer',
-          phone: '+91 70207 58779',
-          delivery_address: 'Sinnar Gaurav, Near Panchvati Hotel, Sinnar',
-          payment_method: 'COD',
-          payment_status: 'pending',
-          status: 'confirmed',
-          total_amount: 71.25,
-          items: [{ item_name: 'Coffee', quantity: 1, item_price: 25.00 }],
-          created_at: new Date().toISOString()
-        }
-      };
-    }
+    try {
+      const cloudOrders = await fetchOrdersFromCloudSync();
+      const foundCloud = cloudOrders.find(o => o.order_number === orderNumber);
+      if (foundCloud) return { success: true, order: foundCloud };
+    } catch (e) {}
+
+    try {
+      const savedOrders = JSON.parse(localStorage.getItem('dakshin_my_orders') || '[]');
+      const found = savedOrders.find(o => o.order_number === orderNumber);
+      if (found) return { success: true, order: found };
+    } catch (e) {}
+
+    return {
+      success: true,
+      order: {
+        order_number: orderNumber,
+        customer_name: 'Customer',
+        customer_phone: '+91 70207 58779',
+        delivery_address: 'Sinnar Gaurav, Near Panchvati Hotel, Sinnar',
+        order_type: 'Home Delivery',
+        payment_method: 'Cash on Delivery',
+        payment_status: 'PENDING',
+        status: 'Pending',
+        total_amount: 71.25,
+        items: [{ item_name: 'Coffee', quantity: 1, price: 25.00 }],
+        created_at: new Date().toISOString()
+      }
+    };
   },
 
   getMyOrders: async () => {
     try {
-      return await apiCall('/orders/my-orders');
-    } catch (err) {
-      try {
-        const savedOrders = JSON.parse(localStorage.getItem('dakshin_my_orders') || '[]');
-        return { success: true, count: savedOrders.length, orders: savedOrders };
-      } catch (e) {
-        return { success: true, count: 0, orders: [] };
-      }
+      const backendRes = await apiCall('/orders/my-orders');
+      if (backendRes && backendRes.orders) return backendRes;
+    } catch (err) {}
+
+    try {
+      const savedOrders = JSON.parse(localStorage.getItem('dakshin_my_orders') || '[]');
+      return { success: true, count: savedOrders.length, orders: savedOrders };
+    } catch (e) {
+      return { success: true, count: 0, orders: [] };
     }
   },
 
@@ -225,16 +314,10 @@ export const apiService = {
       return await apiCall('/coupons/validate', 'POST', { code, subtotal });
     } catch (err) {
       const upper = (code || '').toUpperCase().trim();
-      if (upper === 'SOUTH10' && subtotal >= 150) {
-        const disc = Math.min(50, subtotal * 0.10);
-        return { success: true, message: '10% Discount Applied!', coupon: { code: 'SOUTH10', calculatedDiscount: disc } };
-      } else if (upper === 'SOUTH20' && subtotal >= 300) {
-        const disc = Math.min(100, subtotal * 0.20);
-        return { success: true, message: '20% Discount Applied!', coupon: { code: 'SOUTH20', calculatedDiscount: disc } };
-      } else if (upper === 'WELCOME50' && subtotal >= 200) {
-        return { success: true, message: '₹50 Instant OFF Applied!', coupon: { code: 'WELCOME50', calculatedDiscount: 50 } };
+      if (upper === 'FREEPLAIN1' && subtotal >= 350) {
+        return { success: true, message: 'Free Plain Dosa Applied!', coupon: { code: 'FREEPLAIN1', calculatedDiscount: 60 } };
       }
-      throw new Error('Invalid coupon code or minimum order amount not met.');
+      throw new Error('Invalid promo code or minimum order amount not met.');
     }
   },
 
@@ -292,11 +375,120 @@ export const apiService = {
   adminLogin: (data) => apiCall('/auth/login', 'POST', data),
   getProfile: () => apiCall('/auth/profile'),
 
-  // Admin Portal APIs
-  getAdminStats: () => apiCall('/orders/admin/dashboard-stats', 'GET', null, localStorage.getItem('dakshin_admin_token')),
-  getAdminOrders: (params = '') => apiCall(`/orders/admin/all${params ? `?${params}` : ''}`, 'GET', null, localStorage.getItem('dakshin_admin_token')),
-  updateOrderStatus: (id, status) => apiCall(`/orders/admin/${id}/status`, 'PATCH', { status }, localStorage.getItem('dakshin_admin_token')),
-  updatePaymentStatus: (id, paymentStatus) => apiCall(`/orders/admin/${id}/payment`, 'PATCH', { paymentStatus }, localStorage.getItem('dakshin_admin_token')),
+  // Admin Portal APIs (Cross-Device Merged Orders)
+  getAdminStats: async () => {
+    let backendStats = null;
+    try {
+      const res = await apiCall('/orders/admin/dashboard-stats', 'GET', null, localStorage.getItem('dakshin_admin_token'));
+      if (res && res.stats) backendStats = res;
+    } catch (err) {}
+
+    const cloudOrders = await fetchOrdersFromCloudSync();
+    
+    if (backendStats) {
+      // Merge cloud orders that are not in backend
+      const existingOrderNums = new Set((backendStats.recentOrders || []).map(o => o.order_number));
+      const newCloudOrders = cloudOrders.filter(o => !existingOrderNums.has(o.order_number));
+
+      if (newCloudOrders.length > 0) {
+        const mergedRecent = [...newCloudOrders, ...backendStats.recentOrders].sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 10);
+        const addedRevenue = newCloudOrders.reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
+
+        return {
+          success: true,
+          stats: {
+            ...backendStats.stats,
+            todayOrders: (backendStats.stats.todayOrders || 0) + newCloudOrders.length,
+            todayRevenue: (backendStats.stats.todayRevenue || 0) + addedRevenue,
+            totalOrders: (backendStats.stats.totalOrders || 0) + newCloudOrders.length,
+            totalRevenue: (backendStats.stats.totalRevenue || 0) + addedRevenue,
+            pendingOrders: (backendStats.stats.pendingOrders || 0) + newCloudOrders.filter(o => o.status === 'Pending').length
+          },
+          recentOrders: mergedRecent
+        };
+      }
+      return backendStats;
+    }
+
+    // Static fallback stats from cloud orders
+    const totalRev = cloudOrders.reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
+    return {
+      success: true,
+      stats: {
+        todayOrders: cloudOrders.length,
+        todayRevenue: totalRev,
+        totalOrders: cloudOrders.length,
+        totalRevenue: totalRev,
+        pendingOrders: cloudOrders.filter(o => o.status === 'Pending').length,
+        completedOrders: cloudOrders.filter(o => o.status === 'Completed').length,
+        totalCustomers: new Set(cloudOrders.map(o => o.customer_phone)).size || 1,
+        totalMenuItems: 51
+      },
+      recentOrders: cloudOrders.slice(0, 10)
+    };
+  },
+
+  getAdminOrders: async (paramsStr = '') => {
+    let backendOrders = [];
+    try {
+      const res = await apiCall(`/orders/admin/all${paramsStr ? `?${paramsStr}` : ''}`, 'GET', null, localStorage.getItem('dakshin_admin_token'));
+      if (res && res.orders) backendOrders = res.orders;
+    } catch (err) {}
+
+    const cloudOrders = await fetchOrdersFromCloudSync();
+
+    // Merge backend & cloud orders by order_number
+    const orderMap = new Map();
+    cloudOrders.forEach(o => orderMap.set(o.order_number, o));
+    backendOrders.forEach(o => orderMap.set(o.order_number, o));
+
+    let allOrders = Array.from(orderMap.values()).sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+
+    // Filter cloud orders if search / status filters apply
+    const searchParams = new URLSearchParams(paramsStr);
+    const status = searchParams.get('status');
+    const orderType = searchParams.get('orderType');
+    const paymentStatus = searchParams.get('paymentStatus');
+    const search = searchParams.get('search');
+
+    if (status && status !== 'all') {
+      allOrders = allOrders.filter(o => o.status === status);
+    }
+    if (orderType && orderType !== 'all') {
+      allOrders = allOrders.filter(o => o.order_type === orderType);
+    }
+    if (paymentStatus && paymentStatus !== 'all') {
+      allOrders = allOrders.filter(o => o.payment_status === paymentStatus);
+    }
+    if (search && search.trim()) {
+      const q = search.trim().toLowerCase();
+      allOrders = allOrders.filter(o => 
+        (o.order_number && o.order_number.toLowerCase().includes(q)) ||
+        (o.customer_name && o.customer_name.toLowerCase().includes(q)) ||
+        (o.customer_phone && o.customer_phone.toLowerCase().includes(q))
+      );
+    }
+
+    return { success: true, count: allOrders.length, orders: allOrders };
+  },
+
+  updateOrderStatus: async (id, status) => {
+    updateOrderStatusInCloudSync(id, status);
+    try {
+      return await apiCall(`/orders/admin/${id}/status`, 'PATCH', { status }, localStorage.getItem('dakshin_admin_token'));
+    } catch (err) {
+      return { success: true, message: `Order status updated to "${status}".` };
+    }
+  },
+
+  updatePaymentStatus: async (id, paymentStatus) => {
+    updateOrderStatusInCloudSync(id, null, paymentStatus);
+    try {
+      return await apiCall(`/orders/admin/${id}/payment`, 'PATCH', { paymentStatus }, localStorage.getItem('dakshin_admin_token'));
+    } catch (err) {
+      return { success: true, message: `Payment status updated to "${paymentStatus}".` };
+    }
+  },
 
   getAdminMenu: () => apiCall('/menu?availableOnly=false'),
   createMenuItem: (data) => apiCall('/menu/admin', 'POST', data, localStorage.getItem('dakshin_admin_token')),
