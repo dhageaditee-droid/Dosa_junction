@@ -176,9 +176,25 @@ const AdminOrders = () => {
             </p>
           </div>
 
-          <button onClick={fetchOrders} className="btn btn-outline btn-sm" style={{ backgroundColor: '#FFFFFF' }}>
-            <RefreshCw size={16} /> Sync Live Orders
-          </button>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <input
+              type="text"
+              placeholder="Enter Order # (e.g. ORD-921219)"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{
+                padding: '0.45rem 0.85rem',
+                borderRadius: '8px',
+                border: '1px solid var(--color-border)',
+                fontSize: '0.85rem',
+                outline: 'none',
+                backgroundColor: '#FFFFFF'
+              }}
+            />
+            <button onClick={() => fetchOrders(true)} className="btn btn-primary btn-sm" style={{ padding: '0.45rem 1rem' }}>
+              <RefreshCw size={16} /> Sync Live Orders
+            </button>
+          </div>
         </div>
 
         {/* Filter Controls */}
