@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingBag, Search, Filter, RefreshCw, Eye, X, Printer, CheckCircle, Ban, DollarSign, ChevronDown, ChevronUp, Package } from 'lucide-react';
+import { ShoppingBag, Search, Filter, RefreshCw, Eye, X, Printer, CheckCircle, Ban, DollarSign, ChevronDown, ChevronUp, Package, MessageCircle } from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
 import StatusBadge from '../components/StatusBadge';
 import SkeletonLoader from '../components/SkeletonLoader';
@@ -58,11 +58,31 @@ const AdminOrders = () => {
     }));
   };
 
+  const sendWhatsAppConfirmation = (ord, statusName = 'Confirmed') => {
+    if (!ord) return;
+    const rawPhone = (ord.customer_phone || '').replace(/[^0-9]/g, '');
+    if (!rawPhone) return;
+    const phoneNum = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone;
+
+    const message = `Hello ${ord.customer_name || 'Customer'}! 🎉 Your Dosa Junction order *#${ord.order_number}* is now *${statusName.toUpperCase()}*!\n\n📋 Ordered Items:\n` +
+      (ord.items ? ord.items.map(i => `• ${i.quantity}x ${cleanDishName(i.item_name)}`).join('\n') : '') +
+      `\n\n💰 Total Bill: ₹${parseFloat(ord.total_amount || 0).toFixed(2)}\n🚚 Order Type: ${ord.order_type || 'Home Delivery'}\n\nTrack your order live status here: https://dosa-junction.vercel.app/track/${ord.order_number}\n\nThank you for ordering with Dosa Junction! 🥞☕`;
+
+    const waUrl = `https://wa.me/${phoneNum}?text=${encodeURIComponent(message)}`;
+    window.open(waUrl, '_blank');
+  };
+
   const handleStatusUpdate = async (orderId, newStatus) => {
     try {
       const res = await apiService.updateOrderStatus(orderId, newStatus);
       if (res.success) {
         if (addToast) addToast(`Order status updated to "${newStatus}"`, 'success');
+        
+        const targetOrder = orders.find(o => String(o.id) === String(orderId) || o.order_number === orderId);
+        if (targetOrder) {
+          sendWhatsAppConfirmation(targetOrder, newStatus);
+        }
+
         fetchOrders();
         if (selectedOrder && selectedOrder.id === orderId) {
           setSelectedOrder(prev => ({ ...prev, status: newStatus }));
@@ -390,6 +410,14 @@ const AdminOrders = () => {
                               style={{ padding: '4px 8px', backgroundColor: '#F1F5F9', borderRadius: '6px', color: '#475569', border: 'none', cursor: 'pointer' }}
                             >
                               <Printer size={15} />
+                            </button>
+
+                            <button
+                              onClick={() => sendWhatsAppConfirmation(ord, ord.status || 'Confirmed')}
+                              title="Send WhatsApp Confirmation to Customer"
+                              style={{ padding: '4px 8px', backgroundColor: '#DCFCE7', borderRadius: '6px', color: '#16A34A', border: 'none', cursor: 'pointer' }}
+                            >
+                              <MessageCircle size={15} />
                             </button>
 
                             {ord.payment_status !== 'PAID' && (
