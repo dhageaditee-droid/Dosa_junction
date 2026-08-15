@@ -3,6 +3,7 @@ import { FALLBACK_CATEGORIES, FALLBACK_MENU_ITEMS } from '../data/fallbackData';
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
 const WEBHOOK_SYNC_POST = 'https://webhook.site/ec62d034-0a31-4911-bed6-37c9031734d9';
 const WEBHOOK_SYNC_GET = 'https://webhook.site/token/ec62d034-0a31-4911-bed6-37c9031734d9/requests?per_page=100';
+const CRUDCRUD_API = 'https://crudcrud.com/api/d7859bc94403407b978b67acd4623a5d/orders';
 
 const INITIAL_DEMO_ORDERS = [
   {
@@ -147,7 +148,7 @@ const INITIAL_DEMO_ORDERS = [
   }
 ];
 
-// Helper to push order to global cloud store (100% CORS-friendly Webhook Relay)
+// Helper to push order to global cloud store (100% CORS-friendly Cloud DB + Webhook Relay)
 const pushOrderToCloudSync = async (newOrder) => {
   // 1. Save to LocalStorage
   try {
@@ -157,7 +158,16 @@ const pushOrderToCloudSync = async (newOrder) => {
     localStorage.setItem('dakshin_my_orders', JSON.stringify(updatedLocal));
   } catch (e) {}
 
-  // 2. Post to 100% CORS-friendly Webhook Cloud Relay
+  // 2. Post to CrudCrud Cloud DB
+  try {
+    await fetch(CRUDCRUD_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newOrder)
+    });
+  } catch (e) {}
+
+  // 3. Post to 100% CORS-friendly Webhook Cloud Relay
   try {
     await fetch(WEBHOOK_SYNC_POST, {
       method: 'POST',
@@ -169,11 +179,24 @@ const pushOrderToCloudSync = async (newOrder) => {
   }
 };
 
-// Helper to fetch live orders from Webhook Cloud Relay + LocalStorage + Demo Orders
+// Helper to fetch live orders from CrudCrud Cloud DB + Webhook Cloud Relay + LocalStorage + Demo Orders
 const fetchOrdersFromCloudSync = async () => {
   const cloudOrders = [];
 
-  // 1. Fetch from 100% working Webhook Cloud Relay
+  // 1. Fetch from CrudCrud Cloud DB
+  try {
+    const res = await fetch(CRUDCRUD_API);
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        data.forEach(ord => {
+          if (ord && ord.order_number) cloudOrders.push(ord);
+        });
+      }
+    }
+  } catch (e) {}
+
+  // 2. Fetch from 100% working Webhook Cloud Relay
   try {
     const res = await fetch(WEBHOOK_SYNC_GET);
     if (res.ok) {
