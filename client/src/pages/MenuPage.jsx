@@ -62,7 +62,7 @@ const MenuPage = () => {
       const params = new URLSearchParams();
       if (selectedCategory !== 'all') params.append('category', selectedCategory);
 
-      const res = await apiService.getMenuItems(params.toString());
+      const res = await apiService.getMenu(params.toString());
       setItems(res.items || []);
     } catch (err) {
       console.error(err);
