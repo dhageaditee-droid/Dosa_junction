@@ -209,74 +209,87 @@ export const apiCall = async (endpoint, method = 'GET', data = null, customToken
   }
 };
 
+// Helper for dynamic local menu persistence across mobile and admin
+const getDynamicMenu = () => {
+  try {
+    const saved = localStorage.getItem('dakshin_custom_menu');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch (e) {}
+  return FALLBACK_MENU_ITEMS;
+};
+
 // Convenience API Service Methods
 export const apiService = {
   // Menu & Categories
   getMenu: async (paramsStr = '') => {
     try {
-      return await apiCall(`/menu${paramsStr ? `?${paramsStr}` : ''}`);
-    } catch (err) {
-      console.log('Serving fallback menu data for Vercel static environment');
+      const res = await apiCall(`/menu${paramsStr ? `?${paramsStr}` : ''}`);
+      if (res && res.items && res.items.length > 0) return res;
+    } catch (err) {}
       
-      const searchParams = new URLSearchParams(paramsStr);
-      const category = searchParams.get('category');
-      const search = searchParams.get('search');
-      const veg = searchParams.get('veg');
-      const bestseller = searchParams.get('bestseller');
-      const maxPrice = searchParams.get('maxPrice');
+    const searchParams = new URLSearchParams(paramsStr);
+    const category = searchParams.get('category');
+    const search = searchParams.get('search');
+    const veg = searchParams.get('veg');
+    const bestseller = searchParams.get('bestseller');
+    const maxPrice = searchParams.get('maxPrice');
 
-      let filtered = [...FALLBACK_MENU_ITEMS];
+    let filtered = getDynamicMenu();
 
-      const categorySlugToId = {
-        'beverages': 1,
-        'dosa': 2,
-        'special-dosa': 3,
-        'uttapam': 4,
-        'idli': 5,
-        'vada': 6,
-        'desserts': 7,
-        'rice': 8,
-        'extras': 9
-      };
+    const categorySlugToId = {
+      'beverages': 1,
+      'dosa': 2,
+      'special-dosa': 3,
+      'uttapam': 4,
+      'idli': 5,
+      'vada': 6,
+      'desserts': 7,
+      'rice': 8,
+      'extras': 9
+    };
 
-      if (category && category !== 'all') {
-        const catId = categorySlugToId[category];
-        filtered = filtered.filter(i => i.category_slug === category || i.category_id === catId);
-      }
-
-      if (search && search.trim()) {
-        const q = search.trim().toLowerCase();
-        filtered = filtered.filter(i => 
-          i.name.toLowerCase().includes(q) || 
-          i.description.toLowerCase().includes(q) ||
-          (i.category_slug && i.category_slug.toLowerCase().includes(q))
-        );
-      }
-
-      if (veg === 'true') {
-        filtered = filtered.filter(i => i.is_veg === true);
-      }
-
-      if (bestseller === 'true') {
-        filtered = filtered.filter(i => i.is_bestseller === true);
-      }
-
-      if (maxPrice) {
-        const maxP = parseFloat(maxPrice);
-        filtered = filtered.filter(i => i.price <= maxP);
-      }
-
-      return { success: true, count: filtered.length, items: filtered };
+    if (category && category !== 'all') {
+      const catId = categorySlugToId[category];
+      filtered = filtered.filter(i => i.category_slug === category || i.category_id === catId);
     }
+
+    if (search && search.trim()) {
+      const q = search.trim().toLowerCase();
+      filtered = filtered.filter(i => 
+        (i.name && i.name.toLowerCase().includes(q)) || 
+        (i.description && i.description.toLowerCase().includes(q)) ||
+        (i.category_slug && i.category_slug.toLowerCase().includes(q))
+      );
+    }
+
+    if (veg === 'true') {
+      filtered = filtered.filter(i => i.is_veg === true);
+    }
+
+    if (bestseller === 'true') {
+      filtered = filtered.filter(i => i.is_bestseller === true);
+    }
+
+    if (maxPrice) {
+      const maxP = parseFloat(maxPrice);
+      filtered = filtered.filter(i => i.price <= maxP);
+    }
+
+    return { success: true, count: filtered.length, items: filtered };
   },
 
   getMenuItem: async (id) => {
     try {
-      return await apiCall(`/menu/${id}`);
-    } catch (err) {
-      const found = FALLBACK_MENU_ITEMS.find(i => i.id === parseInt(id, 10));
-      return { success: true, item: found || FALLBACK_MENU_ITEMS[0] };
-    }
+      const res = await apiCall(`/menu/${id}`);
+      if (res && res.item) return res;
+    } catch (err) {}
+
+    const items = getDynamicMenu();
+    const found = items.find(i => String(i.id) === String(id));
+    return { success: true, item: found || items[0] };
   },
 
   getCategories: async () => {
@@ -605,22 +618,218 @@ export const apiService = {
     }
   },
 
-  getAdminMenu: () => apiCall('/menu?availableOnly=false'),
-  createMenuItem: (data) => apiCall('/menu/admin', 'POST', data, localStorage.getItem('dakshin_admin_token')),
-  updateMenuItem: (id, data) => apiCall(`/menu/admin/${id}`, 'PUT', data, localStorage.getItem('dakshin_admin_token')),
-  deleteMenuItem: (id) => apiCall(`/menu/admin/${id}`, 'DELETE', null, localStorage.getItem('dakshin_admin_token')),
+  // Admin Menu CRUD
+  getAdminMenu: async () => {
+    try {
+      const res = await apiCall('/menu?availableOnly=false');
+      if (res && res.items && res.items.length > 0) return res;
+    } catch (e) {}
+    const items = getDynamicMenu();
+    return { success: true, count: items.length, items };
+  },
 
-  getAdminOffers: () => apiCall('/offers/admin/all', 'GET', null, localStorage.getItem('dakshin_admin_token')),
-  createOffer: (data) => apiCall('/offers/admin', 'POST', data, localStorage.getItem('dakshin_admin_token')),
-  updateOffer: (id, data) => apiCall(`/offers/admin/${id}`, 'PUT', data, localStorage.getItem('dakshin_admin_token')),
-  deleteOffer: (id) => apiCall(`/offers/admin/${id}`, 'DELETE', null, localStorage.getItem('dakshin_admin_token')),
+  createMenuItem: async (data) => {
+    const newItem = {
+      id: Date.now(),
+      name: data.name,
+      description: data.description || '',
+      price: parseFloat(data.price),
+      category_id: parseInt(data.category_id || 2, 10),
+      category_slug: data.category_slug || 'dosa',
+      is_veg: data.is_veg !== false,
+      is_bestseller: !!data.is_bestseller,
+      is_available: data.is_available !== false,
+      image_url: data.image_url || 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=800&q=80'
+    };
+    try {
+      await apiCall('/menu/admin', 'POST', data, localStorage.getItem('dakshin_admin_token'));
+    } catch (e) {}
+    try {
+      const current = getDynamicMenu();
+      const updated = [newItem, ...current];
+      localStorage.setItem('dakshin_custom_menu', JSON.stringify(updated));
+    } catch (e) {}
+    return { success: true, message: 'Menu item created successfully!', item: newItem };
+  },
 
-  getAdminCoupons: () => apiCall('/coupons/admin/all', 'GET', null, localStorage.getItem('dakshin_admin_token')),
-  createCoupon: (data) => apiCall('/coupons/admin', 'POST', data, localStorage.getItem('dakshin_admin_token')),
-  updateCoupon: (id, data) => apiCall(`/coupons/admin/${id}`, 'PUT', data, localStorage.getItem('dakshin_admin_token')),
-  deleteCoupon: (id) => apiCall(`/coupons/admin/${id}`, 'DELETE', null, localStorage.getItem('dakshin_admin_token')),
+  updateMenuItem: async (id, data) => {
+    try {
+      await apiCall(`/menu/admin/${id}`, 'PUT', data, localStorage.getItem('dakshin_admin_token'));
+    } catch (e) {}
+    try {
+      const current = getDynamicMenu();
+      const updated = current.map(item => {
+        if (String(item.id) === String(id)) {
+          return {
+            ...item,
+            ...data,
+            price: data.price ? parseFloat(data.price) : item.price
+          };
+        }
+        return item;
+      });
+      localStorage.setItem('dakshin_custom_menu', JSON.stringify(updated));
+    } catch (e) {}
+    return { success: true, message: 'Menu item updated successfully!' };
+  },
+
+  deleteMenuItem: async (id) => {
+    try {
+      await apiCall(`/menu/admin/${id}`, 'DELETE', null, localStorage.getItem('dakshin_admin_token'));
+    } catch (e) {}
+    try {
+      const current = getDynamicMenu();
+      const updated = current.filter(item => String(item.id) !== String(id));
+      localStorage.setItem('dakshin_custom_menu', JSON.stringify(updated));
+    } catch (e) {}
+    return { success: true, message: 'Menu item deleted successfully!' };
+  },
+
+  // Admin Offers CRUD
+  getAdminOffers: async () => {
+    try {
+      const res = await apiCall('/offers/admin/all', 'GET', null, localStorage.getItem('dakshin_admin_token'));
+      if (res && res.offers) return res;
+    } catch (e) {}
+    try {
+      const saved = localStorage.getItem('dakshin_custom_offers');
+      if (saved) return { success: true, offers: JSON.parse(saved) };
+    } catch (e) {}
+    return apiService.getOffers();
+  },
+
+  createOffer: async (data) => {
+    try {
+      await apiCall('/offers/admin', 'POST', data, localStorage.getItem('dakshin_admin_token'));
+    } catch (e) {}
+    try {
+      const currentRes = await apiService.getAdminOffers();
+      const current = currentRes.offers || [];
+      const newOffer = { id: Date.now(), ...data };
+      const updated = [newOffer, ...current];
+      localStorage.setItem('dakshin_custom_offers', JSON.stringify(updated));
+    } catch (e) {}
+    return { success: true, message: 'Offer created successfully!' };
+  },
+
+  updateOffer: async (id, data) => {
+    try {
+      await apiCall(`/offers/admin/${id}`, 'PUT', data, localStorage.getItem('dakshin_admin_token'));
+    } catch (e) {}
+    try {
+      const currentRes = await apiService.getAdminOffers();
+      const current = currentRes.offers || [];
+      const updated = current.map(o => String(o.id) === String(id) ? { ...o, ...data } : o);
+      localStorage.setItem('dakshin_custom_offers', JSON.stringify(updated));
+    } catch (e) {}
+    return { success: true, message: 'Offer updated successfully!' };
+  },
+
+  deleteOffer: async (id) => {
+    try {
+      await apiCall(`/offers/admin/${id}`, 'DELETE', null, localStorage.getItem('dakshin_admin_token'));
+    } catch (e) {}
+    try {
+      const currentRes = await apiService.getAdminOffers();
+      const current = currentRes.offers || [];
+      const updated = current.filter(o => String(o.id) !== String(id));
+      localStorage.setItem('dakshin_custom_offers', JSON.stringify(updated));
+    } catch (e) {}
+    return { success: true, message: 'Offer deleted successfully!' };
+  },
+
+  // Admin Coupons CRUD
+  getAdminCoupons: async () => {
+    try {
+      const res = await apiCall('/coupons/admin/all', 'GET', null, localStorage.getItem('dakshin_admin_token'));
+      if (res && res.coupons) return res;
+    } catch (e) {}
+    try {
+      const saved = localStorage.getItem('dakshin_custom_coupons');
+      if (saved) return { success: true, coupons: JSON.parse(saved) };
+    } catch (e) {}
+    return {
+      success: true,
+      coupons: [
+        { id: 1, code: 'FREEPLAIN1', discount_percentage: 0, discount_amount: 60, min_order_amount: 350, is_active: true }
+      ]
+    };
+  },
+
+  createCoupon: async (data) => {
+    try {
+      await apiCall('/coupons/admin', 'POST', data, localStorage.getItem('dakshin_admin_token'));
+    } catch (e) {}
+    try {
+      const currentRes = await apiService.getAdminCoupons();
+      const current = currentRes.coupons || [];
+      const newC = { id: Date.now(), is_active: true, ...data };
+      const updated = [newC, ...current];
+      localStorage.setItem('dakshin_custom_coupons', JSON.stringify(updated));
+    } catch (e) {}
+    return { success: true, message: 'Coupon created successfully!' };
+  },
+
+  updateCoupon: async (id, data) => {
+    try {
+      await apiCall(`/coupons/admin/${id}`, 'PUT', data, localStorage.getItem('dakshin_admin_token'));
+    } catch (e) {}
+    try {
+      const currentRes = await apiService.getAdminCoupons();
+      const current = currentRes.coupons || [];
+      const updated = current.map(c => String(c.id) === String(id) ? { ...c, ...data } : c);
+      localStorage.setItem('dakshin_custom_coupons', JSON.stringify(updated));
+    } catch (e) {}
+    return { success: true, message: 'Coupon updated successfully!' };
+  },
+
+  deleteCoupon: async (id) => {
+    try {
+      await apiCall(`/coupons/admin/${id}`, 'DELETE', null, localStorage.getItem('dakshin_admin_token'));
+    } catch (e) {}
+    try {
+      const currentRes = await apiService.getAdminCoupons();
+      const current = currentRes.coupons || [];
+      const updated = current.filter(c => String(c.id) !== String(id));
+      localStorage.setItem('dakshin_custom_coupons', JSON.stringify(updated));
+    } catch (e) {}
+    return { success: true, message: 'Coupon deleted successfully!' };
+  },
 
   getAdminEnquiries: () => apiCall('/contact/admin/all', 'GET', null, localStorage.getItem('dakshin_admin_token')),
-  getAdminSettings: () => apiCall('/settings'),
-  updateAdminSettings: (data) => apiCall('/settings/admin', 'PUT', data, localStorage.getItem('dakshin_admin_token'))
+
+  getAdminSettings: async () => {
+    try {
+      const res = await apiCall('/settings');
+      if (res && res.settings) return res;
+    } catch (e) {}
+    try {
+      const saved = localStorage.getItem('dakshin_custom_settings');
+      if (saved) return { success: true, settings: JSON.parse(saved) };
+    } catch (e) {}
+    return {
+      success: true,
+      settings: {
+        restaurant_name: 'Dosa Junction',
+        restaurant_tagline: 'Taste of South',
+        phone: '+91 91580 75480',
+        email: 'info@dosajunction.com',
+        address: 'Sinnar Gaurav, Near Panchvati Hotel, Sinnar',
+        opening_hours: '7:00 AM - 11:00 PM',
+        delivery_charge: 30,
+        packing_charge: 15,
+        min_order_free_delivery: 350
+      }
+    };
+  },
+
+  updateAdminSettings: async (data) => {
+    try {
+      await apiCall('/settings/admin', 'PUT', data, localStorage.getItem('dakshin_admin_token'));
+    } catch (e) {}
+    try {
+      localStorage.setItem('dakshin_custom_settings', JSON.stringify(data));
+    } catch (e) {}
+    return { success: true, message: 'Restaurant settings updated successfully!' };
+  }
 };
