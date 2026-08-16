@@ -192,6 +192,53 @@ const MenuPage = () => {
           
 
 
+          {/* Mobile Horizontally Scrollable Category Bar */}
+          <div className="mobile-category-container" style={{ display: 'none', marginBottom: '1.5rem' }}>
+            <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#064E3B', marginBottom: '8px', letterSpacing: '1px', textTransform: 'uppercase', textAlign: 'center' }}>
+              ❖ Categories ❖
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                gap: '8px',
+                overflowX: 'auto',
+                paddingBottom: '8px',
+                scrollbarWidth: 'none'
+              }}
+              className="no-scrollbar"
+            >
+              {categories.map((cat) => {
+                const isActiveCat = selectedCategory === cat.slug;
+                const IconComponent = cat.icon || Utensils;
+                return (
+                  <button
+                    key={cat.slug}
+                    onClick={() => setSelectedCategory(cat.slug)}
+                    style={{
+                      flexShrink: 0,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '8px 16px',
+                      borderRadius: '25px',
+                      border: '1.5px solid',
+                      borderColor: isActiveCat ? '#064E3B' : '#E2E8F0',
+                      backgroundColor: isActiveCat ? '#064E3B' : '#FFFFFF',
+                      color: isActiveCat ? '#FFFFFF' : '#334155',
+                      fontWeight: isActiveCat ? 800 : 600,
+                      fontSize: '0.82rem',
+                      cursor: 'pointer',
+                      boxShadow: isActiveCat ? '0 4px 10px rgba(6, 78, 59, 0.25)' : '0 2px 6px rgba(0,0,0,0.03)'
+                    }}
+                  >
+                    <IconComponent size={15} color={isActiveCat ? '#F59E0B' : '#64748B'} />
+                    <span>{translateCategory(cat.name)}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Main 2-Column Grid: Left Categories Sidebar + Right Dishes */}
           <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: '2rem' }} className="menu-layout-grid">
             
@@ -406,6 +453,9 @@ const MenuPage = () => {
           }
           .desktop-category-sidebar {
             display: none !important;
+          }
+          .mobile-category-container {
+            display: block !important;
           }
           .food-menu-grid {
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
