@@ -63,19 +63,20 @@ const AdminLogin = () => {
         
         {/* Header */}
         <div style={{ textCenter: 'center', marginBottom: '2rem', textAlign: 'center' }}>
-          <div style={{
-            width: '56px',
-            height: '56px',
-            borderRadius: '50%',
-            backgroundColor: 'var(--color-emerald)',
-            color: 'var(--color-gold)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 0.75rem auto'
-          }}>
-            <Utensils size={28} />
-          </div>
+          <img
+            src="/dosa-junction-logo.jpg"
+            alt="Dosa Junction Logo"
+            style={{
+              width: '80px',
+              height: '80px',
+              borderRadius: '50%',
+              objectFit: 'cover',
+              border: '3px solid var(--color-gold)',
+              boxShadow: '0 6px 16px rgba(0,0,0,0.15)',
+              margin: '0 auto 1rem auto',
+              display: 'block'
+            }}
+          />
 
           <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.8rem', color: 'var(--color-emerald)', marginBottom: '0.25rem' }}>
             Dosa Junction <span style={{ color: 'var(--color-gold)' }}>Admin</span>

@@ -122,6 +122,20 @@ const CustomerAuthModal = ({ isOpen, onClose }) => {
         </button>
 
         <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+          <img
+            src="/dosa-junction-logo.jpg"
+            alt="Dosa Junction Logo"
+            style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              objectFit: 'cover',
+              border: '2px solid var(--color-gold)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              margin: '0 auto 0.75rem auto',
+              display: 'block'
+            }}
+          />
           <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--color-emerald)' }}>
             {isLoginView ? 'Welcome Back!' : 'Create Customer Account'}
           </h2>

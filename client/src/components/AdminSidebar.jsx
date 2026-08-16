@@ -47,13 +47,27 @@ const AdminSidebar = () => {
     }}>
       
       {/* Brand Header */}
-      <div style={{ padding: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-        <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', color: '#FFFFFF', margin: 0 }}>
-          Dosa Junction <span style={{ color: 'var(--color-gold)' }}>Admin</span>
-        </h2>
-        <span style={{ fontSize: '0.7rem', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600 }}>
-          Management Portal
-        </span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '1.25rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+        <img
+          src="/dosa-junction-logo.jpg"
+          alt="Dosa Junction Logo"
+          style={{
+            width: '42px',
+            height: '42px',
+            borderRadius: '50%',
+            objectFit: 'cover',
+            border: '2px solid #F59E0B',
+            flexShrink: 0
+          }}
+        />
+        <div>
+          <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.15rem', color: '#FFFFFF', margin: 0, lineHeight: 1.1 }}>
+            Dosa Junction <span style={{ color: 'var(--color-gold)' }}>Admin</span>
+          </h2>
+          <span style={{ fontSize: '0.68rem', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600 }}>
+            Management Portal
+          </span>
+        </div>
       </div>
 
       {/* Admin User Badge */}

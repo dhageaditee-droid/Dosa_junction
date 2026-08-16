@@ -16,19 +16,19 @@ const Footer = () => {
           
           {/* Column 1: Restaurant Story */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1rem' }}>
-              <div style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '50%',
-                backgroundColor: 'var(--color-gold)',
-                color: '#fff',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <Utensils size={20} />
-              </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+              <img
+                src="/dosa-junction-logo.jpg"
+                alt="Dosa Junction Logo"
+                style={{
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: '50%',
+                  objectFit: 'cover',
+                  border: '2px solid var(--color-gold)',
+                  flexShrink: 0
+                }}
+              />
               <span style={{ fontFamily: 'var(--font-heading)', fontSize: '1.4rem', fontWeight: 800, color: '#fff' }}>
                 Dosa <span style={{ color: 'var(--color-gold)' }}>Junction</span>
               </span>

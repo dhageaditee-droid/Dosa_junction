@@ -27,21 +27,19 @@ const Navbar = ({ onOpenAuthModal }) => {
         
         {/* Brand Logo & Name */}
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', textDecoration: 'none' }}>
-          <div style={{
-            width: '44px',
-            height: '44px',
-            borderRadius: '12px',
-            background: 'linear-gradient(135deg, #0F172A, #1E293B)',
-            color: '#D97706',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 4px 14px rgba(217, 119, 6, 0.25)',
-            border: '1px solid rgba(217, 119, 6, 0.3)',
-            flexShrink: 0
-          }}>
-            <UtensilsCrossed size={22} />
-          </div>
+          <img
+            src="/dosa-junction-logo.jpg"
+            alt="Dosa Junction Logo"
+            style={{
+              width: '46px',
+              height: '46px',
+              borderRadius: '50%',
+              objectFit: 'cover',
+              border: '2px solid var(--color-gold)',
+              boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
+              flexShrink: 0
+            }}
+          />
           <div>
             <span style={{
               fontFamily: 'var(--font-heading)',
