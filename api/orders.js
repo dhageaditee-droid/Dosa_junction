@@ -1,18 +1,30 @@
-const CRUDCRUD_API = 'https://crudcrud.com/api/bd9a3ec70f874fa7b84f60f95cd82dff/orders';
+const CRUDCRUD_TOKENS = [
+  'bbdea4a2062f40b3a98a93961cf46147',
+  'bd9a3ec70f874fa7b84f60f95cd82dff',
+  'b2c7cdd91fb548f69456e69f9c521266'
+];
 
-let initialDemoOrders = [];
+let memoryOrdersStore = [];
 
 const fetchCloudOrders = async () => {
-  try {
-    const res = await fetch(CRUDCRUD_API);
-    if (res.ok) {
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        return data;
+  if (memoryOrdersStore.length > 0) {
+    return memoryOrdersStore;
+  }
+
+  for (const token of CRUDCRUD_TOKENS) {
+    try {
+      const res = await fetch(`https://crudcrud.com/api/${token}/orders`);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          memoryOrdersStore = data;
+          return memoryOrdersStore;
+        }
       }
-    }
-  } catch (e) {}
-  return initialDemoOrders;
+    } catch (e) {}
+  }
+
+  return memoryOrdersStore;
 };
 
 module.exports = async function handler(req, res) {
@@ -30,15 +42,22 @@ module.exports = async function handler(req, res) {
 
   try {
     if (req.method === 'DELETE') {
-      try {
-        const cloud = await fetchCloudOrders();
-        for (const item of cloud) {
-          if (item._id) {
-            await fetch(`${CRUDCRUD_API}/${item._id}`, { method: 'DELETE' });
+      memoryOrdersStore = [];
+      for (const token of CRUDCRUD_TOKENS) {
+        try {
+          const res = await fetch(`https://crudcrud.com/api/${token}/orders`);
+          if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data)) {
+              for (const item of data) {
+                if (item._id) {
+                  await fetch(`https://crudcrud.com/api/${token}/orders/${item._id}`, { method: 'DELETE' });
+                }
+              }
+            }
           }
-        }
-      } catch (e) {}
-      initialDemoOrders = [];
+        } catch (e) {}
+      }
       return res.status(200).json({ success: true, message: 'All orders cleared successfully' });
     }
 
@@ -94,15 +113,20 @@ module.exports = async function handler(req, res) {
         created_at: orderData.created_at || new Date().toISOString()
       };
 
-      try {
-        await fetch(CRUDCRUD_API, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newOrder)
-        });
-      } catch (e) {}
+      // Add to memory store immediately
+      memoryOrdersStore = [newOrder, ...memoryOrdersStore.filter(o => o.order_number !== newOrder.order_number)];
 
-      currentOrders = [newOrder, ...currentOrders];
+      // Sync to cloud token
+      for (const token of CRUDCRUD_TOKENS) {
+        try {
+          const cloudRes = await fetch(`https://crudcrud.com/api/${token}/orders`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newOrder)
+          });
+          if (cloudRes.ok) break;
+        } catch (e) {}
+      }
 
       return res.status(201).json({
         success: true,
@@ -118,8 +142,8 @@ module.exports = async function handler(req, res) {
 
     return res.status(200).json({
       success: true,
-      count: currentOrders.length,
-      orders: currentOrders
+      count: memoryOrdersStore.length,
+      orders: memoryOrdersStore
     });
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });

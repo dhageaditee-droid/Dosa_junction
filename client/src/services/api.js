@@ -5,7 +5,11 @@ const LIVE_VERCEL_API = 'https://dosa-junction.vercel.app/api/orders';
 
 const INITIAL_DEMO_ORDERS = [];
 
-const CRUDCRUD_API = 'https://crudcrud.com/api/bd9a3ec70f874fa7b84f60f95cd82dff/orders';
+const CRUDCRUD_TOKENS = [
+  'bbdea4a2062f40b3a98a93961cf46147',
+  'bd9a3ec70f874fa7b84f60f95cd82dff',
+  'b2c7cdd91fb548f69456e69f9c521266'
+];
 
 const getOrdersEndpoint = () => {
   if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
@@ -36,13 +40,16 @@ const pushOrderToCloudSync = async (newOrder) => {
   }
 
   // 3. Direct backup post to CrudCrud cloud DB
-  try {
-    await fetch(CRUDCRUD_API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newOrder)
-    });
-  } catch (e) {}
+  for (const token of CRUDCRUD_TOKENS) {
+    try {
+      const res = await fetch(`https://crudcrud.com/api/${token}/orders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newOrder)
+      });
+      if (res.ok) break;
+    } catch (e) {}
+  }
 };
 
 // Helper to fetch live orders from Vercel API + CrudCrud + LocalStorage
@@ -61,15 +68,18 @@ const fetchOrdersFromCloudSync = async () => {
   } catch (e) {}
 
   // 2. Fetch from CrudCrud Cloud DB Direct Backup
-  try {
-    const res = await fetch(CRUDCRUD_API);
-    if (res.ok) {
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        data.forEach(o => cloudOrders.push(o));
+  for (const token of CRUDCRUD_TOKENS) {
+    try {
+      const res = await fetch(`https://crudcrud.com/api/${token}/orders`);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          data.forEach(o => cloudOrders.push(o));
+          break;
+        }
       }
-    }
-  } catch (e) {}
+    } catch (e) {}
+  }
 
   // 3. Fetch from LocalStorage
   try {
