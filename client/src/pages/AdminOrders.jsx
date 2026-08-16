@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { ShoppingBag, Search, Filter, RefreshCw, Eye, X, Printer, CheckCircle, Ban, DollarSign, ChevronDown, ChevronUp, Package, Clock } from 'lucide-react';
+import { ShoppingBag, Search, Filter, RefreshCw, Eye, X, Printer, CheckCircle, Ban, DollarSign, ChevronDown, ChevronUp, Package, Clock, Trash2 } from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
 import StatusBadge from '../components/StatusBadge';
 import SkeletonLoader from '../components/SkeletonLoader';
@@ -48,6 +47,21 @@ const AdminOrders = () => {
       if (showLoading && addToast) addToast('Failed to load admin orders list', 'error');
     } finally {
       if (showLoading) setLoading(false);
+    }
+  };
+
+  const handleClearAllOrders = async () => {
+    if (window.confirm('Are you sure you want to clear ALL dummy & past orders? This will wipe the list completely.')) {
+      try {
+        setLoading(true);
+        await apiService.clearAllOrders();
+        setOrders([]);
+        if (addToast) addToast('All dummy orders cleared successfully!', 'success');
+      } catch (err) {
+        if (addToast) addToast('Failed to clear orders', 'error');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -141,9 +155,27 @@ const AdminOrders = () => {
             </p>
           </div>
 
-          <button onClick={fetchOrders} className="btn btn-outline btn-sm" style={{ backgroundColor: '#FFFFFF', flexShrink: 0 }}>
-            <RefreshCw size={16} /> Sync Live Orders
-          </button>
+          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+            <button onClick={fetchOrders} className="btn btn-outline btn-sm" style={{ backgroundColor: '#FFFFFF', flexShrink: 0 }}>
+              <RefreshCw size={16} /> Sync Live Orders
+            </button>
+            <button
+              onClick={handleClearAllOrders}
+              className="btn btn-sm"
+              style={{
+                backgroundColor: '#dc2626',
+                color: '#ffffff',
+                border: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                fontWeight: 'bold',
+                flexShrink: 0
+              }}
+            >
+              <Trash2 size={16} /> Clear All Orders
+            </button>
+          </div>
         </div>
 
         {/* Filter Controls */}

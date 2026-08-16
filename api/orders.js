@@ -29,6 +29,19 @@ module.exports = async function handler(req, res) {
   }
 
   try {
+    if (req.method === 'DELETE') {
+      try {
+        const cloud = await fetchCloudOrders();
+        for (const item of cloud) {
+          if (item._id) {
+            await fetch(`${CRUDCRUD_API}/${item._id}`, { method: 'DELETE' });
+          }
+        }
+      } catch (e) {}
+      initialDemoOrders = [];
+      return res.status(200).json({ success: true, message: 'All orders cleared successfully' });
+    }
+
     let currentOrders = await fetchCloudOrders();
 
     if (req.method === 'POST') {

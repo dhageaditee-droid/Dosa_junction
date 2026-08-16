@@ -29,6 +29,15 @@ const pushOrderToCloudSync = async (newOrder) => {
 
 // Helper to fetch live orders from Vercel API + LocalStorage + Demo Orders
 const fetchOrdersFromCloudSync = async () => {
+  // One-time auto purge of cached legacy dummy orders in localStorage
+  if (localStorage.getItem('dakshin_orders_clean_v6') !== 'true') {
+    try {
+      localStorage.removeItem('dakshin_all_orders');
+      localStorage.removeItem('dakshin_my_orders');
+      localStorage.setItem('dakshin_orders_clean_v6', 'true');
+    } catch (e) {}
+  }
+
   const cloudOrders = [];
 
   // 1. Fetch from same-domain Vercel Serverless API (/api/orders)
@@ -544,6 +553,18 @@ export const apiService = {
     }
 
     return { success: true, count: allOrders.length, orders: allOrders };
+  },
+
+  clearAllOrders: async () => {
+    try {
+      localStorage.removeItem('dakshin_all_orders');
+      localStorage.removeItem('dakshin_my_orders');
+      localStorage.setItem('dakshin_orders_clean_v6', 'true');
+    } catch (e) {}
+    try {
+      await fetch('/api/orders', { method: 'DELETE' });
+    } catch (e) {}
+    return { success: true, message: 'All orders cleared successfully' };
   },
 
   updateOrderStatus: async (id, status) => {
