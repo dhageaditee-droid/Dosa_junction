@@ -132,9 +132,10 @@ const MenuPage = () => {
 
       {/* ================= TOP MENU HERO BANNER ================= */}
       <section
+        className="menu-top-banner"
         style={{
           background: 'linear-gradient(180deg, #FBF8F1 0%, #F5EFE3 100%)',
-          padding: '2.5rem 0 2rem 0',
+          padding: '1.25rem 0 1rem 0',
           borderBottom: '1px solid #E5E7EB',
           position: 'relative',
           overflow: 'hidden'
@@ -144,42 +145,38 @@ const MenuPage = () => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '1fr 340px',
-              gap: '2rem',
+              gridTemplateColumns: '1fr 280px',
+              gap: '1.5rem',
               alignItems: 'center'
             }}
             className="menu-banner-grid"
           >
             <div>
               <h1
+                className="menu-title-text"
                 style={{
-                  fontSize: '3rem',
+                  fontSize: '2rem',
                   fontWeight: 800,
                   color: '#064E3B',
                   fontFamily: 'var(--font-heading)',
-                  margin: '0 0 8px 0',
+                  margin: '0 0 4px 0',
                   lineHeight: 1.15
                 }}
               >
                 Our <span style={{ color: '#D97706' }}>South Indian</span> Menu
               </h1>
 
-              {/* Ornamental Divider */}
-              <div style={{ color: '#D97706', fontSize: '0.9rem', letterSpacing: '4px', margin: '0 0 12px 0' }}>
-                ❖ ❖ ❖
-              </div>
-
-              <p style={{ color: '#475569', fontSize: '1.05rem', maxWidth: '520px', margin: 0, lineHeight: 1.6 }}>
+              <p className="menu-desc-text" style={{ color: '#475569', fontSize: '0.88rem', maxWidth: '520px', margin: 0, lineHeight: 1.5 }}>
                 Explore authentic crisp dosas, ghee specials, uttapam, soft idli, pineapple sheera, and filter coffee.
               </p>
             </div>
 
             {/* Right Hero Dish Graphic */}
-            <div style={{ borderRadius: '20px', overflow: 'hidden', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', border: '3px solid #FFFFFF' }}>
+            <div className="menu-banner-img" style={{ borderRadius: '16px', overflow: 'hidden', boxShadow: '0 6px 18px rgba(0,0,0,0.08)', border: '2px solid #FFFFFF' }}>
               <img
                 src="https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=600&q=80"
                 alt="South Indian Dosa Platter"
-                style={{ width: '100%', height: '160px', objectFit: 'cover', display: 'block' }}
+                style={{ width: '100%', height: '120px', objectFit: 'cover', display: 'block' }}
               />
             </div>
           </div>
@@ -187,7 +184,7 @@ const MenuPage = () => {
       </section>
 
       {/* ================= MAIN CONTENT SECTION ================= */}
-      <section style={{ padding: '2rem 0 4rem 0' }}>
+      <section className="menu-main-section" style={{ padding: '1.25rem 0 4rem 0' }}>
         <div className="container">
           
 
@@ -448,14 +445,36 @@ const MenuPage = () => {
       {/* Responsive Breakpoints */}
       <style>{`
         @media (max-width: 850px) {
-          .menu-banner-grid, .menu-layout-grid, .offer-grid-menu {
+          .menu-top-banner {
+            padding: 0.75rem 0 !important;
+          }
+          .menu-banner-grid {
+            grid-template-columns: 1fr !important;
+            gap: 0.4rem !important;
+          }
+          .menu-title-text {
+            font-size: 1.35rem !important;
+            margin-bottom: 2px !important;
+          }
+          .menu-desc-text {
+            font-size: 0.78rem !important;
+            line-height: 1.35 !important;
+          }
+          .menu-banner-img {
+            display: none !important;
+          }
+          .menu-main-section {
+            padding: 0.6rem 0 3rem 0 !important;
+          }
+          .mobile-category-container {
+            display: block !important;
+            margin-bottom: 1rem !important;
+          }
+          .menu-layout-grid, .offer-grid-menu {
             grid-template-columns: 1fr !important;
           }
           .desktop-category-sidebar {
             display: none !important;
-          }
-          .mobile-category-container {
-            display: block !important;
           }
           .food-menu-grid {
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
