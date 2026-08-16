@@ -1,56 +1,6 @@
-const CRUDCRUD_API = 'https://crudcrud.com/api/b2c7cdd91fb548f69456e69f9c521266/orders';
+const CRUDCRUD_API = 'https://crudcrud.com/api/bd9a3ec70f874fa7b84f60f95cd82dff/orders';
 
-// Fixed, static timestamps for demo orders
-let initialDemoOrders = [
-  {
-    id: 104,
-    order_number: 'ORD-924536',
-    customer_name: 'Dhanshri Wale',
-    customer_phone: '+91 91580 75480',
-    customer_email: 'dhanshri@example.com',
-    delivery_address: 'Sinnar Gaurav, Near Panchvati Hotel, Sinnar',
-    order_type: 'Home Delivery',
-    payment_method: 'Cash on Delivery',
-    payment_status: 'PENDING',
-    status: 'Pending',
-    subtotal: 215.00,
-    tax: 10.75,
-    packing_charge: 15.00,
-    delivery_charge: 30.00,
-    discount_amount: 0.00,
-    total_amount: 270.75,
-    items: [
-      { menuItemId: 2, item_name: 'Filter Coffee', name: 'Filter Coffee', price: 25.00, quantity: 1, subtotal: 25.00 },
-      { menuItemId: 10, item_name: 'Ghee Masala Dosa', name: 'Ghee Masala Dosa', price: 110.00, quantity: 1, subtotal: 110.00 },
-      { menuItemId: 15, item_name: 'Loni Sponge Dosa (3 Pcs)', name: 'Loni Sponge Dosa (3 Pcs)', price: 80.00, quantity: 1, subtotal: 80.00 }
-    ],
-    created_at: '2026-08-16T15:08:00.000Z'
-  },
-  {
-    id: 101,
-    order_number: 'ORD-20260815-4829',
-    customer_name: 'Aditee Kumar',
-    customer_phone: '+91 70207 58779',
-    customer_email: 'aditee@example.com',
-    delivery_address: 'Sinnar Gaurav, Near Panchvati Hotel, Sinnar',
-    order_type: 'Home Delivery',
-    payment_method: 'Cash on Delivery',
-    payment_status: 'PAID',
-    status: 'Confirmed',
-    subtotal: 185.00,
-    tax: 9.25,
-    packing_charge: 15.00,
-    delivery_charge: 0.00,
-    discount_amount: 0.00,
-    total_amount: 209.25,
-    items: [
-      { menuItemId: 10, item_name: 'Ghee Masala Dosa', name: 'Ghee Masala Dosa', price: 110.00, quantity: 1, subtotal: 110.00 },
-      { menuItemId: 1, item_name: 'Chaha', name: 'Chaha', price: 15.00, quantity: 1, subtotal: 15.00 },
-      { menuItemId: 2, item_name: 'Filter Coffee', name: 'Filter Coffee', price: 25.00, quantity: 2, subtotal: 50.00 }
-    ],
-    created_at: '2026-08-16T14:45:00.000Z'
-  }
-];
+let initialDemoOrders = [];
 
 const fetchCloudOrders = async () => {
   try {
