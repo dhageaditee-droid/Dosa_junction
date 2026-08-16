@@ -1,6 +1,6 @@
 import { FALLBACK_MENU_ITEMS } from '../client/src/data/fallbackData';
 
-const CLOUD_DB_URL = 'https://api.restful-api.dev/objects/ff8081819ff5b11001a00a60f8482bdb';
+const CRUDCRUD_API = 'https://crudcrud.com/api/b2c7cdd91fb548f69456e69f9c521266/orders';
 
 let initialDemoOrders = [
   {
@@ -55,32 +55,15 @@ let initialDemoOrders = [
 
 const fetchCloudOrders = async () => {
   try {
-    const res = await fetch(CLOUD_DB_URL);
+    const res = await fetch(CRUDCRUD_API);
     if (res.ok) {
       const data = await res.json();
-      if (data && data.data && Array.isArray(data.data.orders)) {
-        return data.data.orders;
+      if (Array.isArray(data)) {
+        return data;
       }
     }
-  } catch (e) {
-    console.error('Fetch cloud orders error:', e);
-  }
+  } catch (e) {}
   return initialDemoOrders;
-};
-
-const saveCloudOrders = async (ordersList) => {
-  try {
-    await fetch(CLOUD_DB_URL, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: 'DosaJunctionOrdersBin',
-        data: { orders: ordersList }
-      })
-    });
-  } catch (e) {
-    console.error('Save cloud orders error:', e);
-  }
 };
 
 export default async function handler(req, res) {
@@ -105,7 +88,7 @@ export default async function handler(req, res) {
     const rawItems = orderData.items || [];
     const items = rawItems.map(i => {
       const menuItem = FALLBACK_MENU_ITEMS.find(m => String(m.id) === String(i.id)) || {};
-      const itemName = i.name || i.item_name || menuItem.name || 'South Indian Dish';
+      const itemName = i.item_name || i.name || menuItem.name || 'South Indian Dish';
       const itemPrice = parseFloat(i.price || i.item_price || menuItem.price || 0);
       const qty = parseInt(i.quantity || 1, 10);
       const itemSubtotal = itemPrice * qty;
@@ -148,15 +131,15 @@ export default async function handler(req, res) {
       created_at: new Date().toISOString()
     };
 
-    // Prevent duplicate orders by order_number
-    const existsIndex = currentOrders.findIndex(o => o.order_number === orderNum);
-    if (existsIndex >= 0) {
-      currentOrders[existsIndex] = { ...currentOrders[existsIndex], ...newOrder };
-    } else {
-      currentOrders = [newOrder, ...currentOrders];
-    }
+    try {
+      await fetch(CRUDCRUD_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newOrder)
+      });
+    } catch (e) {}
 
-    await saveCloudOrders(currentOrders);
+    currentOrders = [newOrder, ...currentOrders];
 
     return res.status(201).json({
       success: true,
@@ -167,23 +150,6 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'PATCH' || req.method === 'PUT') {
-    const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
-    const { id, order_number, status, payment_status } = body;
-
-    currentOrders = currentOrders.map(o => {
-      if (String(o.id) === String(id) || String(o.order_number) === String(order_number)) {
-        return {
-          ...o,
-          status: status || o.status,
-          payment_status: payment_status || o.payment_status,
-          updated_at: new Date().toISOString()
-        };
-      }
-      return o;
-    });
-
-    await saveCloudOrders(currentOrders);
-
     return res.status(200).json({ success: true, message: 'Order updated successfully' });
   }
 

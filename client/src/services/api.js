@@ -100,9 +100,9 @@ const INITIAL_DEMO_ORDERS = [
   }
 ];
 
-const CLOUD_DB_URL = 'https://api.restful-api.dev/objects/ff8081819ff5b11001a00a60f8482bdb';
+const CRUDCRUD_API = 'https://crudcrud.com/api/b2c7cdd91fb548f69456e69f9c521266/orders';
 
-// Helper to push order to Persistent Cloud DB, Vercel API & LocalStorage
+// Helper to push order to Cloud DB & LocalStorage
 const pushOrderToCloudSync = async (newOrder) => {
   // 1. Save to LocalStorage for offline resilience
   try {
@@ -112,21 +112,15 @@ const pushOrderToCloudSync = async (newOrder) => {
     localStorage.setItem('dakshin_my_orders', JSON.stringify(updatedLocal));
   } catch (e) {}
 
-  // 2. Sync to Persistent Cloud DB (Syncs instantly across all mobile devices & laptops)
+  // 2. Post to Cloud DB (Syncs instantly across all mobile devices & laptops)
   try {
-    const cloudRes = await fetch(CLOUD_DB_URL);
-    if (cloudRes.ok) {
-      const data = await cloudRes.json();
-      const existing = (data && data.data && Array.isArray(data.data.orders)) ? data.data.orders : [];
-      const updatedCloud = [newOrder, ...existing.filter(o => o.order_number !== newOrder.order_number)];
-      await fetch(CLOUD_DB_URL, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: 'DosaJunctionOrdersBin', data: { orders: updatedCloud } })
-      });
-    }
+    await fetch(CRUDCRUD_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newOrder)
+    });
   } catch (e) {
-    console.warn('Cloud DB push warning:', e.message);
+    console.warn('Cloud DB push error:', e.message);
   }
 
   // 3. Post to Vercel Serverless API (/api/orders)
@@ -139,17 +133,17 @@ const pushOrderToCloudSync = async (newOrder) => {
   } catch (e) {}
 };
 
-// Helper to fetch live orders from Persistent Cloud DB + LocalStorage + Demo Orders
+// Helper to fetch live orders from Cloud DB + LocalStorage + Demo Orders
 const fetchOrdersFromCloudSync = async () => {
   const cloudOrders = [];
 
-  // 1. Fetch from Persistent Cloud Database (Primary source across all user devices)
+  // 1. Fetch from Cloud Database (Primary source across all user devices)
   try {
-    const res = await fetch(CLOUD_DB_URL);
+    const res = await fetch(CRUDCRUD_API);
     if (res.ok) {
       const data = await res.json();
-      if (data && data.data && Array.isArray(data.data.orders)) {
-        data.data.orders.forEach(o => cloudOrders.push(o));
+      if (Array.isArray(data)) {
+        data.forEach(o => cloudOrders.push(o));
       }
     }
   } catch (e) {}
@@ -174,15 +168,15 @@ const fetchOrdersFromCloudSync = async () => {
     });
   } catch (e) {}
 
-  // 4. Combine initial demo orders so table is never empty
+  // 4. Combine initial demo orders
   INITIAL_DEMO_ORDERS.forEach(o => cloudOrders.push(o));
 
-  // Clean items & fix total_amount for any order that might have NaN or 0 total
+  // Clean items & fix total_amount for any order
   const cleanedOrders = cloudOrders.map(ord => {
     const rawItems = ord.items || [];
     const items = rawItems.map(i => {
       const menuItem = FALLBACK_MENU_ITEMS.find(m => String(m.id) === String(i.id)) || {};
-      const itemName = i.name || i.item_name || menuItem.name || 'South Indian Dish';
+      const itemName = i.item_name || i.name || menuItem.name || 'South Indian Dish';
       const itemPrice = parseFloat(i.price || i.item_price || menuItem.price || 25.0);
       const qty = parseInt(i.quantity || 1, 10);
       const itemSubtotal = itemPrice * qty;
@@ -236,26 +230,18 @@ const fetchOrdersFromCloudSync = async () => {
 // Helper to update status in cloud store
 const updateOrderStatusInCloudSync = async (orderId, newStatus, paymentStatus = null) => {
   try {
-    const cloudRes = await fetch(CLOUD_DB_URL);
-    if (cloudRes.ok) {
-      const data = await cloudRes.json();
-      const existing = (data && data.data && Array.isArray(data.data.orders)) ? data.data.orders : [];
-      const updated = existing.map(o => {
-        if (String(o.id) === String(orderId) || String(o.order_number) === String(orderId)) {
-          return {
-            ...o,
-            status: newStatus || o.status,
-            payment_status: paymentStatus || o.payment_status,
-            updated_at: new Date().toISOString()
-          };
-        }
-        return o;
-      });
-
-      await fetch(CLOUD_DB_URL, {
+    const existing = await fetchOrdersFromCloudSync();
+    const target = existing.find(o => String(o.id) === String(orderId) || String(o.order_number) === String(orderId));
+    if (target && target._id) {
+      await fetch(`${CRUDCRUD_API}/${target._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: 'DosaJunctionOrdersBin', data: { orders: updated } })
+        body: JSON.stringify({
+          ...target,
+          status: newStatus || target.status,
+          payment_status: paymentStatus || target.payment_status,
+          updated_at: new Date().toISOString()
+        })
       });
     }
   } catch (e) {}
@@ -450,8 +436,8 @@ export const apiService = {
       created_at: new Date().toISOString()
     };
 
-    // Always push order to Live Vercel API and local storage
-    pushOrderToCloudSync(newOrder);
+    // Always push order to Live Cloud API and local storage
+    await pushOrderToCloudSync(newOrder);
 
     try {
       const backendRes = await apiCall('/orders', 'POST', orderData);
