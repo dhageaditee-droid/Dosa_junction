@@ -41,11 +41,11 @@ const AdminEnquiries = () => {
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--color-cream-alt)' }}>
-      <SEOHead title="Admin Contact Enquiries" />
+    <div className="admin-page-layout" style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--color-cream-alt)' }}>
+      <SEOHead title="Admin Contact Enquiries | Dosa Junction" />
       <AdminSidebar />
 
-      <main style={{ flexGrow: 1, padding: '2rem', overflowY: 'auto' }}>
+      <main className="admin-main-content" style={{ flexGrow: 1, padding: '2rem', overflowY: 'auto' }}>
         
         <div style={{ marginBottom: '2rem' }}>
           <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem', color: 'var(--color-emerald)' }}>
