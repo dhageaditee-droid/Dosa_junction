@@ -1,69 +1,165 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, Award, Flame, Clock, ArrowRight, Star, CheckCircle2, Coffee, Sparkles } from 'lucide-react';
+import { 
+  ArrowRight, 
+  ChevronLeft, 
+  ChevronRight, 
+  Star, 
+  Award, 
+  Leaf, 
+  Truck, 
+  UtensilsCrossed, 
+  Phone, 
+  MapPin, 
+  Clock, 
+  Mail, 
+  Send, 
+  ShoppingCart,
+  CheckCircle2,
+  Sparkles,
+  ExternalLink
+} from 'lucide-react';
 import FoodCard from '../components/FoodCard';
 import FoodDetailsModal from '../components/FoodDetailsModal';
-import OfferCard from '../components/OfferCard';
 import SEOHead from '../components/SEOHead';
 import { apiService } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
+import { useCart } from '../context/CartContext';
+import { useToast } from '../context/ToastContext';
 
 const Home = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [popularDishes, setPopularDishes] = useState([]);
-  const [bestsellerDishes, setBestsellerDishes] = useState([]);
-  const [recommendedDishes, setRecommendedDishes] = useState([]);
-  const [offers, setOffers] = useState([]);
-  const [reviews, setReviews] = useState([]);
-  const [selectedFoodModal, setSelectedFoodModal] = useState(null);
-  const [loading, setLoading] = useState(true);
-
+  const { t, translateDish, language } = useLanguage();
+  const { addToCart } = useCart();
+  const { addToast } = useToast();
   const navigate = useNavigate();
 
-  const circularCategories = [
-    { name: 'Dosa', slug: 'dosa', img: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=300&q=80' },
-    { name: 'Idli', slug: 'idli', img: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=300&q=80' },
-    { name: 'Vada', slug: 'vada', img: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=300&q=80' },
-    { name: 'Uttapam', slug: 'uttapam', img: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=300&q=80' },
-    { name: 'Meals', slug: 'south-indian-meals', img: 'https://images.unsplash.com/photo-1610192244261-3f33de3f55e4?auto=format&fit=crop&w=300&q=80' },
-    { name: 'Rice', slug: 'rice', img: 'https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=300&q=80' },
-    { name: 'Snacks', slug: 'snacks', img: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=300&q=80' },
-    { name: 'Desserts', slug: 'desserts', img: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=300&q=80' },
-    { name: 'Beverages', slug: 'beverages', img: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=300&q=80' },
-    { name: 'Filter Coffee', slug: 'filter-coffee', img: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=300&q=80' }
+  const [menuItems, setMenuItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedFoodModal, setSelectedFoodModal] = useState(null);
+
+  // Contact Form State
+  const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
+  const [sendingContact, setSendingContact] = useState(false);
+
+  // Popular Dishes Carousel Ref
+  const popularRef = useRef(null);
+  const testimonialRef = useRef(null);
+
+  // Sample Featured Popular Dishes (matching image mockup)
+  const popularDishesData = [
+    {
+      id: 10,
+      name: 'Masala Dosa',
+      description: 'Crispy dosa with spicy potato masala',
+      price: 129,
+      rating: 4.8,
+      is_veg: true,
+      is_bestseller: true,
+      image_url: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=600&q=80'
+    },
+    {
+      id: 11,
+      name: 'Mysore Masala Dosa',
+      description: 'Spicy dosa with mysore masala',
+      price: 149,
+      rating: 4.7,
+      is_veg: true,
+      is_bestseller: true,
+      image_url: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80'
+    },
+    {
+      id: 12,
+      name: 'Idli Sambar',
+      description: 'Soft idlis served with hot sambar & chutney',
+      price: 79,
+      rating: 4.9,
+      is_veg: true,
+      is_bestseller: false,
+      image_url: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80'
+    },
+    {
+      id: 13,
+      name: 'Medu Vada',
+      description: 'Crispy medu vada with sambar & chutney',
+      price: 79,
+      rating: 4.8,
+      is_veg: true,
+      is_bestseller: false,
+      image_url: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80'
+    },
+    {
+      id: 14,
+      name: 'Uttapam',
+      description: 'Soft & tasty uttapam with veggies',
+      price: 109,
+      rating: 4.6,
+      is_veg: true,
+      is_bestseller: false,
+      image_url: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80'
+    },
+    {
+      id: 2,
+      name: 'Filter Coffee',
+      description: 'South Indian filter coffee made fresh',
+      price: 49,
+      rating: 4.9,
+      is_veg: true,
+      is_bestseller: true,
+      image_url: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=600&q=80'
+    }
+  ];
+
+  const testimonials = [
+    {
+      name: 'Priya S.',
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80',
+      comment: 'Best dosa I ever had! Authentic taste and super fresh.',
+      rating: 5
+    },
+    {
+      name: 'Rahul K.',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80',
+      comment: 'Filter coffee is just wow! Feels like South India.',
+      rating: 5
+    },
+    {
+      name: 'Neha M.',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+      comment: 'Quick delivery and amazing food. Highly recommended!',
+      rating: 5
+    }
   ];
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchMenu = async () => {
       try {
         setLoading(true);
-        const [menuRes, offersRes, reviewsRes] = await Promise.all([
-          apiService.getMenu(),
-          apiService.getOffers().catch(() => ({ offers: [] })),
-          apiService.getReviews().catch(() => ({ reviews: [] }))
-        ]);
-
-        if (menuRes.items && menuRes.items.length > 0) {
-          const items = menuRes.items;
-          setPopularDishes(items.slice(0, 4));
-          setBestsellerDishes(items.filter(i => i.is_bestseller).slice(0, 4));
-          setRecommendedDishes(items.filter(i => i.is_featured || i.rating >= 4.7).slice(0, 4));
+        const res = await apiService.getMenu();
+        if (res && res.items && res.items.length > 0) {
+          setMenuItems(res.items);
+        } else {
+          setMenuItems(popularDishesData);
         }
-
-        if (offersRes.offers) setOffers(offersRes.offers.slice(0, 3));
-        if (reviewsRes.reviews) setReviews(reviewsRes.reviews);
       } catch (err) {
-        console.error(err);
+        setMenuItems(popularDishesData);
       } finally {
         setLoading(false);
       }
     };
-    fetchData();
+    fetchMenu();
   }, []);
 
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/menu?search=${encodeURIComponent(searchQuery.trim())}`);
+  const handleScrollPopular = (direction) => {
+    if (popularRef.current) {
+      const scrollAmount = direction === 'left' ? -320 : 320;
+      popularRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
+  const handleScrollTestimonials = (direction) => {
+    if (testimonialRef.current) {
+      const scrollAmount = direction === 'left' ? -320 : 320;
+      testimonialRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
 
@@ -80,282 +176,834 @@ const Home = () => {
     }
   };
 
+  const handleContactSubmit = (e) => {
+    e.preventDefault();
+    if (!contactForm.name || !contactForm.email || !contactForm.message) {
+      addToast('Please fill out all fields in the contact form.', 'warning');
+      return;
+    }
+    setSendingContact(true);
+    setTimeout(() => {
+      setSendingContact(false);
+      addToast('Thank you! Your message has been sent successfully.', 'success');
+      setContactForm({ name: '', email: '', message: '' });
+    }, 1000);
+  };
+
+  const displayDishes = menuItems.length > 0 ? menuItems.slice(0, 6) : popularDishesData;
+
   return (
-    <div>
-      <SEOHead title="Dosa Junction - Authentic South Indian Food & Filter Coffee" />
+    <div style={{ backgroundColor: '#FAF7F0', color: '#1E293B', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      <SEOHead title="Dosa Junction | Authentic Taste of South India" />
 
-      {/* Hero Section */}
-      <section style={{
-        position: 'relative',
-        minHeight: '82vh',
-        background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 41, 59, 0.85) 100%), url("https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=1800&q=80") center/cover no-repeat',
-        display: 'flex',
-        alignItems: 'center',
-        color: '#fff',
-        padding: '3.5rem 0'
-      }}>
+      {/* ================= HERO SECTION ================= */}
+      <section
+        style={{
+          position: 'relative',
+          padding: '3rem 0 4rem 0',
+          background: 'linear-gradient(180deg, #FBF8F1 0%, #F5EFE3 100%)',
+          overflow: 'hidden'
+        }}
+      >
         <div className="container">
-          <div style={{ maxWidth: '720px' }}>
-            
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              backgroundColor: 'rgba(217, 119, 6, 0.22)',
-              border: '1px solid rgba(217, 119, 6, 0.45)',
-              color: '#F59E0B',
-              padding: '6px 16px',
-              borderRadius: '20px',
-              fontSize: '0.85rem',
-              fontWeight: 700,
-              marginBottom: '1.5rem'
-            }}>
-              <Award size={16} /> 100% Traditional South Indian Recipes
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '2.5rem',
+              alignItems: 'center'
+            }}
+            className="hero-grid"
+          >
+            {/* Left Content Column */}
+            <div>
+              {/* Top Traditional Badge */}
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  backgroundColor: '#EFF6E0',
+                  border: '1px solid #A3E635',
+                  color: '#15803D',
+                  padding: '6px 16px',
+                  borderRadius: '30px',
+                  fontSize: '0.82rem',
+                  fontWeight: 700,
+                  marginBottom: '1.5rem',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
+                }}
+              >
+                <Leaf size={15} color="#16A34A" />
+                <span>100% Traditional South Indian Recipes</span>
+              </div>
+
+              {/* Main Headline */}
+              <h1
+                style={{
+                  fontSize: '3.2rem',
+                  fontFamily: 'var(--font-heading)',
+                  fontWeight: 800,
+                  lineHeight: 1.15,
+                  color: '#064E3B',
+                  marginBottom: '1.2rem'
+                }}
+              >
+                Taste the Tradition <br />
+                of <span style={{ color: '#D97706' }}>South India</span>
+              </h1>
+
+              {/* Subheadline */}
+              <p
+                style={{
+                  fontSize: '1.05rem',
+                  color: '#475569',
+                  lineHeight: 1.6,
+                  marginBottom: '2rem',
+                  maxWidth: '500px'
+                }}
+              >
+                Crispy Dosas, Soft Idlis & Authentic Flavours Made Fresh Every Day.
+              </p>
+
+              {/* Primary Action Buttons */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '2.5rem' }}>
+                <Link
+                  to="/menu"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    backgroundColor: '#D97706',
+                    color: '#FFFFFF',
+                    padding: '12px 26px',
+                    borderRadius: '30px',
+                    fontWeight: 800,
+                    fontSize: '0.98rem',
+                    textDecoration: 'none',
+                    boxShadow: '0 6px 18px rgba(217, 119, 6, 0.35)',
+                    transition: 'transform 0.2s'
+                  }}
+                >
+                  <span>Explore Menu</span>
+                  <ArrowRight size={18} />
+                </Link>
+
+                <Link
+                  to="/menu"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    backgroundColor: '#064E3B',
+                    color: '#FFFFFF',
+                    padding: '12px 26px',
+                    borderRadius: '30px',
+                    fontWeight: 800,
+                    fontSize: '0.98rem',
+                    textDecoration: 'none',
+                    boxShadow: '0 6px 18px rgba(6, 78, 59, 0.3)',
+                    transition: 'transform 0.2s'
+                  }}
+                >
+                  <ShoppingCart size={18} />
+                  <span>Order Now</span>
+                </Link>
+              </div>
+
+              {/* Feature Pills Row */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.2rem', fontSize: '0.85rem', fontWeight: 700, color: '#166534' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Leaf size={16} color="#16A34A" />
+                  <span>Pure Veg</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Sparkles size={16} color="#D97706" />
+                  <span>Fresh Ingredients</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Truck size={16} color="#0284C7" />
+                  <span>Fast Delivery</span>
+                </div>
+              </div>
             </div>
 
-            <h1 style={{
-              fontSize: '3.4rem',
-              fontFamily: 'var(--font-heading)',
-              lineHeight: 1.15,
-              marginBottom: '1rem',
-              color: '#FFFFFF'
-            }}>
-              Authentic South Indian Food, <span style={{ color: 'var(--color-gold)' }}>Delivered Fresh</span>
-            </h1>
-
-            <p style={{
-              fontSize: '1.15rem',
-              color: '#E2E8F0',
-              marginBottom: '2rem',
-              lineHeight: 1.6
-            }}>
-              Traditional recipes, fresh ingredients and unforgettable South Indian flavours. Experience golden crispy dosas, fluffy idlis, and authentic filter coffee delivered hot to your doorstep.
-            </p>
-
-
-
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
-              <Link to="/menu" className="btn btn-primary" style={{ padding: '0.75rem 1.8rem' }}>
-                Explore Menu <ArrowRight size={18} />
-              </Link>
-              <Link to="/menu" className="btn btn-outline" style={{ borderColor: '#FFFFFF', color: '#FFFFFF', padding: '0.75rem 1.8rem' }}>
-                Order Now
-              </Link>
+            {/* Right Hero Image Column */}
+            <div style={{ position: 'relative', textAlign: 'center' }}>
+              <div
+                style={{
+                  position: 'relative',
+                  borderRadius: '24px',
+                  overflow: 'hidden',
+                  boxShadow: '0 20px 40px rgba(0,0,0,0.18)',
+                  border: '4px solid #FFFFFF'
+                }}
+              >
+                <img
+                  src="https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=1000&q=80"
+                  alt="South Indian Dosa Platter"
+                  style={{ width: '100%', height: 'auto', display: 'block', transform: 'scale(1.02)' }}
+                />
+              </div>
             </div>
-
           </div>
         </div>
       </section>
 
-      {/* What's on your mind? Circular Category Cards */}
-      <section className="section-padding" style={{ backgroundColor: '#FFFFFF', padding: '3rem 0' }}>
+      {/* ================= POPULAR SOUTH INDIAN DISHES ================= */}
+      <section style={{ padding: '4rem 0', backgroundColor: '#FFFFFF' }}>
         <div className="container">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-            <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--color-emerald)', fontFamily: 'var(--font-heading)' }}>
-              What's on your mind?
-            </h2>
-            <Link to="/menu" style={{ color: 'var(--color-gold)', fontWeight: 700, textDecoration: 'none', fontSize: '0.9rem' }}>
-              See All Menu →
-            </Link>
+          
+          {/* Section Header with Slider Navigation Controls */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
+            <div style={{ flexGrow: 1, textAlign: 'center' }}>
+              <span style={{ color: '#94A3B8', fontSize: '0.9rem', letterSpacing: '2px', fontWeight: 700 }}>
+                — POPULAR SOUTH INDIAN DISHES —
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                onClick={() => handleScrollPopular('left')}
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  border: '1px solid #CBD5E1',
+                  backgroundColor: '#FFFFFF',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.06)'
+                }}
+              >
+                <ChevronLeft size={20} color="#475569" />
+              </button>
+              <button
+                onClick={() => handleScrollPopular('right')}
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  border: '1px solid #CBD5E1',
+                  backgroundColor: '#FFFFFF',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.06)'
+                }}
+              >
+                <ChevronRight size={20} color="#475569" />
+              </button>
+            </div>
           </div>
 
-          <div style={{
-            display: 'flex',
-            gap: '1.5rem',
-            overflowX: 'auto',
-            paddingBottom: '1rem',
-            scrollSnapType: 'x mandatory'
-          }}>
-            {circularCategories.map((cat) => (
-              <Link
-                key={cat.slug}
-                to={`/menu?category=${cat.slug}`}
+          {/* Horizontally Scrollable Carousel Grid */}
+          <div
+            ref={popularRef}
+            style={{
+              display: 'flex',
+              gap: '1.25rem',
+              overflowX: 'auto',
+              scrollBehavior: 'smooth',
+              paddingBottom: '1rem',
+              scrollbarWidth: 'none'
+            }}
+            className="no-scrollbar"
+          >
+            {displayDishes.map((dish) => {
+              const translatedName = translateDish(dish.name);
+              return (
+                <div
+                  key={dish.id}
+                  style={{
+                    flexShrink: 0,
+                    width: '240px',
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '16px',
+                    border: '1px solid #E2E8F0',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                    padding: '12px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    transition: 'transform 0.2s, boxShadow 0.2s'
+                  }}
+                  className="pop-dish-card"
+                >
+                  <div>
+                    <div style={{ width: '100%', height: '140px', borderRadius: '12px', overflow: 'hidden', marginBottom: '10px' }}>
+                      <img
+                        src={dish.image_url || 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=500&q=80'}
+                        alt={translatedName}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    </div>
+                    <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#064E3B', margin: '0 0 4px 0' }}>
+                      {translatedName}
+                    </h4>
+                    <p style={{ fontSize: '0.78rem', color: '#64748B', margin: '0 0 10px 0', lineHeight: 1.4, height: '34px', overflow: 'hidden' }}>
+                      {dish.description}
+                    </p>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '8px', borderTop: '1px solid #F1F5F9' }}>
+                    <span style={{ fontSize: '1.05rem', fontWeight: 800, color: '#064E3B' }}>
+                      ₹{dish.price}
+                    </span>
+
+                    <button
+                      onClick={() => {
+                        addToCart(dish, 1);
+                        addToast(`${translatedName} added to cart!`, 'success');
+                      }}
+                      style={{
+                        padding: '6px 14px',
+                        borderRadius: '20px',
+                        border: '1.5px solid #D97706',
+                        backgroundColor: '#FFF9ED',
+                        color: '#D97706',
+                        fontSize: '0.8rem',
+                        fontWeight: 800,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}
+                    >
+                      <ShoppingCart size={13} />
+                      <span>Add to Cart</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+        </div>
+      </section>
+
+      {/* ================= TODAY'S SPECIAL OFFER BANNER ================= */}
+      <section style={{ padding: '2rem 0 4rem 0' }}>
+        <div className="container">
+          <div
+            style={{
+              position: 'relative',
+              background: 'linear-gradient(135deg, #0A4D28 0%, #032A15 100%)',
+              borderRadius: '24px',
+              padding: '2.5rem',
+              color: '#FFFFFF',
+              overflow: 'hidden',
+              boxShadow: '0 15px 35px rgba(6, 78, 59, 0.3)',
+              border: '2px solid #D4AF37'
+            }}
+          >
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '260px 1fr auto',
+                gap: '2rem',
+                alignItems: 'center'
+              }}
+              className="offer-grid"
+            >
+              {/* Offer Platter Image */}
+              <div style={{ borderRadius: '16px', overflow: 'hidden', border: '2px solid rgba(255,255,255,0.2)' }}>
+                <img
+                  src="https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80"
+                  alt="Breakfast Combo Offer"
+                  style={{ width: '100%', height: '180px', objectFit: 'cover', display: 'block' }}
+                />
+              </div>
+
+              {/* Offer Content */}
+              <div>
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                    border: '1px solid #F59E0B',
+                    color: '#FCD34D',
+                    padding: '4px 12px',
+                    borderRadius: '20px',
+                    fontSize: '0.78rem',
+                    fontWeight: 800,
+                    marginBottom: '0.8rem'
+                  }}
+                >
+                  <Star size={13} fill="#FCD34D" color="#FCD34D" />
+                  <span>Today's Special Offer</span>
+                </div>
+
+                <h2 style={{ fontSize: '2rem', fontWeight: 800, fontFamily: 'var(--font-heading)', margin: '0 0 6px 0', color: '#FFFFFF' }}>
+                  South Indian Breakfast Combo
+                </h2>
+
+                <p style={{ fontSize: '1rem', color: '#E2E8F0', margin: '0 0 1.2rem 0' }}>
+                  Masala Dosa + Idli + Vada + Filter Coffee
+                </p>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                    <span style={{ fontSize: '2rem', fontWeight: 900, color: '#FCD34D' }}>₹199</span>
+                    <span style={{ fontSize: '1.1rem', textDecoration: 'line-through', color: '#94A3B8' }}>₹259</span>
+                  </div>
+
+                  <Link
+                    to="/menu"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      backgroundColor: '#F59E0B',
+                      color: '#111827',
+                      padding: '10px 22px',
+                      borderRadius: '30px',
+                      fontWeight: 800,
+                      fontSize: '0.9rem',
+                      textDecoration: 'none',
+                      boxShadow: '0 4px 14px rgba(245, 158, 11, 0.4)'
+                    }}
+                  >
+                    <span>Order Now</span>
+                    <ArrowRight size={16} />
+                  </Link>
+                </div>
+              </div>
+
+              {/* Save Badge Starburst */}
+              <div
                 style={{
+                  width: '85px',
+                  height: '85px',
+                  borderRadius: '50%',
+                  backgroundColor: '#EA580C',
+                  border: '3px solid #FFEDD5',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 6px 20px rgba(234, 88, 12, 0.5)',
+                  transform: 'rotate(-10deg)'
+                }}
+                className="desktop-save-badge"
+              >
+                <span style={{ fontSize: '0.72rem', fontWeight: 800, textTransform: 'uppercase' }}>Save</span>
+                <span style={{ fontSize: '1.4rem', fontWeight: 900, lineHeight: 1 }}>₹60</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= WHY CHOOSE DOSA JUNCTION? ================= */}
+      <section style={{ padding: '3rem 0 4rem 0', backgroundColor: '#FFFFFF' }}>
+        <div className="container">
+          <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+            <span style={{ color: '#94A3B8', fontSize: '0.9rem', letterSpacing: '2px', fontWeight: 700 }}>
+              — WHY CHOOSE DOSA JUNCTION? —
+            </span>
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: '1.5rem'
+            }}
+          >
+            {[
+              {
+                icon: UtensilsCrossed,
+                title: '100% Authentic',
+                desc: 'Traditional recipes passed down through generations.'
+              },
+              {
+                icon: Leaf,
+                title: 'Fresh Ingredients',
+                desc: 'We use only the freshest and finest ingredients.'
+              },
+              {
+                icon: CheckCircle2,
+                title: 'Pure Veg Restaurant',
+                desc: '100% vegetarian with hygienic preparation.'
+              },
+              {
+                icon: Truck,
+                title: 'Fast Delivery',
+                desc: 'Hot & fresh food delivered to your doorstep.'
+              }
+            ].map((feature, idx) => {
+              const IconComp = feature.icon;
+              return (
+                <div
+                  key={idx}
+                  style={{
+                    backgroundColor: '#FAF7F0',
+                    borderRadius: '16px',
+                    padding: '1.8rem 1.2rem',
+                    textAlign: 'center',
+                    border: '1px solid #E5E7EB',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '54px',
+                      height: '54px',
+                      borderRadius: '50%',
+                      backgroundColor: '#064E3B',
+                      color: '#FFFFFF',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      margin: '0 auto 1.2rem auto',
+                      boxShadow: '0 4px 10px rgba(6, 78, 59, 0.25)'
+                    }}
+                  >
+                    <IconComp size={26} />
+                  </div>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#064E3B', marginBottom: '0.5rem' }}>
+                    {feature.title}
+                  </h3>
+                  <p style={{ fontSize: '0.85rem', color: '#64748B', lineHeight: 1.5, margin: 0 }}>
+                    {feature.desc}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ================= OUR STORY & GALLERY ================= */}
+      <section style={{ padding: '4rem 0', backgroundColor: '#FAF7F0' }}>
+        <div className="container">
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1.3fr',
+              gap: '3rem',
+              alignItems: 'center'
+            }}
+            className="story-grid"
+          >
+            {/* Left Story Text */}
+            <div>
+              <h2 style={{ fontSize: '2.4rem', fontWeight: 800, fontFamily: 'var(--font-heading)', color: '#064E3B', marginBottom: '1rem' }}>
+                Our Story
+              </h2>
+              <p style={{ fontSize: '1rem', color: '#475569', lineHeight: 1.7, marginBottom: '1.8rem' }}>
+                Dosa Junction is born out of a passion for authentic South Indian food. We bring you the true taste of tradition with love and quality in every dish.
+              </p>
+
+              <Link
+                to="/about"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  backgroundColor: '#064E3B',
+                  color: '#FFFFFF',
+                  padding: '10px 22px',
+                  borderRadius: '30px',
+                  fontWeight: 800,
+                  fontSize: '0.9rem',
                   textDecoration: 'none',
-                  flexShrink: 0,
-                  width: '90px',
-                  scrollSnapAlign: 'start'
+                  boxShadow: '0 4px 12px rgba(6, 78, 59, 0.3)'
                 }}
               >
-                <div style={{
-                  width: '80px',
-                  height: '80px',
+                <span>Read More</span>
+                <ArrowRight size={16} />
+              </Link>
+            </div>
+
+            {/* Right Photo Gallery Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px' }}>
+              {[
+                'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=400&q=80',
+                'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=400&q=80',
+                'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=400&q=80',
+                'https://images.unsplash.com/photo-1610192244261-3f33de3f55e4?auto=format&fit=crop&w=400&q=80',
+                'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=400&q=80'
+              ].map((imgUrl, i) => (
+                <div key={i} style={{ height: '140px', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}>
+                  <img src={imgUrl} alt={`Gallery item ${i}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= WHAT OUR CUSTOMERS SAY ================= */}
+      <section style={{ padding: '4rem 0', backgroundColor: '#FFFFFF' }}>
+        <div className="container">
+          
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
+            <div style={{ flexGrow: 1, textAlign: 'center' }}>
+              <span style={{ color: '#94A3B8', fontSize: '0.9rem', letterSpacing: '2px', fontWeight: 700 }}>
+                — WHAT OUR CUSTOMERS SAY —
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                onClick={() => handleScrollTestimonials('left')}
+                style={{
+                  width: '36px',
+                  height: '36px',
                   borderRadius: '50%',
+                  border: '1px solid #CBD5E1',
+                  backgroundColor: '#FFFFFF',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <ChevronLeft size={20} color="#475569" />
+              </button>
+              <button
+                onClick={() => handleScrollTestimonials('right')}
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  border: '1px solid #CBD5E1',
+                  backgroundColor: '#FFFFFF',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <ChevronRight size={20} color="#475569" />
+              </button>
+            </div>
+          </div>
+
+          <div
+            ref={testimonialRef}
+            style={{
+              display: 'flex',
+              gap: '1.5rem',
+              overflowX: 'auto',
+              scrollBehavior: 'smooth',
+              paddingBottom: '1rem',
+              scrollbarWidth: 'none'
+            }}
+            className="no-scrollbar"
+          >
+            {testimonials.map((test, idx) => (
+              <div
+                key={idx}
+                style={{
+                  flexShrink: 0,
+                  width: '320px',
+                  backgroundColor: '#FAF7F0',
+                  borderRadius: '16px',
+                  padding: '1.5rem',
+                  border: '1px solid #E5E7EB',
+                  display: 'flex',
+                  gap: '1rem',
+                  alignItems: 'flex-start'
+                }}
+              >
+                <img
+                  src={test.avatar}
+                  alt={test.name}
+                  style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover' }}
+                />
+
+                <div>
+                  <div style={{ display: 'flex', gap: '2px', color: '#F59E0B', marginBottom: '6px' }}>
+                    {Array.from({ length: test.rating }).map((_, i) => (
+                      <Star key={i} size={14} fill="#F59E0B" />
+                    ))}
+                  </div>
+
+                  <p style={{ fontSize: '0.85rem', color: '#334155', fontStyle: 'italic', marginBottom: '8px', lineHeight: 1.5 }}>
+                    "{test.comment}"
+                  </p>
+
+                  <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#064E3B' }}>
+                    — {test.name}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </section>
+
+      {/* ================= VISIT US & CONTACT US ================= */}
+      <section style={{ padding: '4rem 0 5rem 0', backgroundColor: '#FAF7F0' }}>
+        <div className="container">
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1.2fr 1.2fr',
+              gap: '2rem',
+              alignItems: 'start'
+            }}
+            className="contact-grid"
+          >
+            {/* Column 1: Visit Us Details */}
+            <div>
+              <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#064E3B', marginBottom: '1rem' }}>
+                Visit Us
+              </h3>
+              <p style={{ fontWeight: 800, fontSize: '1.05rem', margin: '0 0 0.8rem 0', color: '#064E3B' }}>
+                Dosa Junction
+              </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', fontSize: '0.88rem', color: '#475569' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                  <MapPin size={18} color="#D97706" style={{ flexShrink: 0, marginTop: '2px' }} />
+                  <span>Sinnar Gaurav, Near Panchvati Hotel, Sinnar, Maharashtra 422103</span>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Phone size={18} color="#D97706" />
+                  <span>+91 70207 58779</span>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Clock size={18} color="#D97706" />
+                  <span>Mon - Sun: 7:00 AM - 10:00 PM</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Column 2: Google Maps Card */}
+            <div>
+              <div
+                style={{
+                  borderRadius: '16px',
                   overflow: 'hidden',
-                  marginBottom: '8px',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                  border: '2px solid var(--color-gold)',
-                  transition: 'transform 0.2s'
-                }}>
-                  <img
-                    src={cat.img}
-                    alt={cat.name}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  border: '1px solid #CBD5E1',
+                  boxShadow: '0 4px 14px rgba(0,0,0,0.06)',
+                  position: 'relative'
+                }}
+              >
+                <iframe
+                  title="Dosa Junction Location Map"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3752.428489240822!2d73.9925!3d19.8456!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTnCsDUwJzg0LjIiTiA3M8KwNTknMzMuMCJF!5e0!3m2!1sen!2sin!4v1650000000000!5m2!1sen!2sin"
+                  width="100%"
+                  height="220"
+                  style={{ border: 0 }}
+                  allowFullScreen=""
+                  loading="lazy"
+                />
+                <a
+                  href="https://maps.google.com/?q=Sinnar+Gaurav+Near+Panchvati+Hotel+Sinnar+Maharashtra+422103"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    position: 'absolute',
+                    bottom: '12px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    backgroundColor: '#064E3B',
+                    color: '#FFFFFF',
+                    padding: '6px 16px',
+                    borderRadius: '20px',
+                    fontSize: '0.78rem',
+                    fontWeight: 800,
+                    textDecoration: 'none',
+                    boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  <span>Open in Google Maps</span>
+                  <ExternalLink size={12} />
+                </a>
+              </div>
+            </div>
+
+            {/* Column 3: Contact Us Form */}
+            <div>
+              <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#064E3B', marginBottom: '1rem' }}>
+                Contact Us
+              </h3>
+
+              <form onSubmit={handleContactSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+                  <input
+                    type="text"
+                    placeholder="Your Name"
+                    value={contactForm.name}
+                    onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: '10px',
+                      border: '1px solid #CBD5E1',
+                      fontSize: '0.85rem',
+                      outline: 'none'
+                    }}
+                  />
+                  <input
+                    type="email"
+                    placeholder="Your Email"
+                    value={contactForm.email}
+                    onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: '10px',
+                      border: '1px solid #CBD5E1',
+                      fontSize: '0.85rem',
+                      outline: 'none'
+                    }}
                   />
                 </div>
-                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-emerald)', textAlign: 'center' }}>
-                  {cat.name}
-                </span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* Popular Dishes */}
-      <section className="section-padding" style={{ backgroundColor: 'var(--color-cream)' }}>
-        <div className="container">
-          <div className="section-header">
-            <span className="section-subtitle">Customer Favorites</span>
-            <h2 className="section-title">Popular Dishes</h2>
-            <p className="section-desc">Handcrafted South Indian delicacies prepared fresh with stone-ground batter and pure ghee.</p>
-          </div>
+                <textarea
+                  placeholder="Your Message"
+                  rows={3}
+                  value={contactForm.message}
+                  onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
+                  style={{
+                    padding: '10px 14px',
+                    borderRadius: '10px',
+                    border: '1px solid #CBD5E1',
+                    fontSize: '0.85rem',
+                    outline: 'none',
+                    resize: 'none'
+                  }}
+                />
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))',
-            gap: '1.5rem',
-            marginBottom: '2rem'
-          }}>
-            {popularDishes.map((dish) => (
-              <FoodCard key={dish.id} item={dish} onClickDetail={handleOpenDetailModal} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Best Sellers */}
-      {bestsellerDishes.length > 0 && (
-        <section className="section-padding" style={{ backgroundColor: '#FFFFFF' }}>
-          <div className="container">
-            <div className="section-header">
-              <span className="section-subtitle" style={{ backgroundColor: '#FEF3C7', color: '#B45309' }}>
-                <Sparkles size={14} style={{ display: 'inline', marginRight: '4px' }} /> Top Rated
-              </span>
-              <h2 className="section-title">Best Sellers</h2>
-              <p className="section-desc">The most ordered dishes loved by thousands of South Indian food enthusiasts.</p>
+                <button
+                  type="submit"
+                  disabled={sendingContact}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    backgroundColor: '#D97706',
+                    color: '#FFFFFF',
+                    padding: '10px 20px',
+                    borderRadius: '10px',
+                    border: 'none',
+                    fontWeight: 800,
+                    fontSize: '0.88rem',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(217, 119, 6, 0.3)'
+                  }}
+                >
+                  <span>{sendingContact ? 'Sending...' : 'Send Message'}</span>
+                  <Send size={15} />
+                </button>
+              </form>
             </div>
-
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))',
-              gap: '1.5rem'
-            }}>
-              {bestsellerDishes.map((dish) => (
-                <FoodCard key={dish.id} item={dish} onClickDetail={handleOpenDetailModal} />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Today's Offers */}
-      {offers.length > 0 && (
-        <section className="section-padding" style={{ backgroundColor: 'var(--color-cream-alt)' }}>
-          <div className="container">
-            <div className="section-header">
-              <span className="section-subtitle">Promotions & Coupons</span>
-              <h2 className="section-title">Today's Offers</h2>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
-              {offers.map((offer) => (
-                <OfferCard key={offer.id} offer={offer} />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Recommended For You */}
-      {recommendedDishes.length > 0 && (
-        <section className="section-padding" style={{ backgroundColor: '#FFFFFF' }}>
-          <div className="container">
-            <div className="section-header">
-              <span className="section-subtitle">Curated Selection</span>
-              <h2 className="section-title">Recommended For You</h2>
-            </div>
-
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))',
-              gap: '1.5rem'
-            }}>
-              {recommendedDishes.map((dish) => (
-                <FoodCard key={dish.id} item={dish} onClickDetail={handleOpenDetailModal} />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Why Choose Us */}
-      <section className="section-padding" style={{ backgroundColor: 'var(--color-cream)' }}>
-        <div className="container">
-          <div className="section-header">
-            <span className="section-subtitle">The Dakshin Quality</span>
-            <h2 className="section-title">Why Choose Us</h2>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
-            {[
-              { title: 'Stone-Ground Batter', desc: 'Fermented naturally over 12 hours for light digestion & optimal crunch.' },
-              { title: 'Pure A2 Cow Ghee', desc: 'Golden dosas roasted lavishly in pure ghee for unmatchable richness.' },
-              { title: 'Kumbakonam Filter Coffee', desc: 'Brewed using freshly roasted Chikmagalur coffee beans in traditional brass tumblers.' },
-              { title: 'Fast & Hygienic Packing', desc: 'Hot piping food packed in eco-friendly tamper-proof banana leaf boxes.' }
-            ].map((item, idx) => (
-              <div key={idx} style={{
-                padding: '1.5rem',
-                borderRadius: '16px',
-                backgroundColor: '#FFFFFF',
-                border: '1px solid var(--color-border)',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
-              }}>
-                <CheckCircle2 size={30} color="var(--color-gold)" style={{ marginBottom: '0.8rem' }} />
-                <h4 style={{ fontSize: '1.1rem', color: 'var(--color-emerald)', fontWeight: 800, marginBottom: '0.4rem' }}>{item.title}</h4>
-                <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Customer Reviews */}
-      <section className="section-padding" style={{ backgroundColor: '#FFFFFF' }}>
-        <div className="container">
-          <div className="section-header">
-            <span className="section-subtitle">Real Feedback</span>
-            <h2 className="section-title">Customer Reviews</h2>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
-            {(reviews.length > 0 ? reviews : [
-              { id: 1, customer_name: 'Ramesh Kumar', rating: 5, comment: 'The Mysore Masala Dosa is out of this world! Crunchy, authentic red chutney and aromatic ghee.' },
-              { id: 2, customer_name: 'Ananya S', rating: 5, comment: 'Filter coffee served hot in brass tumbler! Reminds me of Bangalore morning breakfast joints.' },
-              { id: 3, customer_name: 'Venkatesh Rao', rating: 5, comment: 'Feather soft idlis and crisp Medu Vadas. Piping hot sambar delivered fast.' }
-            ]).map((rev) => (
-              <div key={rev.id} style={{
-                backgroundColor: 'var(--color-cream-alt)',
-                padding: '1.5rem',
-                borderRadius: '16px',
-                border: '1px solid var(--color-border)'
-              }}>
-                <div style={{ display: 'flex', gap: '3px', color: '#D97706', marginBottom: '0.75rem' }}>
-                  {Array.from({ length: rev.rating || 5 }).map((_, i) => (
-                    <Star key={i} size={16} fill="#D97706" />
-                  ))}
-                </div>
-                <p style={{ fontSize: '0.9rem', color: 'var(--color-text)', fontStyle: 'italic', marginBottom: '1rem', lineHeight: 1.5 }}>
-                  "{rev.comment}"
-                </p>
-                <div style={{ fontWeight: 800, fontSize: '0.9rem', color: 'var(--color-emerald)' }}>
-                  — {rev.customer_name}
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>
@@ -369,6 +1017,31 @@ const Home = () => {
         />
       )}
 
+      {/* Responsive Breakpoint CSS */}
+      <style>{`
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .pop-dish-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 10px 22px rgba(0,0,0,0.1) !important;
+        }
+        @media (max-width: 900px) {
+          .hero-grid, .story-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .offer-grid {
+            grid-template-columns: 1fr !important;
+            text-align: center;
+          }
+          .desktop-save-badge {
+            display: none !important;
+          }
+          .contact-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };
