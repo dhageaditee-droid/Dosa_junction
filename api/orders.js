@@ -2,6 +2,7 @@ import { FALLBACK_MENU_ITEMS } from '../client/src/data/fallbackData';
 
 const CRUDCRUD_API = 'https://crudcrud.com/api/b2c7cdd91fb548f69456e69f9c521266/orders';
 
+// Fixed, static timestamps for demo orders so order times NEVER change dynamically
 let initialDemoOrders = [
   {
     id: 104,
@@ -25,7 +26,7 @@ let initialDemoOrders = [
       { menuItemId: 10, item_name: 'Ghee Masala Dosa', price: 110.00, quantity: 1, subtotal: 110.00 },
       { menuItemId: 15, item_name: 'Loni Sponge Dosa (3 Pcs)', price: 80.00, quantity: 1, subtotal: 80.00 }
     ],
-    created_at: new Date().toISOString()
+    created_at: '2026-08-16T15:08:00.000Z'
   },
   {
     id: 101,
@@ -49,7 +50,7 @@ let initialDemoOrders = [
       { menuItemId: 1, item_name: 'Chaha', price: 15.00, quantity: 1, subtotal: 15.00 },
       { menuItemId: 2, item_name: 'Filter Coffee', price: 25.00, quantity: 2, subtotal: 50.00 }
     ],
-    created_at: new Date(Date.now() - 15 * 60 * 1000).toISOString()
+    created_at: '2026-08-16T14:45:00.000Z'
   }
 ];
 
@@ -128,7 +129,7 @@ export default async function handler(req, res) {
       discount_amount: discount_amount,
       total_amount: total_amount,
       items: items,
-      created_at: new Date().toISOString()
+      created_at: orderData.created_at || new Date().toISOString()
     };
 
     try {

@@ -26,7 +26,7 @@ const INITIAL_DEMO_ORDERS = [
       { menuItemId: 10, item_name: 'Ghee Masala Dosa', price: 110.00, quantity: 1, subtotal: 110.00 },
       { menuItemId: 15, item_name: 'Loni Sponge Dosa (3 Pcs)', price: 80.00, quantity: 1, subtotal: 80.00 }
     ],
-    created_at: new Date().toISOString()
+    created_at: '2026-08-16T15:08:00.000Z'
   },
   {
     id: 101,
@@ -50,7 +50,7 @@ const INITIAL_DEMO_ORDERS = [
       { menuItemId: 1, item_name: 'Chaha', price: 15.00, quantity: 1, subtotal: 15.00 },
       { menuItemId: 2, item_name: 'Filter Coffee', price: 25.00, quantity: 2, subtotal: 50.00 }
     ],
-    created_at: new Date(Date.now() - 15 * 60 * 1000).toISOString()
+    created_at: '2026-08-16T14:45:00.000Z'
   },
   {
     id: 102,
@@ -73,7 +73,7 @@ const INITIAL_DEMO_ORDERS = [
       { menuItemId: 20, item_name: 'Paper Masala Dosa', price: 100.00, quantity: 1, subtotal: 100.00 },
       { menuItemId: 30, item_name: 'Sambar Vada (2 Pcs)', price: 40.00, quantity: 1, subtotal: 40.00 }
     ],
-    created_at: new Date(Date.now() - 45 * 60 * 1000).toISOString()
+    created_at: '2026-08-16T14:15:00.000Z'
   },
   {
     id: 103,
@@ -96,7 +96,7 @@ const INITIAL_DEMO_ORDERS = [
       { menuItemId: 15, item_name: 'Loni Sponge Dosa (3 Pcs)', price: 90.00, quantity: 1, subtotal: 90.00 },
       { menuItemId: 25, item_name: 'Special Mysore Masala Dosa', price: 120.00, quantity: 1, subtotal: 120.00 }
     ],
-    created_at: new Date(Date.now() - 5 * 60 * 1000).toISOString()
+    created_at: '2026-08-16T14:00:00.000Z'
   }
 ];
 
