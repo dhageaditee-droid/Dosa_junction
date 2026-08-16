@@ -5,7 +5,16 @@ const LIVE_VERCEL_API = 'https://dosa-junction.vercel.app/api/orders';
 
 const INITIAL_DEMO_ORDERS = [];
 
-// Helper to push order to Vercel API & LocalStorage
+const CRUDCRUD_API = 'https://crudcrud.com/api/bd9a3ec70f874fa7b84f60f95cd82dff/orders';
+
+const getOrdersEndpoint = () => {
+  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+    return 'https://dosa-junction.vercel.app/api/orders';
+  }
+  return '/api/orders';
+};
+
+// Helper to push order to Vercel API, CrudCrud & LocalStorage
 const pushOrderToCloudSync = async (newOrder) => {
   // 1. Save to LocalStorage for offline resilience
   try {
@@ -15,34 +24,34 @@ const pushOrderToCloudSync = async (newOrder) => {
     localStorage.setItem('dakshin_my_orders', JSON.stringify(updatedLocal));
   } catch (e) {}
 
-  // 2. Post to same-domain Vercel Serverless API (/api/orders)
+  // 2. Post to Live Vercel API
   try {
-    await fetch('/api/orders', {
+    await fetch(getOrdersEndpoint(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newOrder)
     });
   } catch (e) {
-    console.warn('/api/orders push error:', e.message);
+    console.warn('Vercel order push error:', e.message);
   }
+
+  // 3. Direct backup post to CrudCrud cloud DB
+  try {
+    await fetch(CRUDCRUD_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newOrder)
+    });
+  } catch (e) {}
 };
 
-// Helper to fetch live orders from Vercel API + LocalStorage + Demo Orders
+// Helper to fetch live orders from Vercel API + CrudCrud + LocalStorage
 const fetchOrdersFromCloudSync = async () => {
-  // One-time auto purge of cached legacy dummy orders in localStorage
-  if (localStorage.getItem('dakshin_orders_clean_v6') !== 'true') {
-    try {
-      localStorage.removeItem('dakshin_all_orders');
-      localStorage.removeItem('dakshin_my_orders');
-      localStorage.setItem('dakshin_orders_clean_v6', 'true');
-    } catch (e) {}
-  }
-
   const cloudOrders = [];
 
-  // 1. Fetch from same-domain Vercel Serverless API (/api/orders)
+  // 1. Fetch from Live Vercel Serverless API (Supports localhost connecting to live Vercel too!)
   try {
-    const res = await fetch('/api/orders');
+    const res = await fetch(getOrdersEndpoint());
     if (res.ok) {
       const data = await res.json();
       if (data && data.orders && Array.isArray(data.orders)) {
@@ -51,7 +60,18 @@ const fetchOrdersFromCloudSync = async () => {
     }
   } catch (e) {}
 
-  // 2. Fetch from LocalStorage
+  // 2. Fetch from CrudCrud Cloud DB Direct Backup
+  try {
+    const res = await fetch(CRUDCRUD_API);
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        data.forEach(o => cloudOrders.push(o));
+      }
+    }
+  } catch (e) {}
+
+  // 3. Fetch from LocalStorage
   try {
     const localAll = JSON.parse(localStorage.getItem('dakshin_all_orders') || '[]');
     const localMy = JSON.parse(localStorage.getItem('dakshin_my_orders') || '[]');
