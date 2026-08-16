@@ -27,7 +27,7 @@ const AdminOrders = () => {
 
     const intervalId = setInterval(() => {
       fetchOrders(false);
-    }, 5000);
+    }, 3000); // Fast 3-second auto-sync for live mobile orders
 
     return () => clearInterval(intervalId);
   }, [statusFilter, typeFilter, paymentStatusFilter, todayOnly, search]);
@@ -291,8 +291,10 @@ const AdminOrders = () => {
                     const itemsList = ord.items || [];
                     const itemCount = itemsList.length;
 
-                    // Format Order Time
-                    const orderDateObj = ord.created_at ? new Date(ord.created_at) : new Date();
+                    // Format Order Time - Lock fixed creation timestamp
+                    const rawTimestamp = ord.created_at || (ord.id && !isNaN(Number(ord.id)) ? new Date(Number(ord.id)).toISOString() : null);
+                    const validTimestamp = rawTimestamp && !isNaN(new Date(rawTimestamp).getTime()) ? rawTimestamp : null;
+                    const orderDateObj = validTimestamp ? new Date(validTimestamp) : new Date();
                     const orderTimeStr = orderDateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
                     const orderDateStr = orderDateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
 
