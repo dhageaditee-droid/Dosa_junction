@@ -56,14 +56,24 @@ const StickyMobileCartBar = () => {
             <span style={{ fontSize: '0.9rem', fontWeight: 800, display: 'block', lineHeight: 1.2 }}>
               {cartCount} {cartCount === 1 ? 'Item' : 'Items'} | ₹{grandTotal.toFixed(2)}
             </span>
-            <span style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.85)', letterSpacing: '0.3px' }}>
-              Tap to View Cart & Checkout
-            </span>
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 800, fontSize: '0.85rem', color: '#F59E0B' }}>
-          <span>View Cart</span>
+        <div
+          style={{
+            backgroundColor: '#F59E0B',
+            color: '#111827',
+            padding: '6px 16px',
+            borderRadius: '10px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            fontWeight: 800,
+            fontSize: '0.88rem',
+            boxShadow: '0 2px 8px rgba(245, 158, 11, 0.4)'
+          }}
+        >
+          <span>Confirm</span>
           <ArrowRight size={16} />
         </div>
       </Link>
