@@ -112,17 +112,24 @@ const fetchOrdersFromCloudSync = async () => {
       };
     });
 
-    let subtotal = parseFloat(ord.subtotal) || items.reduce((sum, i) => sum + i.subtotal, 0);
-    if (subtotal === 0) subtotal = 180.00;
+    const calculatedSubtotal = items.reduce((sum, i) => sum + (parseFloat(i.subtotal) || 0), 0);
+    const subtotal = (parseFloat(ord.subtotal) > 0) ? parseFloat(ord.subtotal) : calculatedSubtotal;
 
-    let total = parseFloat(ord.total_amount) || parseFloat(ord.totalAmount) || (subtotal + 15 + 30);
-    if (isNaN(total) || total === 0) total = subtotal + 45.00;
+    const packing = parseFloat(ord.packing_charge || ord.packingFee) || (ord.order_type === 'Dine-In' || ord.order_type === 'Dine In' ? 0 : 15);
+    const delivery = parseFloat(ord.delivery_charge || ord.deliveryFee) || (ord.order_type === 'Home Delivery' ? 30 : 0);
+    const tax = parseFloat(ord.tax) || parseFloat((subtotal * 0.05).toFixed(2));
+    const discount = parseFloat(ord.discount_amount || ord.discountAmount || 0);
+
+    const calculatedTotal = subtotal + tax + packing + delivery - discount;
+    const total_amount = (parseFloat(ord.total_amount || ord.totalAmount) > 0)
+      ? parseFloat(ord.total_amount || ord.totalAmount)
+      : calculatedTotal;
 
     return {
       ...ord,
       items,
       subtotal: parseFloat(subtotal.toFixed(2)),
-      total_amount: parseFloat(total.toFixed(2))
+      total_amount: parseFloat(total_amount.toFixed(2))
     };
   });
 

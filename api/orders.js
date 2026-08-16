@@ -85,12 +85,18 @@ module.exports = async function handler(req, res) {
         };
       });
 
-      const subtotal = parseFloat(orderData.subtotal) || items.reduce((sum, i) => sum + i.subtotal, 0);
-      const tax = parseFloat(orderData.tax) || parseFloat((subtotal * 0.05).toFixed(2));
-      const packing_charge = parseFloat(orderData.packingFee || orderData.packing_charge) || (orderData.orderType === 'Dine In' ? 0 : 15);
+      const calculatedSubtotal = items.reduce((sum, i) => sum + (parseFloat(i.subtotal) || 0), 0);
+      const subtotal = parseFloat(orderData.subtotal) > 0 ? parseFloat(orderData.subtotal) : calculatedSubtotal;
+
+      const packing_charge = parseFloat(orderData.packingFee || orderData.packing_charge) || (orderData.orderType === 'Dine In' || orderData.orderType === 'Dine-In' ? 0 : 15);
       const delivery_charge = parseFloat(orderData.deliveryFee || orderData.delivery_charge) || (orderData.orderType === 'Home Delivery' ? 30 : 0);
+      const tax = parseFloat(orderData.tax) || parseFloat((subtotal * 0.05).toFixed(2));
       const discount_amount = parseFloat(orderData.discountAmount || orderData.discount_amount) || 0;
-      const total_amount = parseFloat(orderData.totalAmount || orderData.total_amount) || (subtotal + tax + packing_charge + delivery_charge - discount_amount);
+
+      const calculatedTotal = subtotal + tax + packing_charge + delivery_charge - discount_amount;
+      const total_amount = parseFloat(orderData.totalAmount || orderData.total_amount) > 0
+        ? parseFloat(orderData.totalAmount || orderData.total_amount)
+        : calculatedTotal;
 
       const newOrder = {
         id: Date.now(),
