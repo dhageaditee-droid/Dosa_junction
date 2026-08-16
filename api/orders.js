@@ -1,6 +1,8 @@
 import { FALLBACK_MENU_ITEMS } from '../client/src/data/fallbackData';
 
-let globalOrders = [
+const CLOUD_DB_URL = 'https://api.restful-api.dev/objects/ff8081819ff5b11001a00a60f8482bdb';
+
+let initialDemoOrders = [
   {
     id: 104,
     order_number: 'ORD-924536',
@@ -48,56 +50,40 @@ let globalOrders = [
       { menuItemId: 2, item_name: 'Filter Coffee', price: 25.00, quantity: 2, subtotal: 50.00 }
     ],
     created_at: new Date(Date.now() - 15 * 60 * 1000).toISOString()
-  },
-  {
-    id: 102,
-    order_number: 'ORD-20260815-5912',
-    customer_name: 'Rohan Sharma',
-    customer_phone: '+91 98234 56789',
-    customer_email: 'rohan@example.com',
-    delivery_address: 'Main Market, Sinnar',
-    order_type: 'Takeaway',
-    payment_method: 'UPI / Online',
-    payment_status: 'PAID',
-    status: 'Preparing',
-    subtotal: 140.00,
-    tax: 7.00,
-    packing_charge: 15.00,
-    delivery_charge: 0.00,
-    discount_amount: 0.00,
-    total_amount: 162.00,
-    items: [
-      { menuItemId: 20, item_name: 'Paper Masala Dosa', price: 100.00, quantity: 1, subtotal: 100.00 },
-      { menuItemId: 30, item_name: 'Sambar Vada (2 Pcs)', price: 40.00, quantity: 1, subtotal: 40.00 }
-    ],
-    created_at: new Date(Date.now() - 45 * 60 * 1000).toISOString()
-  },
-  {
-    id: 103,
-    order_number: 'ORD-20260815-6301',
-    customer_name: 'Priya Patel',
-    customer_phone: '+91 91580 12345',
-    customer_email: 'priya@example.com',
-    delivery_address: 'Panchvati Hotel Lane, Sinnar',
-    order_type: 'Dine-In',
-    payment_method: 'Cash / Pay at Restaurant',
-    payment_status: 'PENDING',
-    status: 'Pending',
-    subtotal: 210.00,
-    tax: 10.50,
-    packing_charge: 0.00,
-    delivery_charge: 0.00,
-    discount_amount: 0.00,
-    total_amount: 220.50,
-    items: [
-      { menuItemId: 15, item_name: 'Loni Sponge Dosa (3 Pcs)', price: 90.00, quantity: 1, subtotal: 90.00 },
-      { menuItemId: 25, item_name: 'Special Mysore Masala Dosa', price: 120.00, quantity: 1, subtotal: 120.00 }
-    ],
-    created_at: new Date(Date.now() - 5 * 60 * 1000).toISOString()
   }
 ];
 
-export default function handler(req, res) {
+const fetchCloudOrders = async () => {
+  try {
+    const res = await fetch(CLOUD_DB_URL);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.data && Array.isArray(data.data.orders)) {
+        return data.data.orders;
+      }
+    }
+  } catch (e) {
+    console.error('Fetch cloud orders error:', e);
+  }
+  return initialDemoOrders;
+};
+
+const saveCloudOrders = async (ordersList) => {
+  try {
+    await fetch(CLOUD_DB_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'DosaJunctionOrdersBin',
+        data: { orders: ordersList }
+      })
+    });
+  } catch (e) {
+    console.error('Save cloud orders error:', e);
+  }
+};
+
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -109,6 +95,8 @@ export default function handler(req, res) {
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
+
+  let currentOrders = await fetchCloudOrders();
 
   if (req.method === 'POST') {
     const orderData = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
@@ -161,12 +149,14 @@ export default function handler(req, res) {
     };
 
     // Prevent duplicate orders by order_number
-    const existsIndex = globalOrders.findIndex(o => o.order_number === orderNum);
+    const existsIndex = currentOrders.findIndex(o => o.order_number === orderNum);
     if (existsIndex >= 0) {
-      globalOrders[existsIndex] = { ...globalOrders[existsIndex], ...newOrder };
+      currentOrders[existsIndex] = { ...currentOrders[existsIndex], ...newOrder };
     } else {
-      globalOrders.unshift(newOrder);
+      currentOrders = [newOrder, ...currentOrders];
     }
+
+    await saveCloudOrders(currentOrders);
 
     return res.status(201).json({
       success: true,
@@ -180,7 +170,7 @@ export default function handler(req, res) {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
     const { id, order_number, status, payment_status } = body;
 
-    globalOrders = globalOrders.map(o => {
+    currentOrders = currentOrders.map(o => {
       if (String(o.id) === String(id) || String(o.order_number) === String(order_number)) {
         return {
           ...o,
@@ -192,12 +182,14 @@ export default function handler(req, res) {
       return o;
     });
 
+    await saveCloudOrders(currentOrders);
+
     return res.status(200).json({ success: true, message: 'Order updated successfully' });
   }
 
   return res.status(200).json({
     success: true,
-    count: globalOrders.length,
-    orders: globalOrders
+    count: currentOrders.length,
+    orders: currentOrders
   });
 }

@@ -100,7 +100,9 @@ const INITIAL_DEMO_ORDERS = [
   }
 ];
 
-// Helper to push order to Vercel Serverless Function & LocalStorage
+const CLOUD_DB_URL = 'https://api.restful-api.dev/objects/ff8081819ff5b11001a00a60f8482bdb';
+
+// Helper to push order to Persistent Cloud DB, Vercel API & LocalStorage
 const pushOrderToCloudSync = async (newOrder) => {
   // 1. Save to LocalStorage for offline resilience
   try {
@@ -110,18 +112,24 @@ const pushOrderToCloudSync = async (newOrder) => {
     localStorage.setItem('dakshin_my_orders', JSON.stringify(updatedLocal));
   } catch (e) {}
 
-  // 2. Post to Live Vercel Serverless API (/api/orders)
+  // 2. Sync to Persistent Cloud DB (Syncs instantly across all mobile devices & laptops)
   try {
-    await fetch(LIVE_VERCEL_API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newOrder)
-    });
+    const cloudRes = await fetch(CLOUD_DB_URL);
+    if (cloudRes.ok) {
+      const data = await cloudRes.json();
+      const existing = (data && data.data && Array.isArray(data.data.orders)) ? data.data.orders : [];
+      const updatedCloud = [newOrder, ...existing.filter(o => o.order_number !== newOrder.order_number)];
+      await fetch(CLOUD_DB_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: 'DosaJunctionOrdersBin', data: { orders: updatedCloud } })
+      });
+    }
   } catch (e) {
-    console.warn('Vercel API push failed:', e.message);
+    console.warn('Cloud DB push warning:', e.message);
   }
 
-  // 3. Post to local Express server endpoint if reachable
+  // 3. Post to Vercel Serverless API (/api/orders)
   try {
     await fetch('/api/orders', {
       method: 'POST',
@@ -131,24 +139,24 @@ const pushOrderToCloudSync = async (newOrder) => {
   } catch (e) {}
 };
 
-// Helper to fetch live orders from Vercel Serverless API + LocalStorage + Demo Orders
+// Helper to fetch live orders from Persistent Cloud DB + LocalStorage + Demo Orders
 const fetchOrdersFromCloudSync = async () => {
   const cloudOrders = [];
 
-  // 1. Fetch from Live Vercel API
+  // 1. Fetch from Persistent Cloud Database (Primary source across all user devices)
   try {
-    const res = await fetch(LIVE_VERCEL_API);
+    const res = await fetch(CLOUD_DB_URL);
     if (res.ok) {
       const data = await res.json();
-      if (data && data.orders && Array.isArray(data.orders)) {
-        data.orders.forEach(o => cloudOrders.push(o));
+      if (data && data.data && Array.isArray(data.data.orders)) {
+        data.data.orders.forEach(o => cloudOrders.push(o));
       }
     }
   } catch (e) {}
 
-  // 2. Fetch from Local Express API if available
+  // 2. Fetch from Live Vercel API
   try {
-    const res = await fetch('/api/orders/admin/all');
+    const res = await fetch('/api/orders');
     if (res.ok) {
       const data = await res.json();
       if (data && data.orders && Array.isArray(data.orders)) {
@@ -204,15 +212,20 @@ const fetchOrdersFromCloudSync = async () => {
 
   // Deduplicate by order_number
   const map = new Map();
-  cleanedOrders.forEach(o => {
-    if (o && o.order_number && !map.has(o.order_number)) {
-      map.set(o.order_number, o);
+  cleanedOrders.forEach(item => {
+    if (item && item.order_number) {
+      if (!map.has(item.order_number)) {
+        map.set(item.order_number, item);
+      } else {
+        const existing = map.get(item.order_number);
+        map.set(item.order_number, { ...existing, ...item });
+      }
     }
   });
 
-  const mergedResult = Array.from(map.values()).sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+  const mergedResult = Array.from(map.values()).sort((a,b) => new Date(b.created_at || Date.now()) - new Date(a.created_at || Date.now()));
 
-  // Save merged result to LocalStorage so previous customer entries are NEVER lost
+  // Save merged result to LocalStorage
   try {
     localStorage.setItem('dakshin_all_orders', JSON.stringify(mergedResult));
   } catch (e) {}
@@ -223,28 +236,36 @@ const fetchOrdersFromCloudSync = async () => {
 // Helper to update status in cloud store
 const updateOrderStatusInCloudSync = async (orderId, newStatus, paymentStatus = null) => {
   try {
-    await fetch(LIVE_VERCEL_API, {
+    const cloudRes = await fetch(CLOUD_DB_URL);
+    if (cloudRes.ok) {
+      const data = await cloudRes.json();
+      const existing = (data && data.data && Array.isArray(data.data.orders)) ? data.data.orders : [];
+      const updated = existing.map(o => {
+        if (String(o.id) === String(orderId) || String(o.order_number) === String(orderId)) {
+          return {
+            ...o,
+            status: newStatus || o.status,
+            payment_status: paymentStatus || o.payment_status,
+            updated_at: new Date().toISOString()
+          };
+        }
+        return o;
+      });
+
+      await fetch(CLOUD_DB_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: 'DosaJunctionOrdersBin', data: { orders: updated } })
+      });
+    }
+  } catch (e) {}
+
+  try {
+    await fetch('/api/orders', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: orderId, status: newStatus, payment_status: paymentStatus })
     });
-  } catch (e) {}
-
-  try {
-    const existing = await fetchOrdersFromCloudSync();
-    const updated = existing.map(o => {
-      if (String(o.id) === String(orderId) || String(o.order_number) === String(orderId)) {
-        return {
-          ...o,
-          status: newStatus || o.status,
-          payment_status: paymentStatus || o.payment_status,
-          updated_at: new Date().toISOString()
-        };
-      }
-      return o;
-    });
-
-    localStorage.setItem('dakshin_all_orders', JSON.stringify(updated));
   } catch (e) {}
 };
 
