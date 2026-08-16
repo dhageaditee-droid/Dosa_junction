@@ -100,9 +100,7 @@ const INITIAL_DEMO_ORDERS = [
   }
 ];
 
-const CRUDCRUD_API = 'https://crudcrud.com/api/b2c7cdd91fb548f69456e69f9c521266/orders';
-
-// Helper to push order to Cloud DB & LocalStorage
+// Helper to push order to Vercel API & LocalStorage
 const pushOrderToCloudSync = async (newOrder) => {
   // 1. Save to LocalStorage for offline resilience
   try {
@@ -112,43 +110,23 @@ const pushOrderToCloudSync = async (newOrder) => {
     localStorage.setItem('dakshin_my_orders', JSON.stringify(updatedLocal));
   } catch (e) {}
 
-  // 2. Post to Cloud DB (Syncs instantly across all mobile devices & laptops)
-  try {
-    await fetch(CRUDCRUD_API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newOrder)
-    });
-  } catch (e) {
-    console.warn('Cloud DB push error:', e.message);
-  }
-
-  // 3. Post to Vercel Serverless API (/api/orders)
+  // 2. Post to same-domain Vercel Serverless API (/api/orders)
   try {
     await fetch('/api/orders', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newOrder)
     });
-  } catch (e) {}
+  } catch (e) {
+    console.warn('/api/orders push error:', e.message);
+  }
 };
 
-// Helper to fetch live orders from Cloud DB + LocalStorage + Demo Orders
+// Helper to fetch live orders from Vercel API + LocalStorage + Demo Orders
 const fetchOrdersFromCloudSync = async () => {
   const cloudOrders = [];
 
-  // 1. Fetch from Cloud Database (Primary source across all user devices)
-  try {
-    const res = await fetch(CRUDCRUD_API);
-    if (res.ok) {
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        data.forEach(o => cloudOrders.push(o));
-      }
-    }
-  } catch (e) {}
-
-  // 2. Fetch from Live Vercel API
+  // 1. Fetch from same-domain Vercel Serverless API (/api/orders)
   try {
     const res = await fetch('/api/orders');
     if (res.ok) {
@@ -159,7 +137,7 @@ const fetchOrdersFromCloudSync = async () => {
     }
   } catch (e) {}
 
-  // 3. Fetch from LocalStorage
+  // 2. Fetch from LocalStorage
   try {
     const localAll = JSON.parse(localStorage.getItem('dakshin_all_orders') || '[]');
     const localMy = JSON.parse(localStorage.getItem('dakshin_my_orders') || '[]');
@@ -168,10 +146,10 @@ const fetchOrdersFromCloudSync = async () => {
     });
   } catch (e) {}
 
-  // 4. Combine initial demo orders
+  // 3. Combine initial demo orders so list is never empty
   INITIAL_DEMO_ORDERS.forEach(o => cloudOrders.push(o));
 
-  // Clean items & fix total_amount for any order
+  // Clean items & normalize schema
   const cleanedOrders = cloudOrders.map(ord => {
     const rawItems = ord.items || [];
     const items = rawItems.map(i => {
@@ -204,7 +182,7 @@ const fetchOrdersFromCloudSync = async () => {
     };
   });
 
-  // Deduplicate by order_number
+  // Deduplicate by order_number (real user orders take priority over demo orders)
   const map = new Map();
   cleanedOrders.forEach(item => {
     if (item && item.order_number) {
@@ -212,7 +190,12 @@ const fetchOrdersFromCloudSync = async () => {
         map.set(item.order_number, item);
       } else {
         const existing = map.get(item.order_number);
-        map.set(item.order_number, { ...existing, ...item });
+        // Merge so items and customer data are preserved
+        map.set(item.order_number, {
+          ...existing,
+          ...item,
+          items: (item.items && item.items.length > 0) ? item.items : existing.items
+        });
       }
     }
   });
@@ -229,23 +212,6 @@ const fetchOrdersFromCloudSync = async () => {
 
 // Helper to update status in cloud store
 const updateOrderStatusInCloudSync = async (orderId, newStatus, paymentStatus = null) => {
-  try {
-    const existing = await fetchOrdersFromCloudSync();
-    const target = existing.find(o => String(o.id) === String(orderId) || String(o.order_number) === String(orderId));
-    if (target && target._id) {
-      await fetch(`${CRUDCRUD_API}/${target._id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...target,
-          status: newStatus || target.status,
-          payment_status: paymentStatus || target.payment_status,
-          updated_at: new Date().toISOString()
-        })
-      });
-    }
-  } catch (e) {}
-
   try {
     await fetch('/api/orders', {
       method: 'PATCH',
