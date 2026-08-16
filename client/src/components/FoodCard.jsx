@@ -1,9 +1,11 @@
 import React from 'react';
 import { Star, Plus, Flame, Clock, Award } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useLanguage } from '../context/LanguageContext';
 
 const FoodCard = ({ item, onClickDetail }) => {
   const { addToCart, cartItems, updateQuantity } = useCart();
+  const { t, translateDish } = useLanguage();
   const cartItem = cartItems.find((i) => i.id === item.id);
   const qty = cartItem ? cartItem.quantity : 0;
 
@@ -11,6 +13,8 @@ const FoodCard = ({ item, onClickDetail }) => {
   const isAvailable = item.is_available !== false;
   const isBestseller = item.is_bestseller || item.bestseller;
   const prepTime = item.preparation_time || item.prepTime || '15 mins';
+
+  const translatedName = translateDish(item.name);
 
   return (
     <div className="food-card" style={{ cursor: onClickDetail ? 'pointer' : 'default' }}>
@@ -20,7 +24,7 @@ const FoodCard = ({ item, onClickDetail }) => {
       >
         <img
           src={item.image_url || 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=600&q=80'}
-          alt={item.name}
+          alt={translatedName}
           className="food-card-img"
           loading="lazy"
         />
@@ -97,7 +101,7 @@ const FoodCard = ({ item, onClickDetail }) => {
           className="food-card-title-row"
           onClick={() => onClickDetail && onClickDetail(item)}
         >
-          <h3 className="food-card-title">{item.name}</h3>
+          <h3 className="food-card-title">{translatedName}</h3>
           
           {item.rating && (
             <div style={{
@@ -141,7 +145,7 @@ const FoodCard = ({ item, onClickDetail }) => {
 
         <div className="food-card-footer">
           <div>
-            <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', display: 'block', textTransform: 'uppercase', fontWeight: 600 }}>Price</span>
+            <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', display: 'block', textTransform: 'uppercase', fontWeight: 600 }}>{t('price')}</span>
             <span className="food-price">₹{parseFloat(item.price).toFixed(2)}</span>
           </div>
 
@@ -176,7 +180,7 @@ const FoodCard = ({ item, onClickDetail }) => {
                 className="btn btn-primary btn-sm"
                 style={{ padding: '0.45rem 1.2rem', fontWeight: 700 }}
               >
-                ADD
+                {t('add')}
               </button>
             )
           ) : (

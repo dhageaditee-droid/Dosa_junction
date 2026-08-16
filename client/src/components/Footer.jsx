@@ -1,8 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail, Clock, Instagram, Facebook, MessageCircle, Utensils, Lock, Navigation } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 const Footer = () => {
+  const { t } = useLanguage();
+
   return (
     <footer style={{ backgroundColor: 'var(--color-emerald-dark)', color: '#E5E7EB', paddingTop: '3.5rem', paddingBottom: '2rem' }}>
       <div className="container">
@@ -34,7 +37,7 @@ const Footer = () => {
               </span>
             </div>
             <p style={{ fontSize: '0.88rem', color: '#9CA3AF', lineHeight: 1.6, marginBottom: '1.25rem' }}>
-              Authentic South Indian restaurant serving crispy dosas, ghee podi specials, uttapam, fluffy idli, and degree filter coffee.
+              {t('footerDesc')}
             </p>
 
             {/* Mobile Call & WhatsApp Buttons */}
@@ -53,7 +56,7 @@ const Footer = () => {
                   fontWeight: 800
                 }}
               >
-                <Phone size={14} /> Call +91 70207 58779
+                <Phone size={14} /> {t('callUs')} +91 70207 58779
               </a>
               <a
                 href="https://wa.me/917020758779"

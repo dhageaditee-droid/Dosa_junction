@@ -2,9 +2,11 @@ import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ShoppingCart, ArrowRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useLanguage } from '../context/LanguageContext';
 
 const StickyMobileCartBar = () => {
   const { cartCount } = useCart();
+  const { t } = useLanguage();
   const location = useLocation();
 
   // Hide on cart, checkout, order success pages or when cart is empty
@@ -60,7 +62,7 @@ const StickyMobileCartBar = () => {
             fontFamily: 'system-ui, -apple-system, sans-serif'
           }}
         >
-          Proceed to Order
+          {t('proceedToOrder')}
         </span>
 
         <div

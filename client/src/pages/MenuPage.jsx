@@ -7,6 +7,7 @@ import SkeletonLoader from '../components/SkeletonLoader';
 import EmptyState from '../components/EmptyState';
 import SEOHead from '../components/SEOHead';
 import { apiService, cleanDishName } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
 
 const DEFAULT_CATEGORIES = [
   { id: 'all', name: 'All Dishes', slug: 'all' },
@@ -29,6 +30,8 @@ const MenuPage = () => {
   const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
   const [loading, setLoading] = useState(true);
   const [selectedFoodModal, setSelectedFoodModal] = useState(null);
+
+  const { t, translateCategory } = useLanguage();
 
   // Filters State
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
@@ -59,7 +62,7 @@ const MenuPage = () => {
       const params = new URLSearchParams();
       if (selectedCategory !== 'all') params.append('category', selectedCategory);
 
-      const res = await apiService.getMenu(params.toString());
+      const res = await apiService.getMenuItems(params.toString());
       setItems(res.items || []);
     } catch (err) {
       console.error(err);
@@ -90,10 +93,10 @@ const MenuPage = () => {
         {/* Clean Header */}
         <div style={{ marginBottom: '1.8rem' }}>
           <h1 style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--color-emerald)', fontFamily: 'var(--font-heading)', marginBottom: '0.4rem' }}>
-            Our South Indian Menu
+            {t('ourMenu')}
           </h1>
           <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem' }}>
-            Explore authentic crisp dosas, ghee specials, uttapam, soft idli, pineapple sheera, and filter coffee.
+            {t('menuDesc')}
           </p>
         </div>
 
@@ -107,7 +110,7 @@ const MenuPage = () => {
                 flexShrink: 0,
                 padding: '8px 16px',
                 borderRadius: '20px',
-                border: '1px solid',
+                border: '1.5px solid',
                 borderColor: selectedCategory === cat.slug ? 'var(--color-emerald)' : 'var(--color-border)',
                 backgroundColor: selectedCategory === cat.slug ? 'var(--color-emerald)' : '#FFFFFF',
                 color: selectedCategory === cat.slug ? '#FFFFFF' : 'var(--color-emerald)',
@@ -117,7 +120,7 @@ const MenuPage = () => {
                 whiteSpace: 'nowrap'
               }}
             >
-              {cleanDishName(cat.name)}
+              {translateCategory(cat.name)}
             </button>
           ))}
         </div>
@@ -137,7 +140,7 @@ const MenuPage = () => {
               top: '90px'
             }}>
               <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--color-emerald)', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                Categories
+                {t('categories')}
               </h3>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -163,7 +166,7 @@ const MenuPage = () => {
                         justifyContent: 'space-between'
                       }}
                     >
-                      <span>{cleanDishName(cat.name)}</span>
+                      <span>{translateCategory(cat.name)}</span>
                       {isActiveCat && <Check size={16} color="#FFFFFF" />}
                     </button>
                   );

@@ -29,6 +29,7 @@ import AdminSettings from './pages/AdminSettings';
 import { ToastProvider } from './context/ToastContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import { LanguageProvider } from './context/LanguageContext';
 
 // Customer Layout Wrapper
 const CustomerLayout = () => {
@@ -63,9 +64,10 @@ const ProtectedAdminRoute = ({ children }) => {
 
 const App = () => {
   return (
-    <ToastProvider>
-      <AuthProvider>
-        <CartProvider>
+    <LanguageProvider>
+      <ToastProvider>
+        <AuthProvider>
+          <CartProvider>
           <Router>
             <Routes>
               
@@ -151,6 +153,7 @@ const App = () => {
         </CartProvider>
       </AuthProvider>
     </ToastProvider>
+  </LanguageProvider>
   );
 };
 
