@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShoppingBag, ArrowRight, ShieldCheck, MapPin, CreditCard, User, Phone, Mail, FileText, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useCart } from '../context/CartContext';
@@ -13,6 +13,8 @@ const CheckoutPage = () => {
   const { customerUser, isCustomerAuthenticated } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
+
+  const isSubmittingRef = useRef(false);
 
   const [formData, setFormData] = useState({
     customerName: customerUser?.name || '',
@@ -94,7 +96,10 @@ const CheckoutPage = () => {
   };
 
   const handleConfirmOrder = async () => {
+    if (isSubmittingRef.current || placingOrder) return;
+
     try {
+      isSubmittingRef.current = true;
       setPlacingOrder(true);
       setShowConfirmModal(false);
 
@@ -136,6 +141,7 @@ const CheckoutPage = () => {
       if (addToast) addToast(err.message || 'Order submission failed.', 'error');
     } finally {
       setPlacingOrder(false);
+      isSubmittingRef.current = false;
     }
   };
 

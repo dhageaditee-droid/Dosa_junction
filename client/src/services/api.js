@@ -133,15 +133,23 @@ const fetchOrdersFromCloudSync = async () => {
     };
   });
 
-  // Deduplicate by order_number (real user orders take priority over demo orders)
+  // Deduplicate by order_number and payload signature (same phone + same total within 60s)
   const map = new Map();
+  const seenSignatures = new Set();
+
   cleanedOrders.forEach(item => {
     if (item && item.order_number) {
-      if (!map.has(item.order_number)) {
+      const timestampMs = new Date(item.created_at || Date.now()).getTime();
+      const timeBucket = Math.floor(timestampMs / 60000); // 1-minute bucket
+      const sig = `${item.customer_phone || ''}_${item.total_amount}_${timeBucket}`;
+
+      if (!map.has(item.order_number) && !seenSignatures.has(sig)) {
         map.set(item.order_number, item);
-      } else {
+        if (item.customer_phone && item.total_amount) {
+          seenSignatures.add(sig);
+        }
+      } else if (map.has(item.order_number)) {
         const existing = map.get(item.order_number);
-        // Merge so items and customer data are preserved
         map.set(item.order_number, {
           ...existing,
           ...item,
@@ -366,17 +374,8 @@ export const apiService = {
       created_at: new Date().toISOString()
     };
 
-    // Always push order to Live Cloud API and local storage
+    // Push order to Live Cloud API and local storage
     await pushOrderToCloudSync(newOrder);
-
-    try {
-      const backendRes = await apiCall('/orders', 'POST', orderData);
-      if (backendRes && backendRes.success) {
-        return backendRes;
-      }
-    } catch (err) {
-      console.log('Backend offline or static Vercel build, order synced via Vercel Serverless Function');
-    }
 
     return {
       success: true,
