@@ -292,24 +292,16 @@ const getDynamicMenu = () => {
   } catch (e) {}
   return FALLBACK_MENU_ITEMS;
 };
-
 // Convenience API Service Methods
 export const apiService = {
   // Menu & Categories
   getMenu: async (paramsStr = '') => {
-    try {
-      const res = await apiCall(`/menu${paramsStr ? `?${paramsStr}` : ''}`);
-      if (res && res.items && res.items.length > 0) return res;
-    } catch (err) {}
-      
     const searchParams = new URLSearchParams(paramsStr);
     const category = searchParams.get('category');
     const search = searchParams.get('search');
     const veg = searchParams.get('veg');
     const bestseller = searchParams.get('bestseller');
     const maxPrice = searchParams.get('maxPrice');
-
-    let filtered = getDynamicMenu();
 
     const categorySlugToId = {
       'beverages': 1,
@@ -322,6 +314,29 @@ export const apiService = {
       'rice': 8,
       'extras': 9
     };
+
+    let itemsList = getDynamicMenu();
+
+    try {
+      const res = await apiCall(`/menu${paramsStr ? `?${paramsStr}` : ''}`);
+      if (res && res.items && Array.isArray(res.items) && res.items.length > 0) {
+        const dbMap = new Map(res.items.map(i => [cleanDishName(i.name).toLowerCase(), i]));
+        const fallbackForCat = category && category !== 'all'
+          ? itemsList.filter(i => i.category_slug === category || i.category_id === categorySlugToId[category])
+          : itemsList;
+
+        fallbackForCat.forEach(fb => {
+          const key = cleanDishName(fb.name).toLowerCase();
+          if (!dbMap.has(key)) {
+            dbMap.set(key, fb);
+          }
+        });
+
+        itemsList = Array.from(dbMap.values());
+      }
+    } catch (err) {}
+
+    let filtered = itemsList;
 
     if (category && category !== 'all') {
       const catId = categorySlugToId[category];
@@ -350,7 +365,11 @@ export const apiService = {
       filtered = filtered.filter(i => i.price <= maxP);
     }
 
-    return { success: true, count: filtered.length, items: filtered };
+    return {
+      success: true,
+      count: filtered.length,
+      items: filtered
+    };
   },
 
   getMenuItem: async (id) => {
