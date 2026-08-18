@@ -70,21 +70,7 @@ const OrderSuccessPage = () => {
             Thank you for ordering with Dosa Junction. Your order has been registered in our kitchen queue.
           </p>
 
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.75rem',
-            backgroundColor: 'var(--color-cream-alt)',
-            padding: '0.75rem 1.6rem',
-            borderRadius: '20px',
-            border: '1px dashed var(--color-gold)',
-            marginBottom: '1.5rem'
-          }}>
-            <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>Order Number:</span>
-            <strong style={{ fontSize: '1.25rem', color: 'var(--color-emerald)', letterSpacing: '0.5px' }}>
-              {orderNumber}
-            </strong>
-          </div>
+
 
           {/* Action Buttons */}
           <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '1rem' }}>

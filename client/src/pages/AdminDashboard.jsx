@@ -193,11 +193,8 @@ const AdminDashboard = () => {
                         return (
                           <tr key={ord.id}>
                             <td style={{ whiteSpace: 'nowrap' }}>
-                              <div style={{ fontWeight: 800, color: 'var(--color-emerald)', fontSize: '1rem' }}>
+                              <div style={{ fontWeight: 800, color: 'var(--color-emerald)', fontSize: '1.05rem' }}>
                                 #{index + 1}
-                              </div>
-                              <div style={{ fontFamily: 'monospace', fontSize: '0.75rem', color: 'var(--color-gold)', fontWeight: 700 }}>
-                                {ord.order_number}
                               </div>
                               <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '3px', marginTop: '2px' }}>
                                 <Clock size={12} color="var(--color-gold)" />
