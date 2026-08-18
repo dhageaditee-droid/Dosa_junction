@@ -251,6 +251,55 @@ const Navbar = ({ onOpenAuthModal }) => {
         </div>
       </div>
 
+      {/* Mobile Sub-Navbar: Horizontal Scrolling Links Row under Logo Bar */}
+      <div 
+        className="mobile-sub-navbar"
+        style={{
+          backgroundColor: '#FFFDF9',
+          borderBottom: '1px solid #EAE3D2',
+          padding: '8px 12px',
+          overflowX: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+        }}
+      >
+        {navLinks.map((link) => {
+          const IconComp = link.icon;
+          const active = isActive(link.path);
+          return (
+            <Link
+              key={link.path}
+              to={link.path}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 14px',
+                borderRadius: '20px',
+                fontSize: '0.82rem',
+                fontWeight: active ? 800 : 600,
+                color: active ? '#FFFFFF' : '#0F3825',
+                backgroundColor: active ? '#EA580C' : 'rgba(15, 56, 37, 0.06)',
+                border: active ? '1px solid #EA580C' : '1px solid #EAE3D2',
+                textDecoration: 'none',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
+                boxShadow: active ? '0 2px 8px rgba(234, 88, 12, 0.25)' : 'none',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <IconComp size={14} color={active ? '#FFFFFF' : '#0F3825'} />
+              <span>{link.name}</span>
+            </Link>
+          );
+        })}
+      </div>
+
       {/* Mobile Drawer Navigation Screen */}
       {mobileOpen && (
         <div
@@ -358,12 +407,18 @@ const Navbar = ({ onOpenAuthModal }) => {
 
       {/* Responsive Breakpoint CSS */}
       <style>{`
+        .mobile-sub-navbar {
+          display: none !important;
+        }
         @media (max-width: 960px) {
           .desktop-nav, .desktop-nav-crest {
             display: none !important;
           }
           .mobile-toggle-btn {
             display: block !important;
+          }
+          .mobile-sub-navbar {
+            display: flex !important;
           }
         }
         @media (max-width: 640px) {
