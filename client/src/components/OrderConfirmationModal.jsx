@@ -165,9 +165,10 @@ const OrderConfirmationModal = ({
         <div
           style={{
             display: 'flex',
-            gap: '0.75rem',
+            gap: '0.6rem',
             justifyContent: 'center',
-            padding: '0 1.5rem 1.2rem 1.5rem'
+            padding: '0 1rem 1.2rem 1rem',
+            flexWrap: 'nowrap'
           }}
         >
           {/* No, Go Back Pill Button */}
@@ -177,10 +178,11 @@ const OrderConfirmationModal = ({
             disabled={placingOrder}
             style={{
               flex: '1',
+              minWidth: '120px',
               maxWidth: '160px',
-              padding: '0.7rem 1rem',
+              padding: '0.65rem 0.75rem',
               borderRadius: '50px',
-              fontSize: '0.88rem',
+              fontSize: '0.82rem',
               fontWeight: 700,
               backgroundColor: '#FFFFFF',
               color: '#0F3825',
@@ -189,12 +191,13 @@ const OrderConfirmationModal = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '6px',
+              gap: '4px',
               transition: 'all 0.2s ease',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
+              boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+              whiteSpace: 'nowrap'
             }}
           >
-            <ArrowLeft size={16} /> No, Go Back
+            <ArrowLeft size={15} /> No, Go Back
           </button>
 
           {/* Yes, Confirm Order Pill Button */}
@@ -204,10 +207,11 @@ const OrderConfirmationModal = ({
             disabled={placingOrder}
             style={{
               flex: '1.2',
+              minWidth: '140px',
               maxWidth: '190px',
-              padding: '0.7rem 1.1rem',
+              padding: '0.65rem 0.85rem',
               borderRadius: '50px',
-              fontSize: '0.88rem',
+              fontSize: '0.82rem',
               fontWeight: 800,
               background: 'linear-gradient(135deg, #0F3825 0%, #175237 100%)',
               color: '#FFFFFF',
@@ -216,13 +220,14 @@ const OrderConfirmationModal = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '6px',
+              gap: '5px',
               boxShadow: '0 4px 14px rgba(15, 56, 37, 0.35)',
               transition: 'all 0.2s ease',
-              opacity: placingOrder ? 0.75 : 1
+              opacity: placingOrder ? 0.75 : 1,
+              whiteSpace: 'nowrap'
             }}
           >
-            <CheckCircle2 size={16} color="#FFC83B" />
+            <CheckCircle2 size={15} color="#FFC83B" />
             {placingOrder ? 'Processing...' : 'Yes, Confirm Order'}
           </button>
         </div>
