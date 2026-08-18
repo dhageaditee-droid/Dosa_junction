@@ -158,7 +158,7 @@ const AdminOrders = () => {
 
           <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
             <button onClick={fetchOrders} className="btn btn-outline btn-sm" style={{ backgroundColor: '#FFFFFF', flexShrink: 0 }}>
-              <RefreshCw size={16} /> Sync Live Orders
+              <RefreshCw size={16} /> Refresh Orders
             </button>
             <button
               onClick={handleClearAllOrders}
