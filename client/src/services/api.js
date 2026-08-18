@@ -278,8 +278,11 @@ const getDynamicMenu = () => {
     const saved = localStorage.getItem('dakshin_custom_menu');
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed) && parsed.length >= 50) return parsed;
     }
+  } catch (e) {}
+  try {
+    localStorage.setItem('dakshin_custom_menu', JSON.stringify(FALLBACK_MENU_ITEMS));
   } catch (e) {}
   return FALLBACK_MENU_ITEMS;
 };
