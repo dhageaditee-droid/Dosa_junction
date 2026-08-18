@@ -155,22 +155,7 @@ const Footer = () => {
               ))}
             </div>
 
-            <Link
-              to="/admin/login"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                fontSize: '0.8rem',
-                color: 'var(--color-gold)',
-                border: '1px solid rgba(217,119,6,0.3)',
-                padding: '6px 14px',
-                borderRadius: '20px',
-                transition: '0.2s'
-              }}
-            >
-              <Lock size={14} /> Admin Portal Login
-            </Link>
+
           </div>
 
         </div>
