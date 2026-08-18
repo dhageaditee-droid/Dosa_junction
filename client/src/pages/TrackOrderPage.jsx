@@ -16,7 +16,17 @@ const TrackOrderPage = () => {
   const { addToast } = useToast();
 
   useEffect(() => {
-    const currentTarget = initialOrderNumber || orderNumberInput;
+    let currentTarget = initialOrderNumber || orderNumberInput;
+
+    if (!currentTarget) {
+      try {
+        const saved = JSON.parse(localStorage.getItem('dakshin_all_orders') || '[]');
+        if (saved && saved.length > 0 && saved[0].order_number) {
+          currentTarget = saved[0].order_number;
+        }
+      } catch (e) {}
+    }
+
     if (!currentTarget) return;
 
     fetchOrder(currentTarget, true);
@@ -78,40 +88,10 @@ const TrackOrderPage = () => {
           <h1 style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--color-emerald)', fontFamily: 'var(--font-heading)', margin: '4px 0' }}>
             Track Your Order
           </h1>
-          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem' }}>
-            Enter your order number to check preparation progress & live status updates.
+          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem', margin: 0 }}>
+            Live preparation progress & kitchen status updates.
           </p>
         </div>
-
-        {/* Search Bar */}
-        <form onSubmit={handleTrackSubmit} style={{ display: 'flex', gap: '0.75rem', marginBottom: '2.5rem', justifyContent: 'center' }}>
-          <input
-            type="text"
-            value={orderNumberInput}
-            onChange={(e) => setOrderNumberInput(e.target.value)}
-            placeholder="e.g. ORD-20260815-4819"
-            style={{
-              width: '100%',
-              maxWidth: '480px',
-              padding: '0.85rem 1.2rem',
-              borderRadius: '16px',
-              border: '1.5px solid var(--color-border)',
-              fontSize: '1rem',
-              fontFamily: 'monospace',
-              outline: 'none',
-              backgroundColor: '#FFFFFF',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.04)'
-            }}
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn btn-primary"
-            style={{ padding: '0.85rem 1.6rem', borderRadius: '16px', fontWeight: 800, flexShrink: 0 }}
-          >
-            {loading ? 'Searching...' : 'Track'} <Search size={18} />
-          </button>
-        </form>
 
         {/* Order Details & Visual Stepper */}
         {order && (
