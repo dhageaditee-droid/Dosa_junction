@@ -276,8 +276,8 @@ export const apiCall = async (endpoint, method = 'GET', data = null, customToken
 const getDynamicMenu = () => {
   try {
     const currentVer = localStorage.getItem('dakshin_menu_ver');
-    if (currentVer !== 'v5_only_pavbhaji_rice_in_extras') {
-      localStorage.setItem('dakshin_menu_ver', 'v5_only_pavbhaji_rice_in_extras');
+    if (currentVer !== 'v6_combo_149') {
+      localStorage.setItem('dakshin_menu_ver', 'v6_combo_149');
       localStorage.setItem('dakshin_custom_menu', JSON.stringify(FALLBACK_MENU_ITEMS));
       return FALLBACK_MENU_ITEMS;
     }
