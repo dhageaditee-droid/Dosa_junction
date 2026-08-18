@@ -515,11 +515,6 @@ export const apiService = {
 
   // Offers & Enquiries
   getOffers: async () => {
-    try {
-      const res = await apiCall('/offers');
-      if (res.offers && res.offers.length > 0) return res;
-    } catch (err) {}
-
     return {
       success: true,
       offers: [
