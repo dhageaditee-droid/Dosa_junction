@@ -1,16 +1,20 @@
 export const FALLBACK_CATEGORIES = [
-  { id: 1, name: 'Tea & Beverages', slug: 'beverages', description: 'Traditional Tea, Coffee & Milk', display_order: 1 },
-  { id: 2, name: 'Dosa', slug: 'dosa', description: 'Crispy traditional South Indian Crepes', display_order: 2 },
-  { id: 3, name: 'Special Dosa', slug: 'special-dosa', description: 'Ghee, Podi & Gourmet Special Dosas', display_order: 3 },
-  { id: 4, name: 'Uttapam', slug: 'uttapam', description: 'Thick savory pancakes with delicious toppings', display_order: 4 },
-  { id: 5, name: 'Idli', slug: 'idli', description: 'Steamed rice cakes served with Sambar & Chutneys', display_order: 5 },
-  { id: 6, name: 'Vada', slug: 'vada', description: 'Crispy lentil donuts & Combos', display_order: 6 },
-  { id: 7, name: 'Sheera & Desserts', slug: 'desserts', description: 'Authentic South Indian Sweets', display_order: 7 },
-  { id: 8, name: 'Rice', slug: 'rice', description: 'Seasoned aromatic rice dishes', display_order: 8 },
-  { id: 9, name: 'Extras', slug: 'extras', description: 'Add-ons: Cheese, Butter, Masala & Pav Bhaji', display_order: 9 }
+  { id: 10, name: 'Combo Offer', slug: 'combo', description: 'Deluxe South Indian Combos', display_order: 1 },
+  { id: 1, name: 'Tea & Beverages', slug: 'beverages', description: 'Traditional Tea, Coffee & Milk', display_order: 2 },
+  { id: 2, name: 'Dosa', slug: 'dosa', description: 'Crispy traditional South Indian Crepes', display_order: 3 },
+  { id: 3, name: 'Special Dosa', slug: 'special-dosa', description: 'Ghee, Podi & Gourmet Special Dosas', display_order: 4 },
+  { id: 4, name: 'Uttapam', slug: 'uttapam', description: 'Thick savory pancakes with delicious toppings', display_order: 5 },
+  { id: 5, name: 'Idli', slug: 'idli', description: 'Steamed rice cakes served with Sambar & Chutneys', display_order: 6 },
+  { id: 6, name: 'Vada', slug: 'vada', description: 'Crispy lentil donuts & Combos', display_order: 7 },
+  { id: 7, name: 'Sheera & Desserts', slug: 'desserts', description: 'Authentic South Indian Sweets', display_order: 8 },
+  { id: 8, name: 'Rice', slug: 'rice', description: 'Seasoned aromatic rice dishes', display_order: 9 },
+  { id: 9, name: 'Extras', slug: 'extras', description: 'Add-ons & Sides: Pav Bhaji, Masala Rice, Fried Rice & Schezwan Rice', display_order: 10 }
 ];
 
 export const FALLBACK_MENU_ITEMS = [
+  // 0. Combo Offer (कॉम्बो ऑफर)
+  { id: 99, category_id: 10, category_slug: 'combo', name: 'South Indian Special Combo (साऊथ इंडियन स्पेशल कॉम्बो)', description: 'Special Deluxe Combo: Masala Dosa + 1 Pc Idli + 1 Pc Medu Vada + Pineapple Sheera + Chaha', price: 149.00, image_url: 'https://images.unsplash.com/photo-1610192244261-3f33de3f55e4?auto=format&fit=crop&w=600&q=80', is_veg: true, spice_level: 'medium', preparation_time: '15 mins', is_available: true, is_bestseller: true, rating: 5.0 },
+
   // 1. Beverages (चहा)
   { id: 1, category_id: 1, category_slug: 'beverages', name: 'Chaha (चहा)', description: 'Traditional hot spiced Indian tea', price: 20.00, image_url: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=600&q=80', is_veg: true, spice_level: 'mild', preparation_time: '5 mins', is_available: true, is_bestseller: true, rating: 4.8 },
   { id: 2, category_id: 1, category_slug: 'beverages', name: 'Black Tea (ब्लॅक टी)', description: 'Strong aromatic black tea', price: 15.00, image_url: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=600&q=80', is_veg: true, spice_level: 'mild', preparation_time: '5 mins', is_available: true, is_bestseller: false, rating: 4.5 },

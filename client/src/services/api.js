@@ -276,8 +276,8 @@ export const apiCall = async (endpoint, method = 'GET', data = null, customToken
 const getDynamicMenu = () => {
   try {
     const currentVer = localStorage.getItem('dakshin_menu_ver');
-    if (currentVer !== 'v6_combo_149') {
-      localStorage.setItem('dakshin_menu_ver', 'v6_combo_149');
+    if (currentVer !== 'v7_combo_tab_149') {
+      localStorage.setItem('dakshin_menu_ver', 'v7_combo_tab_149');
       localStorage.setItem('dakshin_custom_menu', JSON.stringify(FALLBACK_MENU_ITEMS));
       return FALLBACK_MENU_ITEMS;
     }
@@ -304,6 +304,7 @@ export const apiService = {
     const maxPrice = searchParams.get('maxPrice');
 
     const categorySlugToId = {
+      'combo': 10,
       'beverages': 1,
       'dosa': 2,
       'special-dosa': 3,

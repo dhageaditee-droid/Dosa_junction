@@ -24,6 +24,7 @@ import { useLanguage } from '../context/LanguageContext';
 
 const DEFAULT_CATEGORIES = [
   { id: 'all', name: 'All Dishes', slug: 'all', icon: Grid },
+  { id: 'combo', name: 'Combo Offer', slug: 'combo', icon: Sparkles },
   { id: 'beverages', name: 'Tea & Beverages', slug: 'beverages', icon: Coffee },
   { id: 'dosa', name: 'Dosa', slug: 'dosa', icon: Utensils },
   { id: 'special-dosa', name: 'Special Dosa', slug: 'special-dosa', icon: Sparkles },
