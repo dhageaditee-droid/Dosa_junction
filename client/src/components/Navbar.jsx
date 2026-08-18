@@ -46,8 +46,8 @@ const Navbar = ({ onOpenAuthModal }) => {
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
               <MapPin size={13} color="#FFC83B" /> Sinnar Gaurav, Near Panchvati Hotel, Sinnar
             </span>
-            <a href="tel:+919158075480" style={{ color: '#E2E8F0', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-              <Phone size={13} color="#FFC83B" /> +91 91580 75480
+            <a href="tel:+917020758779" style={{ color: '#E2E8F0', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+              <Phone size={13} color="#FFC83B" /> +91 70207 58779
             </a>
           </div>
 
@@ -59,7 +59,7 @@ const Navbar = ({ onOpenAuthModal }) => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <a href="https://instagram.com" target="_blank" rel="noreferrer" style={{ color: '#E2E8F0', display: 'flex' }} aria-label="Instagram"><Instagram size={14} /></a>
               <a href="https://facebook.com" target="_blank" rel="noreferrer" style={{ color: '#E2E8F0', display: 'flex' }} aria-label="Facebook"><Facebook size={14} /></a>
-              <a href="https://wa.me/919158075480" target="_blank" rel="noreferrer" style={{ color: '#E2E8F0', display: 'flex' }} aria-label="WhatsApp"><MessageCircle size={14} /></a>
+              <a href="https://wa.me/917020758779" target="_blank" rel="noreferrer" style={{ color: '#E2E8F0', display: 'flex' }} aria-label="WhatsApp"><MessageCircle size={14} /></a>
             </div>
           </div>
         </div>

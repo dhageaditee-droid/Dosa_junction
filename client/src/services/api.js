@@ -838,7 +838,7 @@ export const apiService = {
       settings: {
         restaurant_name: 'Dosa Junction',
         restaurant_tagline: 'Taste of South',
-        phone: '+91 91580 75480',
+        phone: '+91 70207 58779',
         email: 'info@dosajunction.com',
         address: 'Sinnar Gaurav, Near Panchvati Hotel, Sinnar',
         opening_hours: '7:00 AM - 11:00 PM',
