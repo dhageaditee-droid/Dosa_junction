@@ -64,9 +64,7 @@ const CheckoutPage = () => {
       errs.customerPhone = 'Please enter a valid 10-digit mobile number';
     }
 
-    if (formData.customerEmail.trim() && !/\S+@\S+\.\S+/.test(formData.customerEmail.trim())) {
-      errs.customerEmail = 'Invalid email address format';
-    }
+
 
     // Require address fields ONLY if orderType is 'Home Delivery'
     if (formData.orderType === 'Home Delivery') {
@@ -230,36 +228,21 @@ const CheckoutPage = () => {
                     {errors.customerName && <span className="form-error" style={{ color: '#EF4444', fontWeight: 700, fontSize: '0.78rem' }}>{errors.customerName}</span>}
                   </div>
 
-                  {/* Phone & Email */}
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
-                    <div>
-                      <label className="form-label">Mobile Number (10 Digits) *</label>
-                      <input
-                        type="tel"
-                        value={formData.customerPhone}
-                        onChange={(e) => {
-                          setFormData({ ...formData, customerPhone: e.target.value });
-                          if (errors.customerPhone) setErrors({ ...errors, customerPhone: null });
-                        }}
-                        placeholder="9876543210"
-                        className="form-input"
-                        style={{ borderColor: errors.customerPhone ? '#EF4444' : undefined }}
-                      />
-                      {errors.customerPhone && <span className="form-error" style={{ color: '#EF4444', fontWeight: 700, fontSize: '0.78rem' }}>{errors.customerPhone}</span>}
-                    </div>
-
-                    <div>
-                      <label className="form-label">Email Address (Optional)</label>
-                      <input
-                        type="email"
-                        value={formData.customerEmail}
-                        onChange={(e) => setFormData({ ...formData, customerEmail: e.target.value })}
-                        placeholder="anand@example.com"
-                        className="form-input"
-                        style={{ borderColor: errors.customerEmail ? '#EF4444' : undefined }}
-                      />
-                      {errors.customerEmail && <span className="form-error" style={{ color: '#EF4444', fontWeight: 700, fontSize: '0.78rem' }}>{errors.customerEmail}</span>}
-                    </div>
+                  {/* Mobile Number */}
+                  <div>
+                    <label className="form-label">Mobile Number (10 Digits) *</label>
+                    <input
+                      type="tel"
+                      value={formData.customerPhone}
+                      onChange={(e) => {
+                        setFormData({ ...formData, customerPhone: e.target.value });
+                        if (errors.customerPhone) setErrors({ ...errors, customerPhone: null });
+                      }}
+                      placeholder="e.g. 9876543210"
+                      className="form-input"
+                      style={{ borderColor: errors.customerPhone ? '#EF4444' : undefined }}
+                    />
+                    {errors.customerPhone && <span className="form-error" style={{ color: '#EF4444', fontWeight: 700, fontSize: '0.78rem' }}>{errors.customerPhone}</span>}
                   </div>
 
                   {/* Delivery Address Fields - Shown ONLY if orderType is 'Home Delivery' */}
