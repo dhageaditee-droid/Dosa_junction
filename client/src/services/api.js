@@ -275,10 +275,16 @@ export const apiCall = async (endpoint, method = 'GET', data = null, customToken
 // Helper for dynamic local menu persistence across mobile and admin
 const getDynamicMenu = () => {
   try {
+    const currentVer = localStorage.getItem('dakshin_menu_ver');
+    if (currentVer !== 'v3_extras_rice') {
+      localStorage.setItem('dakshin_menu_ver', 'v3_extras_rice');
+      localStorage.setItem('dakshin_custom_menu', JSON.stringify(FALLBACK_MENU_ITEMS));
+      return FALLBACK_MENU_ITEMS;
+    }
     const saved = localStorage.getItem('dakshin_custom_menu');
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length >= 50) return parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
     }
   } catch (e) {}
   try {
