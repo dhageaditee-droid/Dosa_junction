@@ -525,13 +525,13 @@ export const apiService = {
       offers: [
         {
           id: 1,
-          title: 'Buy 5 Masala Dosa & Get 1 Plain Dosa Free!',
-          description: 'Order 5 Masala Dosa and get 1 Plain Dosa (Worth ₹60) absolutely FREE!',
-          code: 'FREEPLAIN1',
+          title: 'Buy 5 Ghee Namma South Special Dosa & Get 1 Dosa Free!',
+          description: 'Order 5 Ghee Namma South Special Dosa and get 1 Dosa (Worth ₹125) absolutely FREE!',
+          code: 'FREEDOSA125',
           discount_percentage: 0,
-          discount_amount: 60,
-          min_order_amount: 350,
-          image_url: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=800&q=80',
+          discount_amount: 125,
+          min_order_amount: 625,
+          image_url: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=800&q=80',
           end_date: '2026-12-31'
         }
       ]
