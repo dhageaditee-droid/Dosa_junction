@@ -25,10 +25,12 @@ const CheckoutPage = () => {
     city: customerUser?.city || 'Sangamner',
     pincode: customerUser?.pincode || '422601',
     orderType: 'Home Delivery', // 'Home Delivery', 'Takeaway', 'Dine In'
-    paymentMethod: 'Cash on Delivery', // 'Cash on Delivery', 'Pay at Restaurant'
+    paymentMethod: 'Online Payment (UPI)', // 'Online Payment (UPI)', 'Cash on Delivery', 'Pay at Restaurant'
+    utrNumber: '',
     notes: ''
   });
 
+  const [copiedUpi, setCopiedUpi] = useState(false);
   const [errors, setErrors] = useState({});
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [placingOrder, setPlacingOrder] = useState(false);
@@ -111,6 +113,10 @@ const CheckoutPage = () => {
         pincode: formData.orderType === 'Home Delivery' ? formData.pincode.trim() : null,
         orderType: formData.orderType,
         paymentMethod: formData.paymentMethod,
+        paymentStatus: formData.paymentMethod === 'Online Payment (UPI)'
+          ? (formData.utrNumber ? `PAID (UPI: ${formData.utrNumber.trim()})` : 'PAID (UPI Scan)')
+          : 'PENDING',
+        transactionId: formData.utrNumber ? formData.utrNumber.trim() : null,
         couponCode: appliedCoupon ? appliedCoupon.code : null,
         notes: formData.notes.trim(),
         subtotal: parseFloat(subtotal.toFixed(2)),
@@ -342,8 +348,9 @@ const CheckoutPage = () => {
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                   {[
-                    { key: 'Cash on Delivery', label: 'Cash on Delivery (COD)', desc: 'Pay cash or UPI directly to delivery partner upon arrival' },
-                    { key: 'Pay at Restaurant', label: 'Pay at Restaurant', desc: 'Pay at billing counter during Takeaway pick up or Dine In' }
+                    { key: 'Online Payment (UPI)', label: '📱 Online Payment (Google Pay / PhonePe / QR Code)', desc: 'Scan GPay QR code or pay directly via Google Pay / PhonePe / Paytm / Any UPI app' },
+                    { key: 'Cash on Delivery', label: '💵 Cash on Delivery (COD)', desc: 'Pay cash or UPI directly to delivery partner upon arrival' },
+                    { key: 'Pay at Restaurant', label: '🏪 Pay at Restaurant', desc: 'Pay at billing counter during Takeaway pick up or Dine In' }
                   ].map((method) => (
                     <label
                       key={method.key}
@@ -353,8 +360,8 @@ const CheckoutPage = () => {
                         gap: '0.8rem',
                         padding: '1rem',
                         borderRadius: '14px',
-                        border: formData.paymentMethod === method.key ? '2px solid var(--color-gold)' : '1px solid var(--color-border)',
-                        backgroundColor: formData.paymentMethod === method.key ? '#FEF3C7' : '#FFFFFF',
+                        border: formData.paymentMethod === method.key ? '2px solid #3B82F6' : '1px solid var(--color-border)',
+                        backgroundColor: formData.paymentMethod === method.key ? '#EFF6FF' : '#FFFFFF',
                         cursor: 'pointer',
                         transition: 'var(--transition-fast)'
                       }}
@@ -364,7 +371,7 @@ const CheckoutPage = () => {
                         name="paymentMethod"
                         checked={formData.paymentMethod === method.key}
                         onChange={() => setFormData({ ...formData, paymentMethod: method.key })}
-                        style={{ accentColor: 'var(--color-gold)', marginTop: '3px' }}
+                        style={{ accentColor: '#2563EB', marginTop: '3px' }}
                       />
                       <div>
                         <strong style={{ display: 'block', fontSize: '0.95rem', color: 'var(--color-emerald)' }}>
@@ -378,9 +385,102 @@ const CheckoutPage = () => {
                   ))}
                 </div>
 
-                <div style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
-                  💡 Online payment gateway (Razorpay / PhonePe / Cards) integration is planned for Phase 2.
-                </div>
+                {/* QR Code Scanner Box when Online Payment (UPI) is selected */}
+                {formData.paymentMethod === 'Online Payment (UPI)' && (
+                  <div style={{
+                    marginTop: '1.2rem',
+                    padding: '1.5rem',
+                    backgroundColor: '#F8FAFC',
+                    borderRadius: '16px',
+                    border: '1.5px solid #3B82F6',
+                    textAlign: 'center',
+                    boxShadow: '0 4px 14px rgba(59, 130, 246, 0.08)'
+                  }}>
+                    <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#1D4ED8', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '8px' }}>
+                      Scan QR Code to Pay ₹{grandTotal.toFixed(2)}
+                    </span>
+
+                    <div style={{
+                      display: 'inline-block',
+                      backgroundColor: '#FFFFFF',
+                      padding: '12px',
+                      borderRadius: '16px',
+                      border: '1px solid #E2E8F0',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
+                      marginBottom: '1rem'
+                    }}>
+                      <img
+                        src="/upi-qr.jpg"
+                        alt="Google Pay UPI QR Code - Ganraj Sonawane"
+                        style={{ width: '220px', height: '220px', objectFit: 'contain', borderRadius: '12px', display: 'block', margin: '0 auto' }}
+                      />
+                    </div>
+
+                    <div style={{ marginBottom: '1.2rem' }}>
+                      <span style={{ fontSize: '0.78rem', color: '#64748B', fontWeight: 600, textTransform: 'uppercase', display: 'block' }}>Account Holder Name</span>
+                      <strong style={{ fontSize: '1.1rem', color: '#0F172A', fontWeight: 800 }}>Ganraj Sonawane</strong>
+                      
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '6px' }}>
+                        <span style={{ fontSize: '0.85rem', color: '#1E293B', fontFamily: 'monospace', fontWeight: 700, backgroundColor: '#E2E8F0', padding: '4px 10px', borderRadius: '8px' }}>
+                          ganrajsonawane136@oksbi
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText('ganrajsonawane136@oksbi');
+                            setCopiedUpi(true);
+                            setTimeout(() => setCopiedUpi(false), 2000);
+                          }}
+                          style={{ padding: '4px 10px', borderRadius: '8px', border: '1px solid #3B82F6', backgroundColor: '#EFF6FF', color: '#1D4ED8', fontSize: '0.75rem', fontWeight: 800, cursor: 'pointer' }}
+                        >
+                          {copiedUpi ? '✓ Copied!' : 'Copy ID'}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Direct UPI Mobile App Deep-Link */}
+                    <a
+                      href={`upi://pay?pa=ganrajsonawane136@oksbi&pn=Ganraj%20Sonawane&am=${grandTotal.toFixed(2)}&cu=INR`}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        width: '100%',
+                        maxWidth: '320px',
+                        padding: '0.75rem 1.2rem',
+                        borderRadius: '24px',
+                        backgroundColor: '#2563EB',
+                        color: '#FFFFFF',
+                        fontWeight: 800,
+                        fontSize: '0.9rem',
+                        textDecoration: 'none',
+                        boxShadow: '0 4px 12px rgba(37, 99, 235, 0.35)',
+                        marginBottom: '1rem'
+                      }}
+                    >
+                      📱 Pay ₹{grandTotal.toFixed(2)} with GPay / PhonePe / Paytm
+                    </a>
+
+                    {/* Transaction Reference / UTR Input */}
+                    <div style={{ textAlign: 'left', backgroundColor: '#FFFFFF', padding: '1rem', borderRadius: '12px', border: '1px solid #CBD5E1' }}>
+                      <label style={{ fontSize: '0.82rem', fontWeight: 800, color: '#1E293B', display: 'block', marginBottom: '4px' }}>
+                        Enter 12-Digit UTR / Transaction No. (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.utrNumber}
+                        onChange={(e) => setFormData({ ...formData, utrNumber: e.target.value })}
+                        placeholder="e.g. 4235XXXXXXXX (12 Digits)"
+                        className="form-input"
+                        style={{ fontSize: '0.9rem', fontFamily: 'monospace' }}
+                      />
+                      <span style={{ fontSize: '0.72rem', color: '#64748B', display: 'block', marginTop: '4px' }}>
+                        ✓ Entering your 12-digit UTR number helps admin instantly verify your payment.
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
 
             </div>
