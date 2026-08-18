@@ -66,18 +66,25 @@ const Navbar = ({ onOpenAuthModal }) => {
               }}
             />
             <div>
-              <span style={{
-                fontFamily: 'var(--font-heading)',
-                fontSize: '1.35rem',
-                fontWeight: 800,
-                color: '#0F3825',
-                letterSpacing: '-0.5px',
-                display: 'block',
-                lineHeight: 1.1
-              }}>
+              <span 
+                className="brand-text-title"
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: '1.35rem',
+                  fontWeight: 800,
+                  color: '#0F3825',
+                  letterSpacing: '-0.5px',
+                  display: 'block',
+                  lineHeight: 1.1,
+                  whiteSpace: 'nowrap'
+                }}
+              >
                 Dosa <span style={{ color: '#EA580C' }}>Junction</span>
               </span>
-              <span style={{ fontSize: '0.6rem', color: '#D97706', letterSpacing: '0.8px', textTransform: 'uppercase', fontWeight: 700 }}>
+              <span 
+                className="brand-text-sub"
+                style={{ fontSize: '0.6rem', color: '#D97706', letterSpacing: '0.8px', textTransform: 'uppercase', fontWeight: 700, whiteSpace: 'nowrap', display: 'block' }}
+              >
                 ✦ TASTE OF SOUTH ✦
               </span>
             </div>
@@ -129,7 +136,7 @@ const Navbar = ({ onOpenAuthModal }) => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
             
             {/* Language Selection Selector Pill */}
-            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+            <div className="nav-lang-desktop" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
               <Globe size={15} color="#D97706" style={{ position: 'absolute', left: '10px', pointerEvents: 'none', zIndex: 1 }} />
               <select
                 value={language}
@@ -163,10 +170,11 @@ const Navbar = ({ onOpenAuthModal }) => {
             {/* Bright Orange Order Now Pill Button with Cart Count */}
             <Link
               to="/cart"
+              className="order-now-btn"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '8px',
+                gap: '6px',
                 background: 'linear-gradient(135deg, #EA580C 0%, #D97706 100%)',
                 color: '#FFFFFF',
                 padding: '0.55rem 1.25rem',
@@ -180,7 +188,7 @@ const Navbar = ({ onOpenAuthModal }) => {
               }}
             >
               <ShoppingBag size={17} />
-              <span>Order Now</span>
+              <span className="order-now-text">Order Now</span>
               {cartCount > 0 && (
                 <span
                   style={{
@@ -359,8 +367,24 @@ const Navbar = ({ onOpenAuthModal }) => {
           }
         }
         @media (max-width: 640px) {
-          .top-bar-hours {
+          .top-bar-hours, .nav-lang-desktop {
             display: none !important;
+          }
+          .brand-text-title {
+            font-size: 1.15rem !important;
+            line-height: 1.2 !important;
+            white-space: nowrap !important;
+          }
+          .brand-text-sub {
+            font-size: 0.52rem !important;
+            white-space: nowrap !important;
+          }
+          .order-now-text {
+            display: none !important;
+          }
+          .order-now-btn {
+            padding: 0.45rem 0.75rem !important;
+            border-radius: 20px !important;
           }
         }
       `}</style>
