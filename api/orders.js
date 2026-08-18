@@ -143,7 +143,30 @@ module.exports = async function handler(req, res) {
     }
 
     if (req.method === 'PATCH' || req.method === 'PUT') {
-      return res.status(200).json({ success: true, message: 'Order updated successfully' });
+      const updateData = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
+      const targetId = updateData.id || updateData.order_id;
+      const targetNum = updateData.order_number || updateData.orderNumber;
+      const newStatus = updateData.status;
+      const newPayStatus = updateData.payment_status || updateData.paymentStatus;
+
+      memoryOrdersStore = memoryOrdersStore.map(ord => {
+        const isMatch = (targetId && String(ord.id) === String(targetId)) ||
+                        (targetNum && String(ord.order_number) === String(targetNum));
+        if (isMatch) {
+          return {
+            ...ord,
+            ...(newStatus ? { status: newStatus } : {}),
+            ...(newPayStatus ? { payment_status: newPayStatus } : {})
+          };
+        }
+        return ord;
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: 'Order status updated successfully',
+        orders: memoryOrdersStore
+      });
     }
 
     return res.status(200).json({

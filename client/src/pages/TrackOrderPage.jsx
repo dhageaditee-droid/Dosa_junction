@@ -16,23 +16,32 @@ const TrackOrderPage = () => {
   const { addToast } = useToast();
 
   useEffect(() => {
-    if (initialOrderNumber) {
-      fetchOrder(initialOrderNumber);
-    }
-  }, [initialOrderNumber]);
+    const currentTarget = initialOrderNumber || orderNumberInput;
+    if (!currentTarget) return;
 
-  const fetchOrder = async (ordNum) => {
+    fetchOrder(currentTarget, true);
+
+    const interval = setInterval(() => {
+      fetchOrder(currentTarget, false);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [initialOrderNumber, orderNumberInput]);
+
+  const fetchOrder = async (ordNum, showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading) setLoading(true);
       const res = await apiService.trackOrder(ordNum.trim());
-      if (res.order) {
+      if (res && res.order) {
         setOrder(res.order);
       }
     } catch (err) {
-      setOrder(null);
-      if (addToast) addToast(err.message || 'Order number not found. Check your order reference.', 'error');
+      if (showLoading) {
+        setOrder(null);
+        if (addToast) addToast(err.message || 'Order number not found. Check your order reference.', 'error');
+      }
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 

@@ -169,10 +169,28 @@ const fetchOrdersFromCloudSync = async () => {
   return mergedResult;
 };
 
-// Helper to update status in cloud store
+// Helper to update status in cloud store and local storage
 const updateOrderStatusInCloudSync = async (orderId, newStatus, paymentStatus = null) => {
+  // Update local storage immediately for fast client UI update
   try {
-    await fetch('/api/orders', {
+    const allSaved = JSON.parse(localStorage.getItem('dakshin_all_orders') || '[]');
+    const updatedLocal = allSaved.map(o => {
+      if (String(o.id) === String(orderId) || String(o.order_number) === String(orderId)) {
+        return {
+          ...o,
+          ...(newStatus ? { status: newStatus } : {}),
+          ...(paymentStatus ? { payment_status: paymentStatus } : {})
+        };
+      }
+      return o;
+    });
+    localStorage.setItem('dakshin_all_orders', JSON.stringify(updatedLocal));
+    localStorage.setItem('dakshin_my_orders', JSON.stringify(updatedLocal));
+  } catch (e) {}
+
+  // Post PATCH to live cloud serverless API
+  try {
+    await fetch(getOrdersEndpoint(), {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: orderId, status: newStatus, payment_status: paymentStatus })
@@ -387,15 +405,15 @@ export const apiService = {
 
   trackOrder: async (orderNumber) => {
     try {
+      const cloudOrders = await fetchOrdersFromCloudSync();
+      const foundCloud = cloudOrders.find(o => String(o.order_number).trim() === String(orderNumber).trim());
+      if (foundCloud) return { success: true, order: foundCloud };
+    } catch (e) {}
+
+    try {
       const backendRes = await apiCall(`/orders/track/${orderNumber}`);
       if (backendRes && backendRes.success) return backendRes;
     } catch (err) {}
-
-    try {
-      const cloudOrders = await fetchOrdersFromCloudSync();
-      const foundCloud = cloudOrders.find(o => o.order_number === orderNumber);
-      if (foundCloud) return { success: true, order: foundCloud };
-    } catch (e) {}
 
     return {
       success: true,
