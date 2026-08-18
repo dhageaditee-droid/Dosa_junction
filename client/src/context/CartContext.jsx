@@ -59,13 +59,8 @@ export const CartProvider = ({ children }) => {
   const subtotal = cartItems.reduce((sum, item) => sum + parseFloat(item.price) * item.quantity, 0);
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-  // Calculate dynamic coupon discount amount
-  let discountAmount = 0;
-  if (appliedCoupon && subtotal > 0) {
-    if (appliedCoupon.calculatedDiscount) {
-      discountAmount = Math.min(subtotal, appliedCoupon.calculatedDiscount);
-    }
-  }
+  // Calculate dynamic coupon discount amount (Disabled)
+  const discountAmount = 0;
 
   const netSubtotal = Math.max(0, subtotal - discountAmount);
   const tax = parseFloat((netSubtotal * 0.05).toFixed(2));
@@ -74,23 +69,12 @@ export const CartProvider = ({ children }) => {
   const deliveryFee = cartItems.length > 0 ? (subtotal >= freeDeliveryThreshold ? 0 : 30.0) : 0;
   const grandTotal = parseFloat((netSubtotal + tax + packingFee + deliveryFee).toFixed(2));
 
-  const applyCoupon = async (code) => {
-    try {
-      const res = await apiService.validateCoupon(code, subtotal);
-      if (res.success && res.coupon) {
-        setAppliedCoupon(res.coupon);
-        if (addToast) addToast(res.message, 'success');
-        return { success: true, message: res.message };
-      }
-    } catch (err) {
-      if (addToast) addToast(err.message || 'Invalid coupon code.', 'error');
-      return { success: false, message: err.message };
-    }
+  const applyCoupon = async () => {
+    return { success: false, message: 'Coupons are currently disabled.' };
   };
 
   const removeCoupon = () => {
     setAppliedCoupon(null);
-    if (addToast) addToast('Coupon removed.', 'info');
   };
 
   return (

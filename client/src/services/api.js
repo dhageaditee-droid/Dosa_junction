@@ -447,16 +447,8 @@ export const apiService = {
     }
   },
 
-  validateCoupon: async (code, subtotal) => {
-    try {
-      return await apiCall('/coupons/validate', 'POST', { code, subtotal });
-    } catch (err) {
-      const upper = (code || '').toUpperCase().trim();
-      if (upper === 'FREEPLAIN1' && subtotal >= 350) {
-        return { success: true, message: 'Free Plain Dosa Applied!', coupon: { code: 'FREEPLAIN1', calculatedDiscount: 60 } };
-      }
-      throw new Error('Invalid promo code or minimum order amount not met.');
-    }
+  validateCoupon: async () => {
+    throw new Error('Coupons are currently disabled.');
   },
 
   // Offers & Enquiries

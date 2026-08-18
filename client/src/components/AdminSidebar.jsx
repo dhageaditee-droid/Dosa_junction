@@ -25,7 +25,6 @@ const AdminSidebar = () => {
     { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
     { name: 'Orders Management', path: '/admin/orders', icon: ShoppingBag },
     { name: 'Menu Items', path: '/admin/menu', icon: Utensils },
-    { name: 'Coupons Management', path: '/admin/coupons', icon: Ticket },
     { name: 'Restaurant Settings', path: '/admin/settings', icon: Settings }
   ];
 

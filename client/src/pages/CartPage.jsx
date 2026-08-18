@@ -145,75 +145,7 @@ const CartPage = () => {
               </div>
             </div>
 
-            {/* Coupon Application Box */}
-            <div style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '16px',
-              padding: '1.2rem 1.5rem',
-              border: '1px solid var(--color-border)',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.8rem' }}>
-                <Tag size={18} color="var(--color-gold)" />
-                <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--color-emerald)', margin: 0 }}>
-                  Apply Coupon Code
-                </h4>
-              </div>
 
-              {appliedCoupon ? (
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  backgroundColor: '#ECFDF5',
-                  border: '1px solid #A7F3D0',
-                  padding: '10px 14px',
-                  borderRadius: '12px',
-                  color: '#065F46'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <CheckCircle2 size={18} color="#059669" />
-                    <div>
-                      <strong style={{ display: 'block', fontSize: '0.9rem' }}>{appliedCoupon.code}</strong>
-                      <span style={{ fontSize: '0.75rem' }}>Discount: ₹{discountAmount.toFixed(2)}</span>
-                    </div>
-                  </div>
-                  <button
-                    onClick={removeCoupon}
-                    style={{ background: 'none', border: 'none', color: '#EF4444', fontWeight: 700, cursor: 'pointer', fontSize: '0.8rem' }}
-                  >
-                    Remove
-                  </button>
-                </div>
-              ) : (
-                <form onSubmit={handleApplyCoupon} style={{ display: 'flex', gap: '8px' }}>
-                  <input
-                    type="text"
-                    value={couponInput}
-                    onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                    placeholder="Enter code (e.g. SOUTH10)"
-                    style={{
-                      flex: 1,
-                      padding: '8px 12px',
-                      borderRadius: '10px',
-                      border: '1px solid var(--color-border)',
-                      outline: 'none',
-                      fontSize: '0.9rem',
-                      fontWeight: 600,
-                      textTransform: 'uppercase'
-                    }}
-                  />
-                  <button
-                    type="submit"
-                    disabled={applyingCoupon}
-                    className="btn btn-primary btn-sm"
-                    style={{ padding: '0.5rem 1rem', borderRadius: '10px', fontWeight: 800 }}
-                  >
-                    {applyingCoupon ? 'Applying...' : 'Apply'}
-                  </button>
-                </form>
-              )}
-            </div>
 
           </div>
 
