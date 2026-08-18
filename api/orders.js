@@ -149,18 +149,37 @@ module.exports = async function handler(req, res) {
       const newStatus = updateData.status;
       const newPayStatus = updateData.payment_status || updateData.paymentStatus;
 
+      await fetchCloudOrders();
+
+      let updatedOrder = null;
       memoryOrdersStore = memoryOrdersStore.map(ord => {
         const isMatch = (targetId && String(ord.id) === String(targetId)) ||
-                        (targetNum && String(ord.order_number) === String(targetNum));
+                        (targetNum && String(ord.order_number) === String(targetNum)) ||
+                        (targetId && String(ord.order_number) === String(targetId)) ||
+                        (targetNum && String(ord.id) === String(targetNum));
         if (isMatch) {
-          return {
+          updatedOrder = {
             ...ord,
             ...(newStatus ? { status: newStatus } : {}),
             ...(newPayStatus ? { payment_status: newPayStatus } : {})
           };
+          return updatedOrder;
         }
         return ord;
       });
+
+      if (updatedOrder) {
+        for (const token of CRUDCRUD_TOKENS) {
+          try {
+            await fetch(`https://crudcrud.com/api/${token}/orders`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(updatedOrder)
+            });
+            break;
+          } catch (e) {}
+        }
+      }
 
       return res.status(200).json({
         success: true,

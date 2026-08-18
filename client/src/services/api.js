@@ -133,6 +133,22 @@ const fetchOrdersFromCloudSync = async () => {
     };
   });
 
+  const STATUS_RANK = {
+    'Pending': 1,
+    'Confirmed': 2,
+    'Preparing': 3,
+    'Ready': 4,
+    'Out for Delivery': 5,
+    'Completed': 6,
+    'Cancelled': 99
+  };
+
+  const getMoreAdvancedStatus = (s1, s2) => {
+    const r1 = STATUS_RANK[s1] || 0;
+    const r2 = STATUS_RANK[s2] || 0;
+    return r2 > r1 ? s2 : (r1 >= r2 ? s1 : s2);
+  };
+
   // Deduplicate by order_number and payload signature (same phone + same total within 60s)
   const map = new Map();
   const seenSignatures = new Set();
@@ -150,9 +166,13 @@ const fetchOrdersFromCloudSync = async () => {
         }
       } else if (map.has(item.order_number)) {
         const existing = map.get(item.order_number);
+        const resolvedStatus = getMoreAdvancedStatus(existing.status, item.status);
+        const resolvedPayStatus = (item.payment_status === 'PAID' || existing.payment_status === 'PAID') ? 'PAID' : (item.payment_status || existing.payment_status);
         map.set(item.order_number, {
           ...existing,
           ...item,
+          status: resolvedStatus,
+          payment_status: resolvedPayStatus,
           items: (item.items && item.items.length > 0) ? item.items : existing.items
         });
       }
