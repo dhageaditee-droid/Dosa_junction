@@ -4,7 +4,7 @@ import { ShoppingBag, ArrowRight, ShieldCheck, MapPin, CreditCard, User, Phone, 
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import ConfirmationModal from '../components/ConfirmationModal';
+import OrderConfirmationModal from '../components/OrderConfirmationModal';
 import SEOHead from '../components/SEOHead';
 import { apiService } from '../services/api';
 
@@ -475,15 +475,15 @@ const CheckoutPage = () => {
 
       </div>
 
-      {/* Confirmation Modal prompt */}
-      <ConfirmationModal
+      {/* Traditional South Indian Order Confirmation Modal */}
+      <OrderConfirmationModal
         isOpen={showConfirmModal}
-        title="Confirm Your Order"
-        message={`Are you sure you want to place this ${formData.orderType} order for ₹${grandTotal.toFixed(2)} via ${formData.paymentMethod}?`}
-        confirmText="Yes, Place Order"
-        cancelText="Review Form"
+        onClose={() => setShowConfirmModal(false)}
         onConfirm={handleConfirmOrder}
-        onCancel={() => setShowConfirmModal(false)}
+        orderType={formData.orderType}
+        totalAmount={grandTotal}
+        paymentMethod={formData.paymentMethod}
+        placingOrder={placingOrder}
       />
 
     </div>
