@@ -28,42 +28,7 @@ const Navbar = ({ onOpenAuthModal }) => {
 
   return (
     <header style={{ position: 'sticky', top: 0, zIndex: 1000 }}>
-      {/* 1. Top Announcement Bar (Dark Green Background) */}
-      <div 
-        className="top-announcement-bar" 
-        style={{
-          backgroundColor: '#0F3825',
-          color: '#E2E8F0',
-          fontSize: '0.78rem',
-          fontWeight: 600,
-          padding: '6px 0',
-          borderBottom: '1px solid rgba(212, 175, 55, 0.25)'
-        }}
-      >
-        <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
-          {/* Left Info: Location & Phone */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.4rem', flexWrap: 'wrap' }}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-              <MapPin size={13} color="#FFC83B" /> Sinnar Gaurav, Near Panchvati Hotel, Sinnar
-            </span>
-            <a href="tel:+917020758779" style={{ color: '#E2E8F0', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-              <Phone size={13} color="#FFC83B" /> +91 70207 58779
-            </a>
-          </div>
 
-          {/* Right Info: Operating Hours & Social Icons */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.4rem' }}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }} className="top-bar-hours">
-              <Clock size={13} color="#FFC83B" /> Mon - Sun: 8:00 AM - 10:30 PM
-            </span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <a href="https://instagram.com" target="_blank" rel="noreferrer" style={{ color: '#E2E8F0', display: 'flex' }} aria-label="Instagram"><Instagram size={14} /></a>
-              <a href="https://facebook.com" target="_blank" rel="noreferrer" style={{ color: '#E2E8F0', display: 'flex' }} aria-label="Facebook"><Facebook size={14} /></a>
-              <a href="https://wa.me/917020758779" target="_blank" rel="noreferrer" style={{ color: '#E2E8F0', display: 'flex' }} aria-label="WhatsApp"><MessageCircle size={14} /></a>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* 2. Main Floating White Card Navbar Container */}
       <div 
