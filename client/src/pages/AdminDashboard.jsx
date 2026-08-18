@@ -268,14 +268,7 @@ const AdminDashboard = () => {
                             </td>
                             <td style={{ fontWeight: 800 }}>₹{parseFloat(ord.total_amount).toFixed(2)}</td>
                             <td>
-                              <span style={{
-                                fontSize: '0.75rem',
-                                fontWeight: 800,
-                                padding: '3px 8px',
-                                borderRadius: '8px',
-                                backgroundColor: String(ord.payment_status).includes('PAID') ? '#DCFCE7' : '#FEF3C7',
-                                color: String(ord.payment_status).includes('PAID') ? '#15803D' : '#B45309'
-                              }}>
+                              <span style={{ fontSize: '0.75rem', fontWeight: 800, padding: '2px 6px', borderRadius: '6px', backgroundColor: '#FEF3C7', color: '#B45309' }}>
                                 {ord.payment_status || 'PENDING'}
                               </span>
                             </td>

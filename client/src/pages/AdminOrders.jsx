@@ -88,14 +88,14 @@ const AdminOrders = () => {
     }
   };
 
-  const handleMarkPaymentPaid = async (orderId, newPaymentStatus = 'PAID') => {
+  const handleMarkPaymentPaid = async (orderId) => {
     try {
-      const res = await apiService.updatePaymentStatus(orderId, newPaymentStatus);
+      const res = await apiService.updatePaymentStatus(orderId, 'PAID');
       if (res.success) {
-        if (addToast) addToast(`Payment status updated to ${newPaymentStatus}!`, 'success');
+        if (addToast) addToast('Payment status marked as PAID!', 'success');
         fetchOrders();
         if (selectedOrder && selectedOrder.id === orderId) {
-          setSelectedOrder(prev => ({ ...prev, payment_status: newPaymentStatus }));
+          setSelectedOrder(prev => ({ ...prev, payment_status: 'PAID' }));
         }
       }
     } catch (err) {
@@ -382,31 +382,18 @@ const AdminOrders = () => {
                           </span>
                         </td>
                         <td style={{ fontWeight: 800, whiteSpace: 'nowrap' }}>₹{parseFloat(ord.total_amount).toFixed(2)}</td>
-                        <td style={{ fontSize: '0.85rem' }}>
-                          {String(ord.payment_method).includes('UPI') || String(ord.payment_method).includes('Online') ? (
-                            <span style={{ backgroundColor: '#EFF6FF', color: '#1D4ED8', border: '1px solid #BFDBFE', padding: '3px 8px', borderRadius: '8px', fontWeight: 800, fontSize: '0.78rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                              📱 Online UPI
-                            </span>
-                          ) : (
-                            ord.payment_method
-                          )}
-                        </td>
+                        <td style={{ fontSize: '0.85rem' }}>{ord.payment_method}</td>
                         <td>
                           <span style={{
                             padding: '4px 10px',
                             borderRadius: '12px',
                             fontSize: '0.75rem',
                             fontWeight: 800,
-                            backgroundColor: String(ord.payment_status).includes('PAID') ? '#DCFCE7' : '#FEF3C7',
-                            color: String(ord.payment_status).includes('PAID') ? '#15803D' : '#B45309'
+                            backgroundColor: ord.payment_status === 'PAID' ? '#DCFCE7' : '#FEF3C7',
+                            color: ord.payment_status === 'PAID' ? '#15803D' : '#B45309'
                           }}>
                             {ord.payment_status || 'PENDING'}
                           </span>
-                          {ord.transaction_id && (
-                            <div style={{ fontSize: '0.7rem', color: '#475569', marginTop: '2px', fontWeight: 700, fontFamily: 'monospace' }}>
-                              UTR: {ord.transaction_id}
-                            </div>
-                          )}
                         </td>
                         <td><StatusBadge status={ord.status} /></td>
                         <td>
@@ -451,25 +438,15 @@ const AdminOrders = () => {
                               <Printer size={15} />
                             </button>
 
-                            <button
-                              onClick={() => {
-                                const isPaid = String(ord.payment_status).includes('PAID');
-                                handleMarkPaymentPaid(ord.id, isPaid ? 'PENDING' : 'PAID');
-                              }}
-                              title="Toggle Payment Status (PAID / PENDING)"
-                              style={{
-                                padding: '4px 8px',
-                                backgroundColor: String(ord.payment_status).includes('PAID') ? '#DCFCE7' : '#FEF3C7',
-                                color: String(ord.payment_status).includes('PAID') ? '#15803D' : '#B45309',
-                                borderRadius: '6px',
-                                border: 'none',
-                                cursor: 'pointer',
-                                fontWeight: 800,
-                                fontSize: '0.75rem'
-                              }}
-                            >
-                              {String(ord.payment_status).includes('PAID') ? '✓ PAID' : '$ MARK PAID'}
-                            </button>
+                            {ord.payment_status !== 'PAID' && (
+                              <button
+                                onClick={() => handleMarkPaymentPaid(ord.id)}
+                                title="Mark Payment as PAID"
+                                style={{ padding: '4px 8px', backgroundColor: '#DCFCE7', color: '#15803D', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 800, fontSize: '0.75rem' }}
+                              >
+                                $ PAID
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>
