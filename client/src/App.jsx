@@ -1,10 +1,21 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Outlet, Navigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Outlet, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import StickyMobileCartBar from './components/StickyMobileCartBar';
 import MobileBottomNav from './components/MobileBottomNav';
 import CustomerAuthModal from './components/CustomerAuthModal';
+
+// Auto Scroll To Top Component on Route Change
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+};
 
 import Home from './pages/Home';
 import MenuPage from './pages/MenuPage';
@@ -69,6 +80,7 @@ const App = () => {
         <AuthProvider>
           <CartProvider>
           <Router>
+            <ScrollToTop />
             <Routes>
               
               {/* Customer Website Routes */}
