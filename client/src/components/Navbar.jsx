@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   ShoppingBag, Menu as MenuIcon, X, Home, Utensils, Tag, Info, PhoneCall, PackageCheck, Globe, 
-  MapPin, Phone, Clock, Instagram, Facebook, MessageCircle, ChevronDown 
+  MapPin, Phone, Instagram, Facebook, MessageCircle, Sparkles, Image
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -16,34 +16,68 @@ const Navbar = ({ onOpenAuthModal }) => {
   const { language, changeLanguage, t } = useLanguage();
 
   const navLinks = [
-    { name: t('home'), path: '/', icon: Home },
-    { name: t('menu'), path: '/menu', icon: Utensils },
-    { name: t('offers'), path: '/offers', icon: Tag },
-    { name: t('about'), path: '/about', icon: Info },
-    { name: t('contact'), path: '/contact', icon: PhoneCall },
-    { name: t('myOrders'), path: '/my-orders', icon: PackageCheck }
+    { name: 'HOME', path: '/' },
+    { name: 'MENU', path: '/menu' },
+    { name: 'SPECIALS', path: '/menu?category=special-dosa' },
+    { name: 'OFFERS', path: '/offers' },
+    { name: 'ABOUT US', path: '/about' },
+    { name: 'CONTACT', path: '/contact' },
+    { name: 'MY ORDERS', path: '/my-orders' }
   ];
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => {
+    if (path.includes('?')) {
+      return location.pathname + location.search === path;
+    }
+    return location.pathname === path;
+  };
 
   return (
-    <header style={{ position: 'sticky', top: 0, zIndex: 1000 }}>
-
-
-      {/* 2. Main Floating White Card Navbar Container */}
+    <header style={{ position: 'sticky', top: 0, zIndex: 1000, fontFamily: 'var(--font-body)' }}>
+      {/* 1. Top Announcement Bar (Black/Dark Background) */}
       <div 
-        className="main-navbar-wrapper"
         style={{
-          backgroundColor: 'rgba(255, 253, 249, 0.95)',
-          backdropFilter: 'blur(8px)',
-          borderBottom: '1px solid #EAE3D2',
-          padding: '0.4rem 0'
+          backgroundColor: '#0B0F0D',
+          color: '#A1A1AA',
+          fontSize: '0.78rem',
+          fontWeight: 600,
+          padding: '6px 0',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+        }}
+      >
+        <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+          {/* Left Info: Phone & Address */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.4rem', flexWrap: 'wrap' }}>
+            <a href="tel:+917020758779" style={{ color: '#E4E4E7', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <Phone size={13} color="#EA580C" /> +91 70207 58779
+            </a>
+            <span style={{ color: '#52525B' }}>|</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#D4D4D8' }}>
+              <MapPin size={13} color="#EA580C" /> Sinnar Gaurav, Near Panchvati Hotel, Sinnar
+            </span>
+          </div>
+
+          {/* Right Info: Social Icons */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <a href="https://facebook.com" target="_blank" rel="noreferrer" style={{ color: '#A1A1AA', display: 'flex', transition: 'color 0.2s' }} aria-label="Facebook"><Facebook size={14} /></a>
+            <a href="https://instagram.com" target="_blank" rel="noreferrer" style={{ color: '#A1A1AA', display: 'flex', transition: 'color 0.2s' }} aria-label="Instagram"><Instagram size={14} /></a>
+            <a href="https://wa.me/917020758779" target="_blank" rel="noreferrer" style={{ color: '#A1A1AA', display: 'flex', transition: 'color 0.2s' }} aria-label="WhatsApp"><MessageCircle size={14} /></a>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. Main Dark Header Bar */}
+      <div 
+        style={{
+          backgroundColor: '#0E1411',
+          borderBottom: '1px solid rgba(234, 88, 12, 0.2)',
+          padding: '0.5rem 0',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.5)'
         }}
       >
         <div 
           className="container" 
           style={{
-            position: 'relative',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -51,18 +85,17 @@ const Navbar = ({ onOpenAuthModal }) => {
           }}
         >
           {/* Brand Logo & Name */}
-          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', textDecoration: 'none' }}>
+          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
             <img
               src="/dosa-junction-logo.jpg"
               alt="Dosa Junction Logo"
               style={{
-                width: '46px',
-                height: '46px',
+                width: '48px',
+                height: '48px',
                 borderRadius: '50%',
                 objectFit: 'cover',
-                border: '2px solid var(--color-gold)',
-                boxShadow: '0 4px 10px rgba(0,0,0,0.12)',
-                flexShrink: 0
+                border: '2px solid #EA580C',
+                boxShadow: '0 0 12px rgba(234, 88, 12, 0.4)'
               }}
             />
             <div>
@@ -70,60 +103,57 @@ const Navbar = ({ onOpenAuthModal }) => {
                 className="brand-text-title"
                 style={{
                   fontFamily: 'var(--font-heading)',
-                  fontSize: '1.35rem',
-                  fontWeight: 800,
-                  color: '#0F3825',
-                  letterSpacing: '-0.5px',
+                  fontSize: '1.4rem',
+                  fontWeight: 900,
+                  color: '#FFFFFF',
+                  letterSpacing: '1px',
                   display: 'block',
                   lineHeight: 1.1,
                   whiteSpace: 'nowrap'
                 }}
               >
-                Dosa <span style={{ color: '#EA580C' }}>Junction</span>
+                DOSA <span style={{ color: '#EA580C' }}>JUNCTION</span>
               </span>
               <span 
                 className="brand-text-sub"
-                style={{ fontSize: '0.6rem', color: '#D97706', letterSpacing: '0.8px', textTransform: 'uppercase', fontWeight: 700, whiteSpace: 'nowrap', display: 'block' }}
+                style={{ fontSize: '0.58rem', color: '#D97706', letterSpacing: '2px', textTransform: 'uppercase', fontWeight: 800, whiteSpace: 'nowrap', display: 'block' }}
               >
-                ✦ TASTE OF SOUTH ✦
+                • PURE SOUTH INDIAN •
               </span>
             </div>
           </Link>
 
-          {/* Desktop Navigation Links with Icons */}
-          <nav style={{ display: 'flex', alignItems: 'center', gap: '1.4rem' }} className="desktop-nav">
+          {/* Desktop Navigation Links */}
+          <nav style={{ display: 'flex', alignItems: 'center', gap: '1.6rem' }} className="desktop-nav">
             {navLinks.map((link) => {
-              const IconComp = link.icon;
               const active = isActive(link.path);
               return (
                 <Link
                   key={link.path}
                   to={link.path}
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '5px',
-                    fontSize: '0.92rem',
-                    fontWeight: active ? 800 : 600,
-                    color: active ? '#EA580C' : '#0F3825',
+                    fontSize: '0.85rem',
+                    fontWeight: 800,
+                    letterSpacing: '0.8px',
+                    color: active ? '#EA580C' : '#E4E4E7',
                     position: 'relative',
                     transition: 'all 0.2s ease',
                     padding: '6px 0',
                     textDecoration: 'none'
                   }}
                 >
-                  <IconComp size={15} color={active ? '#EA580C' : '#0F3825'} />
                   <span>{link.name}</span>
                   {active && (
                     <span
                       style={{
                         position: 'absolute',
-                        bottom: '0px',
+                        bottom: 0,
                         left: 0,
                         right: 0,
-                        height: '2.5px',
+                        height: '2px',
                         backgroundColor: '#EA580C',
-                        borderRadius: '2px'
+                        borderRadius: '2px',
+                        boxShadow: '0 0 8px #EA580C'
                       }}
                     />
                   )}
@@ -132,73 +162,43 @@ const Navbar = ({ onOpenAuthModal }) => {
             })}
           </nav>
 
-          {/* Right Controls: Language Selector & Order Now Button */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
-            
-            {/* Language Selection Selector Pill */}
-            <div className="nav-lang-desktop" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-              <Globe size={15} color="#D97706" style={{ position: 'absolute', left: '10px', pointerEvents: 'none', zIndex: 1 }} />
-              <select
-                value={language}
-                onChange={(e) => changeLanguage(e.target.value)}
-                style={{
-                  paddingLeft: '30px',
-                  paddingRight: '22px',
-                  paddingTop: '6px',
-                  paddingBottom: '6px',
-                  borderRadius: '30px',
-                  border: '1.5px solid #EAE3D2',
-                  backgroundColor: '#FFFDF9',
-                  color: '#0F3825',
-                  fontWeight: 700,
-                  fontSize: '0.82rem',
-                  cursor: 'pointer',
-                  outline: 'none',
-                  appearance: 'none',
-                  WebkitAppearance: 'none',
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
-                }}
-                title="Select Language / भाषा चुनें"
-              >
-                <option value="en">English</option>
-                <option value="mr">मराठी</option>
-                <option value="hi">हिंदी</option>
-              </select>
-              <ChevronDown size={14} color="#0F3825" style={{ position: 'absolute', right: '8px', pointerEvents: 'none' }} />
-            </div>
-
-            {/* Bright Orange Order Now Pill Button with Cart Count */}
+          {/* Right Controls: Order Now Button */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <Link
               to="/cart"
               className="order-now-btn"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '6px',
+                gap: '8px',
                 background: 'linear-gradient(135deg, #EA580C 0%, #D97706 100%)',
                 color: '#FFFFFF',
-                padding: '0.55rem 1.25rem',
+                padding: '0.6rem 1.3rem',
                 borderRadius: '30px',
                 fontWeight: 800,
-                fontSize: '0.88rem',
+                fontSize: '0.85rem',
+                letterSpacing: '0.5px',
                 textDecoration: 'none',
-                boxShadow: '0 4px 14px rgba(234, 88, 12, 0.35)',
+                boxShadow: '0 4px 15px rgba(234, 88, 12, 0.4)',
                 transition: 'all 0.2s ease',
                 whiteSpace: 'nowrap'
               }}
             >
-              <ShoppingBag size={17} />
-              <span className="order-now-text">Order Now</span>
+              <span>ORDER NOW</span>
+              <ShoppingBag size={16} />
               {cartCount > 0 && (
                 <span
                   style={{
                     backgroundColor: '#FFFFFF',
                     color: '#EA580C',
-                    fontSize: '0.75rem',
-                    fontWeight: 900,
-                    padding: '1px 7px',
-                    borderRadius: '20px',
-                    marginLeft: '2px'
+                    borderRadius: '50%',
+                    width: '20px',
+                    height: '20px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '0.72rem',
+                    fontWeight: 900
                   }}
                 >
                   {cartCount}
@@ -206,57 +206,32 @@ const Navbar = ({ onOpenAuthModal }) => {
               )}
             </Link>
 
-            {/* Mobile Hamburger Toggle Button */}
+            {/* Mobile Toggle Button */}
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
               className="mobile-toggle-btn"
               style={{
-                padding: '0.5rem',
-                color: '#0F3825',
                 display: 'none',
                 background: 'none',
                 border: 'none',
-                cursor: 'pointer'
+                color: '#FFFFFF',
+                cursor: 'pointer',
+                padding: '4px'
               }}
-              aria-label="Toggle Navigation Menu"
+              aria-label="Toggle navigation menu"
             >
-              {mobileOpen ? <X size={28} color="#0F3825" /> : <MenuIcon size={28} color="#0F3825" />}
+              {mobileOpen ? <X size={26} color="#EA580C" /> : <MenuIcon size={26} color="#FFFFFF" />}
             </button>
           </div>
-
-          {/* Bottom Curved Lotus Crest Dip Accent */}
-          <div
-            className="desktop-nav-crest"
-            style={{
-              position: 'absolute',
-              bottom: '-17px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '28px',
-              height: '14px',
-              backgroundColor: '#FFFDF9',
-              borderRadius: '0 0 14px 14px',
-              borderBottom: '1px solid #EAE3D2',
-              borderLeft: '1px solid #EAE3D2',
-              borderRight: '1px solid #EAE3D2',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 2
-            }}
-          >
-            <span style={{ color: '#0F3825', fontSize: '0.7rem', lineHeight: 1 }}>🌿</span>
-          </div>
-
         </div>
       </div>
 
-      {/* Mobile Sub-Navbar: Horizontal Scrolling Links Row under Logo Bar */}
+      {/* 3. Mobile Sub-Navbar: Horizontal Scrolling Links Row */}
       <div 
         className="mobile-sub-navbar"
         style={{
-          backgroundColor: '#FFFDF9',
-          borderBottom: '1px solid #EAE3D2',
+          backgroundColor: '#0B0F0D',
+          borderBottom: '1px solid rgba(234, 88, 12, 0.2)',
           padding: '8px 12px',
           overflowX: 'auto',
           WebkitOverflowScrolling: 'touch',
@@ -264,12 +239,10 @@ const Navbar = ({ onOpenAuthModal }) => {
           msOverflowStyle: 'none',
           display: 'flex',
           alignItems: 'center',
-          gap: '8px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+          gap: '8px'
         }}
       >
         {navLinks.map((link) => {
-          const IconComp = link.icon;
           const active = isActive(link.path);
           return (
             <Link
@@ -278,140 +251,33 @@ const Navbar = ({ onOpenAuthModal }) => {
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '6px',
                 padding: '6px 14px',
                 borderRadius: '20px',
-                fontSize: '0.82rem',
-                fontWeight: active ? 800 : 600,
-                color: active ? '#FFFFFF' : '#0F3825',
-                backgroundColor: active ? '#EA580C' : 'rgba(15, 56, 37, 0.06)',
-                border: active ? '1px solid #EA580C' : '1px solid #EAE3D2',
+                fontSize: '0.78rem',
+                fontWeight: active ? 800 : 700,
+                letterSpacing: '0.5px',
+                color: active ? '#FFFFFF' : '#A1A1AA',
+                backgroundColor: active ? '#EA580C' : 'rgba(255, 255, 255, 0.06)',
+                border: active ? '1px solid #EA580C' : '1px solid rgba(255, 255, 255, 0.1)',
                 textDecoration: 'none',
                 whiteSpace: 'nowrap',
                 flexShrink: 0,
-                boxShadow: active ? '0 2px 8px rgba(234, 88, 12, 0.25)' : 'none',
                 transition: 'all 0.2s ease'
               }}
             >
-              <IconComp size={14} color={active ? '#FFFFFF' : '#0F3825'} />
               <span>{link.name}</span>
             </Link>
           );
         })}
       </div>
 
-      {/* Mobile Drawer Navigation Screen */}
-      {mobileOpen && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: '110px 0 0 0',
-            backgroundColor: '#FFFFFF',
-            zIndex: 9999,
-            padding: '1.5rem',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.8rem',
-            boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
-            overflowY: 'auto'
-          }}
-        >
-          {/* Mobile Language Selector */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '0.8rem', borderBottom: '1px solid #EAE3D2' }}>
-            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0F3825', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Globe size={18} color="#D97706" /> Select Language:
-            </span>
-            <div style={{ display: 'flex', gap: '6px' }}>
-              {[
-                { code: 'en', label: 'English' },
-                { code: 'mr', label: 'मराठी' },
-                { code: 'hi', label: 'हिंदी' }
-              ].map((lang) => (
-                <button
-                  key={lang.code}
-                  onClick={() => changeLanguage(lang.code)}
-                  style={{
-                    padding: '4px 10px',
-                    borderRadius: '12px',
-                    border: '1px solid #D97706',
-                    backgroundColor: language === lang.code ? '#D97706' : '#FFFFFF',
-                    color: language === lang.code ? '#FFFFFF' : '#0F3825',
-                    fontWeight: 800,
-                    fontSize: '0.8rem',
-                    cursor: 'pointer'
-                  }}
-                >
-                  {lang.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#D97706', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.2rem' }}>
-            Navigation Menu
-          </div>
-
-          {navLinks.map((link) => {
-            const LinkIcon = link.icon;
-            const isSel = isActive(link.path);
-            return (
-              <Link
-                key={link.path}
-                to={link.path}
-                onClick={() => setMobileOpen(false)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.8rem',
-                  fontSize: '1.05rem',
-                  fontWeight: isSel ? 800 : 600,
-                  color: isSel ? '#EA580C' : '#0F3825',
-                  padding: '0.8rem 1rem',
-                  borderRadius: '12px',
-                  backgroundColor: isSel ? '#FFF9ED' : '#F8FAFC',
-                  textDecoration: 'none'
-                }}
-              >
-                <LinkIcon size={20} color={isSel ? '#EA580C' : '#0F3825'} />
-                <span>{link.name}</span>
-              </Link>
-            );
-          })}
-
-          <div style={{ margin: '0.4rem 0' }} />
-
-          <Link
-            to="/cart"
-            onClick={() => setMobileOpen(false)}
-            style={{
-              width: '100%',
-              padding: '0.9rem',
-              fontSize: '1.05rem',
-              fontWeight: 800,
-              textAlign: 'center',
-              borderRadius: '12px',
-              textDecoration: 'none',
-              backgroundColor: '#EA580C',
-              color: '#FFFFFF',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px'
-            }}
-          >
-            <ShoppingBag size={20} />
-            <span>Order Now ({cartCount})</span>
-          </Link>
-        </div>
-      )}
-
-      {/* Responsive Breakpoint CSS */}
+      {/* Responsive CSS */}
       <style>{`
         .mobile-sub-navbar {
           display: none !important;
         }
         @media (max-width: 960px) {
-          .desktop-nav, .desktop-nav-crest {
+          .desktop-nav {
             display: none !important;
           }
           .mobile-toggle-btn {
@@ -422,24 +288,11 @@ const Navbar = ({ onOpenAuthModal }) => {
           }
         }
         @media (max-width: 640px) {
-          .top-bar-hours, .nav-lang-desktop {
-            display: none !important;
-          }
           .brand-text-title {
             font-size: 1.15rem !important;
-            line-height: 1.2 !important;
-            white-space: nowrap !important;
           }
           .brand-text-sub {
-            font-size: 0.52rem !important;
-            white-space: nowrap !important;
-          }
-          .order-now-text {
-            display: none !important;
-          }
-          .order-now-btn {
-            padding: 0.45rem 0.75rem !important;
-            border-radius: 20px !important;
+            font-size: 0.5rem !important;
           }
         }
       `}</style>
