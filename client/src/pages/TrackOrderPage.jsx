@@ -13,7 +13,26 @@ const TrackOrderPage = () => {
   const [orderNumberInput, setOrderNumberInput] = useState(initialOrderNumber);
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
   const { addToast } = useToast();
+
+  const handleCancelOrder = async () => {
+    if (!order) return;
+    const confirmCancel = window.confirm('नक्की ही ऑर्डर रद्द करायची आहे का?\n(Are you sure you want to cancel this order?)');
+    if (!confirmCancel) return;
+
+    try {
+      setCancelling(true);
+      const targetId = order.order_number || order.id;
+      await apiService.updateOrderStatus(targetId, 'Cancelled');
+      setOrder(prev => prev ? ({ ...prev, status: 'Cancelled' }) : null);
+      addToast('ऑर्डर यशस्वीरीत्या रद्द केली गेली आहे (Order cancelled successfully)', 'info');
+    } catch (err) {
+      addToast('ऑर्डर रद्द करताना अडचण आली', 'error');
+    } finally {
+      setCancelling(false);
+    }
+  };
 
   useEffect(() => {
     let currentTarget = initialOrderNumber || orderNumberInput;
@@ -218,6 +237,34 @@ const TrackOrderPage = () => {
               <span>Total Amount</span>
               <span style={{ color: 'var(--color-gold)' }}>₹{parseFloat(order.total_amount).toFixed(2)}</span>
             </div>
+
+            {/* Cancel Order Option for Customer */}
+            {['Pending', 'Confirmed', 'Preparing'].includes(order.status) && (
+              <div style={{ marginTop: '1.5rem', textAlign: 'center', borderTop: '1px solid var(--color-border)', paddingTop: '1.2rem' }}>
+                <button
+                  onClick={handleCancelOrder}
+                  disabled={cancelling}
+                  style={{
+                    padding: '0.65rem 1.4rem',
+                    borderRadius: '30px',
+                    backgroundColor: '#FEE2E2',
+                    color: '#DC2626',
+                    border: '1.5px solid #FCA5A5',
+                    fontWeight: 700,
+                    fontSize: '0.85rem',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    boxShadow: '0 2px 6px rgba(220,38,38,0.1)',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <span>❌</span>
+                  <span>{cancelling ? 'रद्द करत आहे...' : 'Cancel Order (ऑर्डर रद्द करा)'}</span>
+                </button>
+              </div>
+            )}
 
           </div>
         )}
