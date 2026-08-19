@@ -52,36 +52,25 @@ const pushOrderToCloudSync = async (newOrder) => {
   }
 };
 
+// Fast helper for fetch with timeout (e.g. 1800ms max timeout)
+const fetchWithTimeout = async (url, options = {}, timeoutMs = 1800) => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { ...options, signal: controller.signal });
+    clearTimeout(timeoutId);
+    return res;
+  } catch (e) {
+    clearTimeout(timeoutId);
+    return null;
+  }
+};
+
 // Helper to fetch live orders from Vercel API + CrudCrud + LocalStorage
 const fetchOrdersFromCloudSync = async () => {
   const cloudOrders = [];
 
-  // 1. Fetch from Live Vercel Serverless API (Supports localhost connecting to live Vercel too!)
-  try {
-    const res = await fetch(getOrdersEndpoint());
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.orders && Array.isArray(data.orders)) {
-        data.orders.forEach(o => cloudOrders.push(o));
-      }
-    }
-  } catch (e) {}
-
-  // 2. Fetch from CrudCrud Cloud DB Direct Backup
-  for (const token of CRUDCRUD_TOKENS) {
-    try {
-      const res = await fetch(`https://crudcrud.com/api/${token}/orders`);
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) {
-          data.forEach(o => cloudOrders.push(o));
-          break;
-        }
-      }
-    } catch (e) {}
-  }
-
-  // 3. Fetch from LocalStorage
+  // 1. Instantly pull from LocalStorage (0ms initial response speed)
   try {
     const localAll = JSON.parse(localStorage.getItem('dakshin_all_orders') || '[]');
     const localMy = JSON.parse(localStorage.getItem('dakshin_my_orders') || '[]');
@@ -90,7 +79,38 @@ const fetchOrdersFromCloudSync = async () => {
     });
   } catch (e) {}
 
-  // 3. Combine initial demo orders so list is never empty
+  // 2. Fetch in PARALLEL from Vercel API and CrudCrud with 1.8s max timeout limit
+  const fetchPromises = [
+    fetchWithTimeout(getOrdersEndpoint()).then(async res => {
+      if (res && res.ok) {
+        const data = await res.json();
+        if (data && data.orders && Array.isArray(data.orders)) {
+          return data.orders;
+        }
+      }
+      return [];
+    }),
+    ...CRUDCRUD_TOKENS.map(token => 
+      fetchWithTimeout(`https://crudcrud.com/api/${token}/orders`).then(async res => {
+        if (res && res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) return data;
+        }
+        return [];
+      })
+    )
+  ];
+
+  try {
+    const results = await Promise.allSettled(fetchPromises);
+    results.forEach(res => {
+      if (res.status === 'fulfilled' && Array.isArray(res.value)) {
+        res.value.forEach(o => cloudOrders.push(o));
+      }
+    });
+  } catch (e) {}
+
+  // Combine initial demo orders so list is never empty
   INITIAL_DEMO_ORDERS.forEach(o => cloudOrders.push(o));
 
   // Clean items & normalize schema
