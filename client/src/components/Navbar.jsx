@@ -302,16 +302,21 @@ const Navbar = ({ onOpenAuthModal }) => {
           }
         }
         @media (max-width: 640px) {
-          .top-bar-hours, .nav-lang-desktop {
+          .top-bar-hours {
             display: none !important;
           }
+          .nav-lang-desktop select {
+            padding-left: 24px !important;
+            padding-right: 18px !important;
+            font-size: 0.75rem !important;
+          }
           .brand-text-title {
-            font-size: 1.15rem !important;
+            font-size: 1.05rem !important;
             line-height: 1.2 !important;
             white-space: nowrap !important;
           }
           .brand-text-sub {
-            font-size: 0.52rem !important;
+            font-size: 0.5rem !important;
             white-space: nowrap !important;
           }
           .order-now-text {
