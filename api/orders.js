@@ -168,6 +168,17 @@ module.exports = async function handler(req, res) {
         return ord;
       });
 
+      if (!updatedOrder && (targetId || targetNum)) {
+        updatedOrder = {
+          id: targetId || Date.now(),
+          order_number: targetNum || targetId,
+          status: newStatus || 'Ready',
+          payment_status: newPayStatus || 'PAID',
+          created_at: new Date().toISOString()
+        };
+        memoryOrdersStore.unshift(updatedOrder);
+      }
+
       if (updatedOrder) {
         for (const token of CRUDCRUD_TOKENS) {
           try {

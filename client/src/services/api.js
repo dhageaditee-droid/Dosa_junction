@@ -149,26 +149,19 @@ const fetchOrdersFromCloudSync = async () => {
     return r2 > r1 ? s2 : (r1 >= r2 ? s1 : s2);
   };
 
-  // Deduplicate by order_number and payload signature (same phone + same total within 60s)
+  // Deduplicate strictly by order_number and merge latest status / payment_status
   const map = new Map();
-  const seenSignatures = new Set();
 
   cleanedOrders.forEach(item => {
     if (item && item.order_number) {
-      const timestampMs = new Date(item.created_at || Date.now()).getTime();
-      const timeBucket = Math.floor(timestampMs / 60000); // 1-minute bucket
-      const sig = `${item.customer_phone || ''}_${item.total_amount}_${timeBucket}`;
-
-      if (!map.has(item.order_number) && !seenSignatures.has(sig)) {
-        map.set(item.order_number, item);
-        if (item.customer_phone && item.total_amount) {
-          seenSignatures.add(sig);
-        }
-      } else if (map.has(item.order_number)) {
-        const existing = map.get(item.order_number);
+      const key = String(item.order_number).trim();
+      if (!map.has(key)) {
+        map.set(key, item);
+      } else {
+        const existing = map.get(key);
         const resolvedStatus = getMoreAdvancedStatus(existing.status, item.status);
         const resolvedPayStatus = (item.payment_status === 'PAID' || existing.payment_status === 'PAID') ? 'PAID' : (item.payment_status || existing.payment_status);
-        map.set(item.order_number, {
+        map.set(key, {
           ...existing,
           ...item,
           status: resolvedStatus,
@@ -184,6 +177,7 @@ const fetchOrdersFromCloudSync = async () => {
   // Save merged result to LocalStorage
   try {
     localStorage.setItem('dakshin_all_orders', JSON.stringify(mergedResult));
+    localStorage.setItem('dakshin_my_orders', JSON.stringify(mergedResult));
   } catch (e) {}
 
   return mergedResult;
@@ -194,7 +188,9 @@ const updateOrderStatusInCloudSync = async (orderId, newStatus, paymentStatus = 
   // Update local storage immediately for fast client UI update
   try {
     const allSaved = JSON.parse(localStorage.getItem('dakshin_all_orders') || '[]');
-    const updatedLocal = allSaved.map(o => {
+    const mySaved = JSON.parse(localStorage.getItem('dakshin_my_orders') || '[]');
+
+    const updateItem = o => {
       if (String(o.id) === String(orderId) || String(o.order_number) === String(orderId)) {
         return {
           ...o,
@@ -203,9 +199,10 @@ const updateOrderStatusInCloudSync = async (orderId, newStatus, paymentStatus = 
         };
       }
       return o;
-    });
-    localStorage.setItem('dakshin_all_orders', JSON.stringify(updatedLocal));
-    localStorage.setItem('dakshin_my_orders', JSON.stringify(updatedLocal));
+    };
+
+    localStorage.setItem('dakshin_all_orders', JSON.stringify(allSaved.map(updateItem)));
+    localStorage.setItem('dakshin_my_orders', JSON.stringify(mySaved.map(updateItem)));
   } catch (e) {}
 
   // Post PATCH to live cloud serverless API
@@ -213,9 +210,21 @@ const updateOrderStatusInCloudSync = async (orderId, newStatus, paymentStatus = 
     await fetch(getOrdersEndpoint(), {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: orderId, status: newStatus, payment_status: paymentStatus })
+      body: JSON.stringify({ id: orderId, order_number: orderId, status: newStatus, payment_status: paymentStatus })
     });
   } catch (e) {}
+
+  // Post PATCH to CrudCrud directly as backup
+  for (const token of CRUDCRUD_TOKENS) {
+    try {
+      await fetch(`https://crudcrud.com/api/${token}/orders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: orderId, order_number: orderId, status: newStatus, payment_status: paymentStatus, created_at: new Date().toISOString() })
+      });
+      break;
+    } catch (e) {}
+  }
 };
 
 export const cleanDishName = (name) => {
@@ -684,21 +693,19 @@ export const apiService = {
   },
 
   updateOrderStatus: async (id, status) => {
-    updateOrderStatusInCloudSync(id, status);
+    await updateOrderStatusInCloudSync(id, status);
     try {
-      return await apiCall(`/orders/admin/${id}/status`, 'PATCH', { status }, localStorage.getItem('dakshin_admin_token'));
-    } catch (err) {
-      return { success: true, message: `Order status updated to "${status}".` };
-    }
+      await apiCall('/orders', 'PATCH', { id, status }, localStorage.getItem('dakshin_admin_token'));
+    } catch (err) {}
+    return { success: true, message: `Order status updated to "${status}".` };
   },
 
   updatePaymentStatus: async (id, paymentStatus) => {
-    updateOrderStatusInCloudSync(id, null, paymentStatus);
+    await updateOrderStatusInCloudSync(id, null, paymentStatus);
     try {
-      return await apiCall(`/orders/admin/${id}/payment`, 'PATCH', { paymentStatus }, localStorage.getItem('dakshin_admin_token'));
-    } catch (err) {
-      return { success: true, message: `Payment status updated to "${paymentStatus}".` };
-    }
+      await apiCall('/orders', 'PATCH', { id, payment_status: paymentStatus }, localStorage.getItem('dakshin_admin_token'));
+    } catch (err) {}
+    return { success: true, message: `Payment status updated to "${paymentStatus}".` };
   },
 
   // Admin Menu CRUD
