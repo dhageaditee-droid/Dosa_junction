@@ -99,6 +99,7 @@ const App = () => {
               </Route>
 
               {/* Admin Portal Routes */}
+              <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route
                 path="/admin/dashboard"
