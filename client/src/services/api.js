@@ -436,6 +436,16 @@ export const apiService = {
 
   // Orders & Checkout (Supports Vercel Realtime Serverless Sync)
   createOrder: async (orderData) => {
+    try {
+      const res = await apiCall('/orders', 'POST', orderData);
+      if (res && res.success && res.order) {
+        await pushOrderToCloudSync(res.order);
+        return res;
+      }
+    } catch (err) {
+      console.warn('Backend order creation failed, using fallback:', err.message);
+    }
+
     const orderNum = `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
     const rawItems = orderData.items || [];
     const formattedItems = rawItems.map(i => {
@@ -462,6 +472,11 @@ export const apiService = {
     const discountAmount = parseFloat(orderData.discountAmount || orderData.discount_amount) || 0;
     const totalAmount = parseFloat(orderData.totalAmount || orderData.total_amount) || (subtotal + tax + packingFee + deliveryFee - discountAmount);
 
+    const upiId = '11424716@indus';
+    const formattedAmount = totalAmount.toFixed(2);
+    const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=Dosa%20Junction&am=${formattedAmount}&cu=INR&tn=${encodeURIComponent(orderNum)}`;
+    const isUpi = orderData.paymentMethod && (orderData.paymentMethod.includes('UPI') || orderData.paymentMethod.includes('QR'));
+
     const newOrder = {
       id: Date.now(),
       order_number: orderNum,
@@ -471,7 +486,7 @@ export const apiService = {
       delivery_address: orderData.deliveryAddress || orderData.address || '',
       order_type: orderData.orderType || orderData.order_type || 'Home Delivery',
       payment_method: orderData.paymentMethod || orderData.payment_method || 'Cash on Delivery',
-      payment_status: 'PENDING',
+      payment_status: isUpi ? 'Payment Verification Pending' : 'PENDING',
       status: 'Pending',
       subtotal: parseFloat(subtotal.toFixed(2)),
       tax: parseFloat(tax.toFixed(2)),
@@ -480,6 +495,8 @@ export const apiService = {
       discount_amount: parseFloat(discountAmount.toFixed(2)),
       total_amount: parseFloat(totalAmount.toFixed(2)),
       items: formattedItems,
+      upi_id: upiId,
+      upi_uri: upiUri,
       created_at: new Date().toISOString()
     };
 
@@ -490,8 +507,95 @@ export const apiService = {
       success: true,
       message: 'Order placed successfully!',
       orderNumber: orderNum,
+      upiUri,
+      upiId,
       order: newOrder
     };
+  },
+
+  submitPaymentProof: async (orderNumber, data) => {
+    try {
+      const res = await apiCall(`/orders/${orderNumber}/payment-proof`, 'POST', data);
+      if (res && res.order) {
+        await pushOrderToCloudSync(res.order);
+      }
+      return res;
+    } catch (err) {
+      // Fallback update in local storage if backend offline
+      const allSaved = JSON.parse(localStorage.getItem('dakshin_all_orders') || '[]');
+      const mySaved = JSON.parse(localStorage.getItem('dakshin_my_orders') || '[]');
+
+      // Check duplicate UTR locally
+      const dup = allSaved.find(o => o.utr_number && String(o.utr_number).trim().toLowerCase() === String(data.utrNumber).trim().toLowerCase() && String(o.order_number) !== String(orderNumber) && o.payment_status !== 'Payment Rejected');
+      if (dup) {
+        throw new Error(`This UTR number (${data.utrNumber.trim()}) has already been submitted for another order (#${dup.order_number}). Duplicate UTR numbers cannot be reused.`);
+      }
+
+      const updateOrder = o => {
+        if (String(o.order_number) === String(orderNumber)) {
+          return {
+            ...o,
+            utr_number: data.utrNumber.trim(),
+            payment_screenshot: data.paymentScreenshot,
+            payment_status: 'Payment Verification Pending',
+            payment_proof_submitted_at: new Date().toISOString(),
+            rejection_reason: null
+          };
+        }
+        return o;
+      };
+
+      const updatedAll = allSaved.map(updateOrder);
+      const updatedMy = mySaved.map(updateOrder);
+      localStorage.setItem('dakshin_all_orders', JSON.stringify(updatedAll));
+      localStorage.setItem('dakshin_my_orders', JSON.stringify(updatedMy));
+
+      const updatedOrder = updatedAll.find(o => String(o.order_number) === String(orderNumber));
+      return {
+        success: true,
+        message: 'Payment proof submitted successfully! Verification is pending.',
+        order: updatedOrder
+      };
+    }
+  },
+
+  verifyPayment: async (orderId, action, rejectionReason = '') => {
+    try {
+      const res = await apiCall(`/orders/admin/${orderId}/verify-payment`, 'PATCH', { action, rejectionReason }, localStorage.getItem('dakshin_admin_token'));
+      if (res && res.order) {
+        await pushOrderToCloudSync(res.order);
+      }
+      return res;
+    } catch (err) {
+      const payStatus = action === 'approve' ? 'Payment Verified' : 'Payment Rejected';
+      const ordStatus = action === 'approve' ? 'Confirmed' : undefined;
+      const reason = action === 'reject' ? (rejectionReason || 'Payment proof verification rejected by admin.') : null;
+
+      const allSaved = JSON.parse(localStorage.getItem('dakshin_all_orders') || '[]');
+      const updateOrder = o => {
+        if (String(o.id) === String(orderId) || String(o.order_number) === String(orderId)) {
+          return {
+            ...o,
+            payment_status: payStatus,
+            ...(ordStatus ? { status: ordStatus } : {}),
+            rejection_reason: reason,
+            ...(action === 'approve' ? { paid_amount: o.total_amount, paid_at: new Date().toISOString() } : {})
+          };
+        }
+        return o;
+      };
+
+      const updatedAll = allSaved.map(updateOrder);
+      localStorage.setItem('dakshin_all_orders', JSON.stringify(updatedAll));
+      localStorage.setItem('dakshin_my_orders', JSON.stringify(updatedAll));
+
+      const updatedOrder = updatedAll.find(o => String(o.id) === String(orderId) || String(o.order_number) === String(orderId));
+      return {
+        success: true,
+        message: action === 'approve' ? 'Payment verified and order confirmed!' : 'Payment rejected.',
+        order: updatedOrder
+      };
+    }
   },
 
   trackOrder: async (orderNumber) => {

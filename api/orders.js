@@ -65,6 +65,66 @@ module.exports = async function handler(req, res) {
 
     if (req.method === 'POST') {
       const orderData = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
+
+      // Check if this is a payment proof submission
+      if (orderData.utrNumber || orderData.paymentScreenshot) {
+        const cleanUtr = (orderData.utrNumber || '').trim();
+        const targetNum = orderData.orderNumber || orderData.order_number;
+
+        // Check duplicate UTR
+        if (cleanUtr) {
+          const dup = memoryOrdersStore.find(o => 
+            o.utr_number && 
+            String(o.utr_number).trim().toLowerCase() === cleanUtr.toLowerCase() && 
+            String(o.order_number) !== String(targetNum) &&
+            o.payment_status !== 'Payment Rejected'
+          );
+
+          if (dup) {
+            return res.status(400).json({
+              success: false,
+              message: `This UTR number (${cleanUtr}) has already been submitted for order #${dup.order_number}.`
+            });
+          }
+        }
+
+        let updatedOrder = null;
+        memoryOrdersStore = memoryOrdersStore.map(ord => {
+          if (String(ord.order_number) === String(targetNum) || String(ord.id) === String(targetNum)) {
+            updatedOrder = {
+              ...ord,
+              utr_number: cleanUtr || ord.utr_number,
+              payment_screenshot: orderData.paymentScreenshot || ord.payment_screenshot,
+              payment_status: 'Payment Verification Pending',
+              payment_proof_submitted_at: new Date().toISOString(),
+              rejection_reason: null
+            };
+            return updatedOrder;
+          }
+          return ord;
+        });
+
+        if (updatedOrder) {
+          for (const token of CRUDCRUD_TOKENS) {
+            try {
+              await fetch(`https://crudcrud.com/api/${token}/orders`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedOrder)
+              });
+              break;
+            } catch (e) {}
+          }
+        }
+
+        return res.status(200).json({
+          success: true,
+          message: 'Payment proof submitted successfully! Verification is pending.',
+          order: updatedOrder
+        });
+      }
+
+      // Create new order
       const orderNum = orderData.order_number || `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
 
       const rawItems = orderData.items || [];
@@ -98,6 +158,11 @@ module.exports = async function handler(req, res) {
         ? parseFloat(orderData.totalAmount || orderData.total_amount)
         : calculatedTotal;
 
+      const upiId = '11424716@indus';
+      const formattedAmount = total_amount.toFixed(2);
+      const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=Dosa%20Junction&am=${formattedAmount}&cu=INR&tn=${encodeURIComponent(orderNum)}`;
+      const isUpi = !orderData.paymentMethod || (orderData.paymentMethod.includes('UPI') || orderData.paymentMethod.includes('QR'));
+
       const newOrder = {
         id: Date.now(),
         order_number: orderNum,
@@ -106,8 +171,8 @@ module.exports = async function handler(req, res) {
         customer_email: orderData.email || orderData.customerEmail || '',
         delivery_address: orderData.deliveryAddress || orderData.address || '',
         order_type: orderData.orderType || orderData.order_type || 'Home Delivery',
-        payment_method: orderData.paymentMethod || orderData.payment_method || 'Cash on Delivery',
-        payment_status: orderData.payment_status || 'PENDING',
+        payment_method: orderData.paymentMethod || orderData.payment_method || 'UPI / Dynamic QR Code',
+        payment_status: isUpi ? 'Payment Verification Pending' : (orderData.payment_status || 'PENDING'),
         status: orderData.status || 'Pending',
         subtotal: subtotal,
         tax: tax,
@@ -116,6 +181,8 @@ module.exports = async function handler(req, res) {
         discount_amount: discount_amount,
         total_amount: total_amount,
         items: items,
+        upi_id: upiId,
+        upi_uri: upiUri,
         created_at: orderData.created_at || new Date().toISOString()
       };
 
@@ -138,6 +205,8 @@ module.exports = async function handler(req, res) {
         success: true,
         message: 'Order placed successfully!',
         orderNumber: orderNum,
+        upiUri,
+        upiId,
         order: newOrder
       });
     }
@@ -146,8 +215,18 @@ module.exports = async function handler(req, res) {
       const updateData = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
       const targetId = updateData.id || updateData.order_id;
       const targetNum = updateData.order_number || updateData.orderNumber;
-      const newStatus = updateData.status;
-      const newPayStatus = updateData.payment_status || updateData.paymentStatus;
+      const action = updateData.action;
+
+      let newStatus = updateData.status;
+      let newPayStatus = updateData.payment_status || updateData.paymentStatus;
+      let rejectionReason = updateData.rejectionReason;
+
+      if (action === 'approve') {
+        newPayStatus = 'Payment Verified';
+        newStatus = 'Confirmed';
+      } else if (action === 'reject') {
+        newPayStatus = 'Payment Rejected';
+      }
 
       await fetchCloudOrders();
 
@@ -161,7 +240,8 @@ module.exports = async function handler(req, res) {
           updatedOrder = {
             ...ord,
             ...(newStatus ? { status: newStatus } : {}),
-            ...(newPayStatus ? { payment_status: newPayStatus } : {})
+            ...(newPayStatus ? { payment_status: newPayStatus } : {}),
+            ...(rejectionReason ? { rejection_reason: rejectionReason } : (action === 'approve' ? { rejection_reason: null } : {}))
           };
           return updatedOrder;
         }
@@ -172,8 +252,8 @@ module.exports = async function handler(req, res) {
         updatedOrder = {
           id: targetId || Date.now(),
           order_number: targetNum || targetId,
-          status: newStatus || 'Ready',
-          payment_status: newPayStatus || 'PAID',
+          status: newStatus || 'Confirmed',
+          payment_status: newPayStatus || 'Payment Verified',
           created_at: new Date().toISOString()
         };
         memoryOrdersStore.unshift(updatedOrder);
@@ -195,6 +275,7 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({
         success: true,
         message: 'Order status updated successfully',
+        order: updatedOrder,
         orders: memoryOrdersStore
       });
     }

@@ -7,7 +7,7 @@ const OrderConfirmationModal = ({
   onConfirm,
   orderType = 'Home Delivery',
   totalAmount = 0,
-  paymentMethod = 'Cash on Delivery',
+  paymentMethod = 'Online UPI Payment',
   placingOrder = false
 }) => {
   if (!isOpen) return null;

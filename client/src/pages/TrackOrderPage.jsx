@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Search, PackageCheck, AlertCircle, CheckCircle, Clock, Truck, ChefHat, CheckCircle2 } from 'lucide-react';
 import SEOHead from '../components/SEOHead';
 import StatusBadge from '../components/StatusBadge';
+import DynamicUpiPayment from '../components/DynamicUpiPayment';
 import { apiService } from '../services/api';
 import { useToast } from '../context/ToastContext';
 
@@ -195,6 +196,13 @@ const TrackOrderPage = () => {
             ) : (
               <div style={{ backgroundColor: '#FEE2E2', color: '#991B1B', padding: '1rem', borderRadius: '12px', textAlign: 'center', fontWeight: 700, margin: '1.5rem 0' }}>
                 This order was cancelled. Please contact restaurant support for assistance.
+              </div>
+            )}
+
+            {/* Dynamic UPI Payment Module for UPI Orders */}
+            {order && (order.payment_method?.toLowerCase().includes('upi') || order.payment_method?.toLowerCase().includes('qr')) && (
+              <div style={{ marginBottom: '1.8rem' }}>
+                <DynamicUpiPayment order={order} onPaymentSubmitted={(updated) => setOrder(updated)} />
               </div>
             )}
 

@@ -25,7 +25,7 @@ const CheckoutPage = () => {
     city: customerUser?.city || 'Sangamner',
     pincode: customerUser?.pincode || '422601',
     orderType: 'Home Delivery', // 'Home Delivery', 'Takeaway', 'Dine In'
-    paymentMethod: 'Cash on Delivery', // 'Cash on Delivery', 'Pay at Restaurant'
+    paymentMethod: 'UPI / Dynamic QR Code', // 'UPI / Dynamic QR Code', 'Cash on Delivery', 'Pay at Restaurant'
     notes: ''
   });
 
@@ -336,50 +336,43 @@ const CheckoutPage = () => {
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--color-emerald)', marginBottom: '0.6rem' }}>
                   3. Payment Method
                 </h3>
-                <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginBottom: '1rem' }}>
-                  Choose your preferred payment method. Payment status will initially be marked as <strong>PENDING</strong> and confirmed by restaurant.
-                </p>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-                  {[
-                    { key: 'Cash on Delivery', label: 'Cash on Delivery (COD)', desc: 'Pay cash or UPI directly to delivery partner upon arrival' },
-                    { key: 'Pay at Restaurant', label: 'Pay at Restaurant', desc: 'Pay at billing counter during Takeaway pick up or Dine In' }
-                  ].map((method) => (
-                    <label
-                      key={method.key}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        gap: '0.8rem',
-                        padding: '1rem',
-                        borderRadius: '14px',
-                        border: formData.paymentMethod === method.key ? '2px solid var(--color-gold)' : '1px solid var(--color-border)',
-                        backgroundColor: formData.paymentMethod === method.key ? '#FEF3C7' : '#FFFFFF',
-                        cursor: 'pointer',
-                        transition: 'var(--transition-fast)'
-                      }}
-                    >
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        checked={formData.paymentMethod === method.key}
-                        onChange={() => setFormData({ ...formData, paymentMethod: method.key })}
-                        style={{ accentColor: 'var(--color-gold)', marginTop: '3px' }}
-                      />
-                      <div>
-                        <strong style={{ display: 'block', fontSize: '0.95rem', color: 'var(--color-emerald)' }}>
-                          {method.label}
-                        </strong>
-                        <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
-                          {method.desc}
-                        </span>
-                      </div>
-                    </label>
-                  ))}
+                
+                <div style={{
+                  padding: '1.25rem',
+                  borderRadius: '16px',
+                  border: '2px solid var(--color-gold)',
+                  backgroundColor: '#FEF3C7',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '0.8rem'
+                }}>
+                  <div style={{
+                    width: '28px',
+                    height: '28px',
+                    borderRadius: '50%',
+                    backgroundColor: 'var(--color-gold)',
+                    color: '#FFFFFF',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 900,
+                    fontSize: '0.9rem',
+                    flexShrink: 0
+                  }}>
+                    ⚡
+                  </div>
+                  <div>
+                    <strong style={{ display: 'block', fontSize: '1.05rem', color: 'var(--color-emerald)' }}>
+                      Online UPI Payment (Dynamic QR Code)
+                    </strong>
+                    <p style={{ fontSize: '0.82rem', color: '#B45309', margin: '4px 0 0 0', lineHeight: 1.4 }}>
+                      Scan dynamic UPI QR code or pay with GPay, PhonePe, Paytm, or BHIM for exact order total on the next page.
+                    </p>
+                  </div>
                 </div>
 
-                <div style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
-                  💡 Online payment gateway (Razorpay / PhonePe / Cards) integration is planned for Phase 2.
+                <div style={{ marginTop: '1rem', fontSize: '0.8rem', color: '#065F46', backgroundColor: '#ECFDF5', padding: '0.75rem 1rem', borderRadius: '12px', fontWeight: 600 }}>
+                  🔒 Direct & Secure: Dynamic QR code with your exact order amount will be generated instantly after placing order.
                 </div>
               </div>
 

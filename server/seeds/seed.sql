@@ -122,4 +122,5 @@ INSERT INTO restaurant_settings (key, value) VALUES
 ('packing_charge', '15.0'),
 ('delivery_charge', '30.0'),
 ('free_delivery_threshold', '250.0'),
-('opening_hours', '7:00 AM - 11:00 PM Daily');
+('opening_hours', '7:00 AM - 11:00 PM Daily'),
+('upi_id', '11424716@indus');

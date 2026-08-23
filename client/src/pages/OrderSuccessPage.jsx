@@ -3,6 +3,7 @@ import { useParams, useLocation, Link, useNavigate } from 'react-router-dom';
 import { CheckCircle2, Clock, MapPin, Phone, ShoppingBag, ArrowRight, Compass } from 'lucide-react';
 import SEOHead from '../components/SEOHead';
 import StatusBadge from '../components/StatusBadge';
+import DynamicUpiPayment from '../components/DynamicUpiPayment';
 import { apiService } from '../services/api';
 
 const OrderSuccessPage = () => {
@@ -14,7 +15,7 @@ const OrderSuccessPage = () => {
   const [loading, setLoading] = useState(!location.state?.order);
 
   useEffect(() => {
-    if (!order && orderNumber) {
+    if (orderNumber) {
       fetchOrderDetails();
     }
   }, [orderNumber]);
@@ -30,6 +31,8 @@ const OrderSuccessPage = () => {
       setLoading(false);
     }
   };
+
+  const isUpiOrder = order?.payment_method && (order.payment_method.toLowerCase().includes('upi') || order.payment_method.toLowerCase().includes('qr'));
 
   return (
     <div style={{ backgroundColor: 'var(--color-cream)', padding: '3rem 0 5rem 0', minHeight: '85vh' }}>
@@ -67,10 +70,8 @@ const OrderSuccessPage = () => {
             Order Placed Successfully! 🎉
           </h1>
           <p style={{ fontSize: '1rem', color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>
-            Thank you for ordering with Dosa Junction. Your order has been registered in our kitchen queue.
+            Thank you for ordering with Dosa Junction. Your order reference is <strong>#{orderNumber}</strong>.
           </p>
-
-
 
           {/* Action Buttons */}
           <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '1rem' }}>
@@ -92,6 +93,13 @@ const OrderSuccessPage = () => {
           </div>
 
         </div>
+
+        {/* Dynamic UPI Payment Section */}
+        {order && isUpiOrder && (
+          <div style={{ marginBottom: '2rem' }}>
+            <DynamicUpiPayment order={order} onPaymentSubmitted={(updated) => setOrder(updated)} />
+          </div>
+        )}
 
         {/* Order Details Grid */}
         {order && (
@@ -129,8 +137,16 @@ const OrderSuccessPage = () => {
 
               <div>
                 <span style={{ color: 'var(--color-text-muted)', display: 'block', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>Payment Status</span>
-                <span style={{ backgroundColor: '#FEF3C7', color: '#B45309', padding: '2px 8px', borderRadius: '8px', fontWeight: 800, fontSize: '0.8rem', display: 'inline-block' }}>
-                  {order.payment_status || 'PENDING'}
+                <span style={{
+                  backgroundColor: order.payment_status === 'Payment Verified' ? '#DCFCE7' : order.payment_status === 'Payment Rejected' ? '#FEE2E2' : '#FEF3C7',
+                  color: order.payment_status === 'Payment Verified' ? '#16A34A' : order.payment_status === 'Payment Rejected' ? '#DC2626' : '#B45309',
+                  padding: '2px 8px',
+                  borderRadius: '8px',
+                  fontWeight: 800,
+                  fontSize: '0.8rem',
+                  display: 'inline-block'
+                }}>
+                  {order.payment_status || 'Payment Verification Pending'}
                 </span>
               </div>
 

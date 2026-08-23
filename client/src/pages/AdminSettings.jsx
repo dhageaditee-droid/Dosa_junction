@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Save, ShieldCheck } from 'lucide-react';
+import { Settings, Save, ShieldCheck, QrCode } from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
 import SkeletonLoader from '../components/SkeletonLoader';
 import SEOHead from '../components/SEOHead';
@@ -17,7 +17,8 @@ const AdminSettings = () => {
     packing_charge: '15.0',
     delivery_charge: '30.0',
     free_delivery_threshold: '400.0',
-    is_accepting_orders: 'true'
+    is_accepting_orders: 'true',
+    upi_id: '11424716@indus'
   });
 
   const [loading, setLoading] = useState(true);
@@ -48,7 +49,7 @@ const AdminSettings = () => {
       setSaving(true);
       const res = await apiCall('/api/settings/admin', 'PUT', settings);
       if (res.success) {
-        addToast('Restaurant settings updated successfully!', 'success');
+        addToast('Restaurant operational & UPI settings updated successfully!', 'success');
       }
     } catch (err) {
       addToast(err.message || 'Failed to update settings', 'error');
@@ -66,10 +67,10 @@ const AdminSettings = () => {
         
         <div style={{ marginBottom: '2rem' }}>
           <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem', color: 'var(--color-emerald)' }}>
-            Restaurant Operational Settings
+            Restaurant Operational & UPI Settings
           </h1>
           <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>
-            Configure tax rates, packaging fees, delivery charges, and store operating hours.
+            Configure store info, tax rates, packaging fees, delivery charges, and Dosa Junction UPI ID for dynamic QR code payments.
           </p>
         </div>
 
@@ -88,7 +89,28 @@ const AdminSettings = () => {
               gap: '1.5rem'
             }}>
               
-              <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', color: 'var(--color-emerald)', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem' }}>
+              <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', color: 'var(--color-emerald)', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <QrCode size={20} color="var(--color-gold)" /> Dynamic UPI Payment Settings
+              </h3>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-emerald)', marginBottom: '4px' }}>
+                  Dosa Junction Official UPI ID *
+                </label>
+                <input
+                  type="text"
+                  value={settings.upi_id}
+                  onChange={(e) => setSettings({ ...settings, upi_id: e.target.value })}
+                  placeholder="e.g. dosajunction@upi or 7020758779@ybl"
+                  required
+                  style={{ width: '100%', padding: '0.7rem', borderRadius: '8px', border: '1px solid #ccc', fontFamily: 'monospace', fontWeight: 700 }}
+                />
+                <span style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', marginTop: '4px', display: 'block' }}>
+                  This UPI ID will be embedded in dynamic payment QR codes (`upi://pay?pa=YOUR_UPI_ID...`) generated for customer orders.
+                </span>
+              </div>
+
+              <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', color: 'var(--color-emerald)', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem', marginTop: '1rem' }}>
                 Store & Contact Info
               </h3>
 
