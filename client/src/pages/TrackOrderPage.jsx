@@ -199,8 +199,8 @@ const TrackOrderPage = () => {
               </div>
             )}
 
-            {/* Dynamic UPI Payment Module for UPI Orders */}
-            {order && (order.payment_method?.toLowerCase().includes('upi') || order.payment_method?.toLowerCase().includes('qr')) && (
+            {/* Dynamic UPI Payment Module */}
+            {order && (
               <div style={{ marginBottom: '1.8rem' }}>
                 <DynamicUpiPayment order={order} onPaymentSubmitted={(updated) => setOrder(updated)} />
               </div>

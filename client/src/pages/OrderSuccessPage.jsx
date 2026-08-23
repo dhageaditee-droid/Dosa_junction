@@ -95,7 +95,7 @@ const OrderSuccessPage = () => {
         </div>
 
         {/* Dynamic UPI Payment Section */}
-        {order && isUpiOrder && (
+        {order && (
           <div style={{ marginBottom: '2rem' }}>
             <DynamicUpiPayment order={order} onPaymentSubmitted={(updated) => setOrder(updated)} />
           </div>
