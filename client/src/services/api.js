@@ -465,7 +465,8 @@ export const apiService = {
 
     const upiId = '11424716@indus';
     const formattedAmount = totalAmount.toFixed(2);
-    const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=Dosa%20Junction&am=${formattedAmount}&cu=INR&tn=${encodeURIComponent(ref)}`;
+    const cleanRef = (ref || '').replace(/[^a-zA-Z0-9]/g, '');
+    const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=DosaJunction&am=${formattedAmount}&cu=INR&tn=${cleanRef}`;
 
     const newSession = {
       id: Date.now(),

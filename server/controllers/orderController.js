@@ -16,7 +16,8 @@ const generatePaymentRef = () => {
 const attachUpiDetails = (order, upiId = '11424716@indus') => {
   if (!order) return order;
   const formattedAmount = parseFloat(order.total_amount).toFixed(2);
-  const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=Dosa%20Junction&am=${formattedAmount}&cu=INR&tn=${encodeURIComponent(order.order_number)}`;
+  const cleanNum = (order.order_number || '').replace(/[^a-zA-Z0-9]/g, '');
+  const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=DosaJunction&am=${formattedAmount}&cu=INR&tn=${cleanNum}`;
   return {
     ...order,
     upi_id: upiId,
@@ -28,8 +29,8 @@ const attachUpiDetails = (order, upiId = '11424716@indus') => {
 const attachSessionUpiDetails = (session, upiId = '11424716@indus') => {
   if (!session) return session;
   const formattedAmount = parseFloat(session.total_amount).toFixed(2);
-  const ref = session.payment_ref;
-  const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=Dosa%20Junction&am=${formattedAmount}&cu=INR&tn=${encodeURIComponent(ref)}`;
+  const cleanRef = (session.payment_ref || '').replace(/[^a-zA-Z0-9]/g, '');
+  const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=DosaJunction&am=${formattedAmount}&cu=INR&tn=${cleanRef}`;
   return {
     ...session,
     upi_id: upiId,
