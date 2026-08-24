@@ -50,6 +50,24 @@ const PaymentPage = () => {
     return () => clearInterval(interval);
   }, [paymentRef]);
 
+  const totalAmountNum = parseFloat(session?.total_amount || 0);
+  const totalAmountFormatted = totalAmountNum.toFixed(2);
+  const upiId = (session?.upi_id || '11424716@indus').trim();
+
+  // 1, 2, 3. Standard NPCI UPI URI Structure:
+  // upi://pay?pa=UPI_ID&pn=Dosa%20Junction&am=ORDER_AMOUNT&cu=INR&tn=PAYMENT_REFERENCE
+  const cleanRef = (paymentRef || 'PAYDJ1001').replace(/[^a-zA-Z0-9]/g, '');
+  const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent('Dosa Junction')}&am=${totalAmountFormatted}&cu=INR&tn=${cleanRef}`;
+
+  // 4. Log generated UPI URI in development mode
+  useEffect(() => {
+    if (session && upiUri) {
+      if (process.env.NODE_ENV !== 'production' || window.location.hostname === 'localhost') {
+        console.log('[UPI Deep Link Generated]:', upiUri);
+      }
+    }
+  }, [session, upiUri]);
+
   const copyToClipboard = (text, typeLabel) => {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text);
@@ -62,6 +80,56 @@ const PaymentPage = () => {
       document.execCommand('copy');
       document.body.removeChild(input);
       if (addToast) addToast(`${typeLabel} copied to clipboard!`, 'success');
+    }
+  };
+
+  // 6, 7, 8, 9, 10. Handler for "Pay with UPI App" button
+  const handlePayWithUpiApp = (e) => {
+    e.preventDefault();
+    setErrorMsg('');
+
+    // 8. Pre-launch Validation Guard
+    if (!upiId || typeof upiId !== 'string' || !upiId.includes('@')) {
+      setErrorMsg('Invalid UPI ID configured.');
+      return;
+    }
+
+    if (isNaN(totalAmountNum) || totalAmountNum <= 0) {
+      setErrorMsg('Payment amount must be greater than ₹0.00.');
+      return;
+    }
+
+    if (!/^\d+(\.\d{1,2})?$/.test(totalAmountFormatted)) {
+      setErrorMsg('Amount formatting invalid.');
+      return;
+    }
+
+    if (!paymentRef || !paymentRef.trim()) {
+      setErrorMsg('Payment reference missing.');
+      return;
+    }
+
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    // 7. Desktop Scoping: Do not redirect desktop users directly
+    if (!isMobile) {
+      if (addToast) addToast('Desktop detected: Please scan the QR code using your mobile UPI app.', 'info');
+      return;
+    }
+
+    // 6 & 9. On mobile, launch via window.location.href = upiUri with fallback error catch
+    try {
+      const startTime = Date.now();
+      window.location.href = upiUri;
+
+      // 9. Fallback if UPI app fails to open
+      setTimeout(() => {
+        if (Date.now() - startTime < 2000 && !document.hidden) {
+          setErrorMsg('Unable to open UPI app. Please scan the QR code instead.');
+        }
+      }, 1500);
+    } catch (err) {
+      setErrorMsg('Unable to open UPI app. Please scan the QR code instead.');
     }
   };
 
@@ -141,11 +209,6 @@ const PaymentPage = () => {
       </div>
     );
   }
-
-  const totalAmount = parseFloat(session.total_amount || 0).toFixed(2);
-  const upiId = session.upi_id || '11424716@indus';
-  
-  const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=DosaJunction&am=${totalAmount}&cu=INR`;
   
   const isApproved = session.status === 'Approved' || !!session.order_number;
   const isPending = session.status === 'Verification Pending';
@@ -188,7 +251,7 @@ const PaymentPage = () => {
               Amount to Pay
             </span>
             <span style={{ fontSize: '2.4rem', fontWeight: 900, color: '#D97706', letterSpacing: '-0.5px' }}>
-              ₹{totalAmount}
+              ₹{totalAmountFormatted}
             </span>
           </div>
 
@@ -283,10 +346,10 @@ const PaymentPage = () => {
               fontFamily: 'var(--font-heading)',
               margin: '4px 0 1.2rem 0'
             }}>
-              Pay ₹{totalAmount}
+              Pay ₹{totalAmountFormatted}
             </h2>
 
-            {/* QR Code Graphic Container */}
+            {/* 5. QR Code Graphic Container uses EXACT SAME upiUri */}
             <div style={{
               display: 'inline-block',
               backgroundColor: '#FFFFFF',
@@ -342,11 +405,11 @@ const PaymentPage = () => {
               <div style={{ borderTop: '1px dashed #F59E0B', paddingTop: '0.6rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
                 <div style={{ textAlign: 'left' }}>
                   <span style={{ fontSize: '0.76rem', color: '#B45309', fontWeight: 700, display: 'block', textTransform: 'uppercase' }}>Exact Payable Amount:</span>
-                  <strong style={{ fontSize: '1.1rem', color: '#78350F' }}>₹{totalAmount}</strong>
+                  <strong style={{ fontSize: '1.1rem', color: '#78350F' }}>₹{totalAmountFormatted}</strong>
                 </div>
                 <button
                   type="button"
-                  onClick={() => copyToClipboard(totalAmount, 'Amount')}
+                  onClick={() => copyToClipboard(totalAmountFormatted, 'Amount')}
                   className="btn btn-sm"
                   style={{ backgroundColor: '#B45309', color: '#FFFFFF', border: 'none', fontWeight: 800, borderRadius: '8px', padding: '0.4rem 0.8rem', fontSize: '0.82rem', cursor: 'pointer' }}
                 >
@@ -355,12 +418,11 @@ const PaymentPage = () => {
               </div>
             </div>
 
-            {/* Mobile Pay with UPI App Buttons */}
+            {/* 5, 6, 7. Mobile "Pay with UPI App" Button Uses EXACT SAME upiUri */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem', marginBottom: '1.2rem' }}>
-              <a
-                href={upiUri}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
+                onClick={handlePayWithUpiApp}
                 className="btn btn-primary"
                 style={{
                   display: 'inline-flex',
@@ -372,24 +434,24 @@ const PaymentPage = () => {
                   borderRadius: '14px',
                   fontWeight: 800,
                   fontSize: '1rem',
-                  textDecoration: 'none',
+                  cursor: 'pointer',
                   boxShadow: '0 4px 14px rgba(6, 78, 59, 0.3)'
                 }}
               >
                 <ExternalLink size={18} /> Pay with UPI App (GPay / PhonePe / Paytm)
-              </a>
+              </button>
               
               <span style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>
                 💡 If automatic app launch shows an error on your phone:
                 <br />
-                <strong>Click "Copy UPI ID" above → Open GPay/PhonePe/Paytm → Send ₹{totalAmount} to {upiId}</strong>
+                <strong>Click "Copy UPI ID" above → Open GPay/PhonePe/Paytm → Send ₹{totalAmountFormatted} to {upiId}</strong>
               </span>
             </div>
 
           </div>
         )}
 
-        {/* Payment Proof Submission Form (Required: Screenshot + UTR) */}
+        {/* 11. Payment Proof Submission Form (Required: Screenshot + UTR) */}
         {!isApproved && (
           <form onSubmit={handleSubmitProof} style={{
             backgroundColor: '#FFFFFF',

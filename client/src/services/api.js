@@ -465,7 +465,10 @@ export const apiService = {
 
     const upiId = '11424716@indus';
     const formattedAmount = totalAmount.toFixed(2);
-    const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=DosaJunction&am=${formattedAmount}&cu=INR`;
+    const cleanRef = (ref || 'PAYDJ1001').replace(/[^a-zA-Z0-9]/g, '');
+    const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent('Dosa Junction')}&am=${formattedAmount}&cu=INR&tn=${cleanRef}`;
+
+    console.log('[UPI Deep Link Generated]:', upiUri);
 
     const newSession = {
       id: Date.now(),

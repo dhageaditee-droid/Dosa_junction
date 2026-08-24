@@ -15,8 +15,14 @@ const generatePaymentRef = () => {
 // Helper to attach UPI URI and UPI ID to order response
 const attachUpiDetails = (order, upiId = '11424716@indus') => {
   if (!order) return order;
-  const formattedAmount = parseFloat(order.total_amount).toFixed(2);
-  const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=DosaJunction&am=${formattedAmount}&cu=INR`;
+  const formattedAmount = parseFloat(order.total_amount || 0).toFixed(2);
+  const cleanRef = (order.order_number || 'DJ1001').replace(/[^a-zA-Z0-9]/g, '');
+  const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent('Dosa Junction')}&am=${formattedAmount}&cu=INR&tn=${cleanRef}`;
+  
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('[UPI Deep Link Generated]:', upiUri);
+  }
+
   return {
     ...order,
     upi_id: upiId,
@@ -27,8 +33,14 @@ const attachUpiDetails = (order, upiId = '11424716@indus') => {
 // Helper to attach UPI URI and UPI ID to payment session response
 const attachSessionUpiDetails = (session, upiId = '11424716@indus') => {
   if (!session) return session;
-  const formattedAmount = parseFloat(session.total_amount).toFixed(2);
-  const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=DosaJunction&am=${formattedAmount}&cu=INR`;
+  const formattedAmount = parseFloat(session.total_amount || 0).toFixed(2);
+  const cleanRef = (session.payment_ref || 'PAYDJ1001').replace(/[^a-zA-Z0-9]/g, '');
+  const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent('Dosa Junction')}&am=${formattedAmount}&cu=INR&tn=${cleanRef}`;
+
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('[UPI Deep Link Generated]:', upiUri);
+  }
+
   return {
     ...session,
     upi_id: upiId,
