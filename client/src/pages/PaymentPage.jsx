@@ -145,9 +145,7 @@ const PaymentPage = () => {
   const totalAmount = parseFloat(session.total_amount || 0).toFixed(2);
   const upiId = session.upi_id || '11424716@indus';
   
-  // Clean alphanumeric note for UPI apps (removes hyphens for maximum compatibility)
-  const cleanRef = (paymentRef || '').replace(/[^a-zA-Z0-9]/g, '');
-  const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=DosaJunction&am=${totalAmount}&cu=INR&tn=${cleanRef}`;
+  const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=DosaJunction&am=${totalAmount}&cu=INR`;
   
   const isApproved = session.status === 'Approved' || !!session.order_number;
   const isPending = session.status === 'Verification Pending';
