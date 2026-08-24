@@ -168,27 +168,24 @@ const DynamicUpiPayment = ({ order, onPaymentSubmitted }) => {
             </div>
           </div>
 
-          {/* 4 & 5. Dynamic QR Code Container */}
+          {/* Dosa Junction Official Scanner */}
           <div style={{
             display: 'inline-block',
             backgroundColor: '#FFFFFF',
-            padding: '1.2rem',
+            padding: '1rem',
             borderRadius: '16px',
             boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
             marginBottom: '1rem'
           }}>
-            <QRCodeSVG
-              value={upiUri}
-              size={210}
-              level="H"
-              includeMargin={true}
-              imageSettings={{
-                src: "https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=100&q=80",
-                x: undefined,
-                y: undefined,
-                height: 36,
-                width: 36,
-                excavate: true,
+            <img
+              src="/assets/dosa_junction_qr.png"
+              alt="Dosa Junction Official UPI QR Code"
+              style={{
+                width: '230px',
+                height: '230px',
+                borderRadius: '12px',
+                objectFit: 'contain',
+                display: 'block'
               }}
             />
           </div>

@@ -349,21 +349,26 @@ const PaymentPage = () => {
               Pay ₹{totalAmountFormatted}
             </h2>
 
-            {/* 5. QR Code Graphic Container uses EXACT SAME upiUri */}
+            {/* Dosa Junction Official Scanner */}
             <div style={{
               display: 'inline-block',
               backgroundColor: '#FFFFFF',
-              padding: '1.2rem',
+              padding: '1rem',
               borderRadius: '20px',
               boxShadow: '0 10px 25px rgba(0,0,0,0.08)',
               border: '2px dashed var(--color-gold)',
               marginBottom: '1.2rem'
             }}>
-              <QRCodeSVG
-                value={upiUri}
-                size={220}
-                level="H"
-                includeMargin={true}
+              <img
+                src="/assets/dosa_junction_qr.png"
+                alt="Dosa Junction Official UPI QR Code"
+                style={{
+                  width: '240px',
+                  height: '240px',
+                  borderRadius: '12px',
+                  objectFit: 'contain',
+                  display: 'block'
+                }}
               />
             </div>
 
