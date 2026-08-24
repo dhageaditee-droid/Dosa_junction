@@ -434,6 +434,196 @@ export const apiService = {
     }
   },
 
+  // Temporary Payment Sessions (Payment First -> Order After Verification)
+  createPaymentSession: async (sessionData) => {
+    try {
+      const res = await apiCall('/payment-sessions', 'POST', sessionData);
+      if (res && res.success) {
+        return res;
+      }
+    } catch (err) {
+      console.warn('Backend session creation failed, using client fallback:', err.message);
+    }
+
+    const ref = `PAY-DJ-${Math.floor(1000 + Math.random() * 9000)}`;
+    const rawItems = sessionData.items || [];
+    const formattedItems = rawItems.map(i => ({
+      id: i.id || 1,
+      menuItemId: i.id || 1,
+      item_name: i.name || i.item_name || 'South Indian Dish',
+      price: parseFloat(i.price || 0),
+      quantity: parseInt(i.quantity || 1, 10),
+      subtotal: parseFloat(i.price || 0) * parseInt(i.quantity || 1, 10)
+    }));
+
+    const subtotal = parseFloat(sessionData.subtotal) || formattedItems.reduce((sum, i) => sum + i.subtotal, 0);
+    const tax = parseFloat(sessionData.tax) || parseFloat((subtotal * 0.05).toFixed(2));
+    const packingFee = parseFloat(sessionData.packingFee || sessionData.packing_charge) || 15;
+    const deliveryFee = parseFloat(sessionData.deliveryFee || sessionData.delivery_charge) || 30;
+    const discountAmount = parseFloat(sessionData.discountAmount || sessionData.discount_amount) || 0;
+    const totalAmount = parseFloat(sessionData.totalAmount || sessionData.total_amount) || (subtotal + tax + packingFee + deliveryFee - discountAmount);
+
+    const upiId = '11424716@indus';
+    const formattedAmount = totalAmount.toFixed(2);
+    const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=Dosa%20Junction&am=${formattedAmount}&cu=INR&tn=${encodeURIComponent(ref)}`;
+
+    const newSession = {
+      id: Date.now(),
+      payment_ref: ref,
+      customer_name: sessionData.customerName || 'Customer',
+      customer_phone: sessionData.customerPhone || '',
+      customer_email: sessionData.customerEmail || '',
+      delivery_address: sessionData.deliveryAddress || '',
+      order_type: sessionData.orderType || 'Home Delivery',
+      payment_method: 'Online UPI Payment',
+      subtotal,
+      tax,
+      packing_charge: packingFee,
+      delivery_charge: deliveryFee,
+      discount_amount: discountAmount,
+      total_amount: totalAmount,
+      cart_items: formattedItems,
+      status: 'Created',
+      upi_id: upiId,
+      upi_uri: upiUri,
+      created_at: new Date().toISOString()
+    };
+
+    const savedSessions = JSON.parse(localStorage.getItem('dakshin_payment_sessions') || '[]');
+    localStorage.setItem('dakshin_payment_sessions', JSON.stringify([newSession, ...savedSessions.filter(s => s.payment_ref !== ref)]));
+
+    return {
+      success: true,
+      message: 'Temporary payment session created.',
+      paymentRef: ref,
+      totalAmount,
+      upiUri,
+      upiId,
+      session: newSession
+    };
+  },
+
+  getPaymentSession: async (paymentRef) => {
+    try {
+      const res = await apiCall(`/payment-sessions/${paymentRef}`);
+      if (res && res.success) return res;
+    } catch (err) {}
+
+    const savedSessions = JSON.parse(localStorage.getItem('dakshin_payment_sessions') || '[]');
+    const session = savedSessions.find(s => String(s.payment_ref) === String(paymentRef));
+    let order = null;
+    if (session && session.order_number) {
+      const allOrders = JSON.parse(localStorage.getItem('dakshin_all_orders') || '[]');
+      order = allOrders.find(o => String(o.order_number) === String(session.order_number));
+    }
+    return { success: !!session, session: session || null, order };
+  },
+
+  submitPaymentSessionProof: async (paymentRef, data) => {
+    try {
+      const res = await apiCall(`/payment-sessions/${paymentRef}/proof`, 'POST', data);
+      if (res && res.success) return res;
+    } catch (err) {
+      if (err.message && err.message.includes('already')) throw err;
+    }
+
+    const savedSessions = JSON.parse(localStorage.getItem('dakshin_payment_sessions') || '[]');
+    const cleanUtr = (data.utrNumber || '').trim();
+
+    // Check duplicate UTR locally
+    const dup = savedSessions.find(s => s.utr_number && String(s.utr_number).toLowerCase() === cleanUtr.toLowerCase() && String(s.payment_ref) !== String(paymentRef) && s.status !== 'Rejected');
+    if (dup) {
+      throw new Error(`This UTR number (${cleanUtr}) has already been submitted for payment session #${dup.payment_ref}.`);
+    }
+
+    let updatedSession = null;
+    const newSessions = savedSessions.map(s => {
+      if (String(s.payment_ref) === String(paymentRef)) {
+        updatedSession = {
+          ...s,
+          utr_number: cleanUtr,
+          payment_screenshot: data.paymentScreenshot,
+          status: 'Verification Pending',
+          payment_proof_submitted_at: new Date().toISOString(),
+          rejection_reason: null
+        };
+        return updatedSession;
+      }
+      return s;
+    });
+
+    localStorage.setItem('dakshin_payment_sessions', JSON.stringify(newSessions));
+    return {
+      success: true,
+      message: 'Payment proof submitted successfully! Verification is pending.',
+      session: updatedSession
+    };
+  },
+
+  getAdminPaymentSessions: async (params = {}) => {
+    try {
+      const query = new URLSearchParams(params).toString();
+      const res = await apiCall(`/payment-sessions/admin/payment-sessions?${query}`);
+      if (res && res.success) return res;
+    } catch (err) {}
+
+    const savedSessions = JSON.parse(localStorage.getItem('dakshin_payment_sessions') || '[]');
+    return { success: true, count: savedSessions.length, sessions: savedSessions };
+  },
+
+  verifyPaymentSession: async (sessionId, data) => {
+    try {
+      const res = await apiCall(`/payment-sessions/admin/payment-sessions/${sessionId}/verify`, 'PATCH', data);
+      if (res && res.success) return res;
+    } catch (err) {}
+
+    const savedSessions = JSON.parse(localStorage.getItem('dakshin_payment_sessions') || '[]');
+    const allOrders = JSON.parse(localStorage.getItem('dakshin_all_orders') || '[]');
+    let targetSession = savedSessions.find(s => String(s.id) === String(sessionId) || String(s.payment_ref) === String(sessionId));
+
+    let createdOrder = null;
+    if (data.action === 'approve' && targetSession) {
+      const orderNum = `DJ-${Math.floor(1000 + Math.random() * 9000)}`;
+      createdOrder = {
+        id: Date.now(),
+        order_number: orderNum,
+        customer_name: targetSession.customer_name,
+        customer_phone: targetSession.customer_phone,
+        customer_email: targetSession.customer_email,
+        delivery_address: targetSession.delivery_address,
+        order_type: targetSession.order_type,
+        payment_method: 'Online UPI Payment',
+        payment_status: 'Payment Verified',
+        status: 'Confirmed',
+        subtotal: targetSession.subtotal,
+        tax: targetSession.tax,
+        packing_charge: targetSession.packing_charge,
+        delivery_charge: targetSession.delivery_charge,
+        discount_amount: targetSession.discount_amount,
+        total_amount: targetSession.total_amount,
+        items: targetSession.cart_items,
+        utr_number: targetSession.utr_number,
+        payment_screenshot: targetSession.payment_screenshot,
+        created_at: new Date().toISOString()
+      };
+      localStorage.setItem('dakshin_all_orders', JSON.stringify([createdOrder, ...allOrders]));
+
+      targetSession = { ...targetSession, status: 'Approved', order_id: createdOrder.id, order_number: createdOrder.order_number };
+    } else if (data.action === 'reject' && targetSession) {
+      targetSession = { ...targetSession, status: 'Rejected', rejection_reason: data.rejectionReason || 'Rejected by admin.' };
+    }
+
+    const updatedSessions = savedSessions.map(s => s.id === targetSession?.id ? targetSession : s);
+    localStorage.setItem('dakshin_payment_sessions', JSON.stringify(updatedSessions));
+
+    return {
+      success: true,
+      message: data.action === 'approve' ? 'Payment Approved & Order Created!' : 'Payment Rejected.',
+      order: createdOrder,
+      session: targetSession
+    };
+  },
+
   // Orders & Checkout (Supports Vercel Realtime Serverless Sync)
   createOrder: async (orderData) => {
     try {

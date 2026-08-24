@@ -24,6 +24,7 @@ import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
+import PaymentPage from './pages/PaymentPage';
 import OrderSuccessPage from './pages/OrderSuccessPage';
 import TrackOrderPage from './pages/TrackOrderPage';
 import CustomerProfilePage from './pages/CustomerProfilePage';
@@ -92,6 +93,7 @@ const App = () => {
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/cart" element={<CartPage />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
+                <Route path="/payment/:paymentRef" element={<PaymentPage />} />
                 <Route path="/order-success/:orderNumber" element={<OrderSuccessPage />} />
                 <Route path="/track" element={<TrackOrderPage />} />
                 <Route path="/track-order" element={<TrackOrderPage />} />

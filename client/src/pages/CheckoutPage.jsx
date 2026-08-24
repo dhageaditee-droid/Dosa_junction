@@ -128,12 +128,12 @@ const CheckoutPage = () => {
         }))
       };
 
-      const res = await apiService.createOrder(payload);
+      const res = await apiService.createPaymentSession(payload);
 
       if (res.success) {
-        if (addToast) addToast('Order placed successfully! 🎉', 'success');
+        if (addToast) addToast('Payment session created! Please complete UPI payment. ⚡', 'success');
         clearCart();
-        navigate(`/order-success/${res.orderNumber}`, { state: { order: res.order } });
+        navigate(`/payment/${res.paymentRef}`, { state: { session: res.session } });
       }
     } catch (err) {
       if (addToast) addToast(err.message || 'Order submission failed.', 'error');
@@ -458,7 +458,7 @@ const CheckoutPage = () => {
                 className="btn btn-primary"
                 style={{ width: '100%', padding: '0.9rem', fontSize: '1rem', fontWeight: 800, borderRadius: '12px' }}
               >
-                {placingOrder ? 'Processing...' : 'Place Order Now'} <CheckCircle2 size={20} />
+                {placingOrder ? 'Creating Payment Session...' : 'Proceed to Payment'} <CheckCircle2 size={20} />
               </button>
 
             </div>

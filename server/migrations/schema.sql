@@ -194,6 +194,40 @@ CREATE TABLE IF NOT EXISTS restaurant_settings (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Payment Sessions Table (Temporary Payment Reference PAY-DJ-XXXX before order creation)
+CREATE TABLE IF NOT EXISTS payment_sessions (
+    id SERIAL PRIMARY KEY,
+    payment_ref VARCHAR(50) UNIQUE NOT NULL,
+    customer_id INT REFERENCES customers(id) ON DELETE SET NULL,
+    customer_name VARCHAR(120) NOT NULL,
+    customer_phone VARCHAR(20) NOT NULL,
+    customer_email VARCHAR(150),
+    delivery_address TEXT,
+    landmark VARCHAR(150),
+    city VARCHAR(100),
+    pincode VARCHAR(20),
+    order_type VARCHAR(50) NOT NULL,
+    payment_method VARCHAR(50) DEFAULT 'Online UPI Payment',
+    subtotal NUMERIC(10, 2) NOT NULL CHECK (subtotal >= 0),
+    coupon_code VARCHAR(50),
+    discount_amount NUMERIC(10, 2) DEFAULT 0,
+    tax NUMERIC(10, 2) DEFAULT 0,
+    packing_charge NUMERIC(10, 2) DEFAULT 0,
+    delivery_charge NUMERIC(10, 2) DEFAULT 0,
+    total_amount NUMERIC(10, 2) NOT NULL CHECK (total_amount >= 0),
+    notes TEXT,
+    cart_items JSONB NOT NULL,
+    status VARCHAR(50) DEFAULT 'Created',
+    utr_number VARCHAR(100),
+    payment_screenshot TEXT,
+    rejection_reason TEXT,
+    payment_proof_submitted_at TIMESTAMP WITH TIME ZONE,
+    order_id INT REFERENCES orders(id) ON DELETE SET NULL,
+    order_number VARCHAR(50),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Indexes for maximum query performance
 CREATE INDEX IF NOT EXISTS idx_menu_items_category ON menu_items(category_id);
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
@@ -201,3 +235,5 @@ CREATE INDEX IF NOT EXISTS idx_orders_number ON orders(order_number);
 CREATE INDEX IF NOT EXISTS idx_offers_active ON offers(is_active);
 CREATE INDEX IF NOT EXISTS idx_coupons_code ON coupons(code);
 CREATE INDEX IF NOT EXISTS idx_payments_order ON payments(order_id);
+CREATE INDEX IF NOT EXISTS idx_payment_sessions_ref ON payment_sessions(payment_ref);
+CREATE INDEX IF NOT EXISTS idx_payment_sessions_utr ON payment_sessions(utr_number);

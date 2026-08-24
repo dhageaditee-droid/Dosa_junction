@@ -4,27 +4,32 @@ const CRUDCRUD_TOKENS = [
   'b2c7cdd91fb548f69456e69f9c521266'
 ];
 
+let memorySessionsStore = [];
 let memoryOrdersStore = [];
 
-const fetchCloudOrders = async () => {
-  if (memoryOrdersStore.length > 0) {
-    return memoryOrdersStore;
+const fetchCloudData = async () => {
+  if (memorySessionsStore.length > 0 || memoryOrdersStore.length > 0) {
+    return;
   }
 
   for (const token of CRUDCRUD_TOKENS) {
     try {
-      const res = await fetch(`https://crudcrud.com/api/${token}/orders`);
+      const res = await fetch(`https://crudcrud.com/api/${token}/payment_sessions`);
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) {
-          memoryOrdersStore = data;
-          return memoryOrdersStore;
+          memorySessionsStore = data;
+        }
+      }
+      const orderRes = await fetch(`https://crudcrud.com/api/${token}/orders`);
+      if (orderRes.ok) {
+        const oData = await orderRes.json();
+        if (Array.isArray(oData) && oData.length > 0) {
+          memoryOrdersStore = oData;
         }
       }
     } catch (e) {}
   }
-
-  return memoryOrdersStore;
 };
 
 module.exports = async function handler(req, res) {
@@ -41,99 +46,102 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    if (req.method === 'DELETE') {
-      memoryOrdersStore = [];
-      for (const token of CRUDCRUD_TOKENS) {
-        try {
-          const res = await fetch(`https://crudcrud.com/api/${token}/orders`);
-          if (res.ok) {
-            const data = await res.json();
-            if (Array.isArray(data)) {
-              for (const item of data) {
-                if (item._id) {
-                  await fetch(`https://crudcrud.com/api/${token}/orders/${item._id}`, { method: 'DELETE' });
-                }
-              }
-            }
-          }
-        } catch (e) {}
+    await fetchCloudData();
+
+    if (req.method === 'GET') {
+      const { paymentRef, orderNumber } = req.query;
+
+      if (paymentRef) {
+        const session = memorySessionsStore.find(s => String(s.payment_ref) === String(paymentRef));
+        if (!session) {
+          return res.status(404).json({ success: false, message: 'Payment session reference not found.' });
+        }
+        let order = null;
+        if (session.order_number) {
+          order = memoryOrdersStore.find(o => String(o.order_number) === String(session.order_number));
+        }
+        return res.status(200).json({ success: true, session, order });
       }
-      return res.status(200).json({ success: true, message: 'All orders cleared successfully' });
+
+      if (orderNumber) {
+        const order = memoryOrdersStore.find(o => String(o.order_number) === String(orderNumber));
+        if (!order) {
+          return res.status(404).json({ success: false, message: 'Order not found.' });
+        }
+        return res.status(200).json({ success: true, order });
+      }
+
+      return res.status(200).json({
+        success: true,
+        sessions: memorySessionsStore,
+        orders: memoryOrdersStore
+      });
     }
 
-    let currentOrders = await fetchCloudOrders();
-
     if (req.method === 'POST') {
-      const orderData = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
+      const payload = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
 
-      // Check if this is a payment proof submission
-      if (orderData.utrNumber || orderData.paymentScreenshot) {
-        const cleanUtr = (orderData.utrNumber || '').trim();
-        const targetNum = orderData.orderNumber || orderData.order_number;
+      // 1. Submit Payment Proof for Session
+      if (payload.utrNumber || payload.paymentScreenshot) {
+        const cleanUtr = (payload.utrNumber || '').trim();
+        const ref = payload.paymentRef || payload.payment_ref;
 
-        // Check duplicate UTR
         if (cleanUtr) {
-          const dup = memoryOrdersStore.find(o => 
-            o.utr_number && 
-            String(o.utr_number).trim().toLowerCase() === cleanUtr.toLowerCase() && 
-            String(o.order_number) !== String(targetNum) &&
-            o.payment_status !== 'Payment Rejected'
+          const dupSess = memorySessionsStore.find(s => 
+            s.utr_number && 
+            String(s.utr_number).toLowerCase() === cleanUtr.toLowerCase() &&
+            String(s.payment_ref) !== String(ref) &&
+            s.status !== 'Rejected'
           );
-
-          if (dup) {
+          if (dupSess) {
             return res.status(400).json({
               success: false,
-              message: `This UTR number (${cleanUtr}) has already been submitted for order #${dup.order_number}.`
+              message: `This UTR number (${cleanUtr}) has already been submitted for payment session #${dupSess.payment_ref}.`
             });
           }
         }
 
-        let updatedOrder = null;
-        memoryOrdersStore = memoryOrdersStore.map(ord => {
-          if (String(ord.order_number) === String(targetNum) || String(ord.id) === String(targetNum)) {
-            updatedOrder = {
-              ...ord,
-              utr_number: cleanUtr || ord.utr_number,
-              payment_screenshot: orderData.paymentScreenshot || ord.payment_screenshot,
-              payment_status: 'Payment Verification Pending',
+        let updatedSession = null;
+        memorySessionsStore = memorySessionsStore.map(s => {
+          if (String(s.payment_ref) === String(ref)) {
+            updatedSession = {
+              ...s,
+              utr_number: cleanUtr || s.utr_number,
+              payment_screenshot: payload.paymentScreenshot || s.payment_screenshot,
+              status: 'Verification Pending',
               payment_proof_submitted_at: new Date().toISOString(),
               rejection_reason: null
             };
-            return updatedOrder;
+            return updatedSession;
           }
-          return ord;
+          return s;
         });
 
-        if (updatedOrder) {
-          for (const token of CRUDCRUD_TOKENS) {
-            try {
-              await fetch(`https://crudcrud.com/api/${token}/orders`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updatedOrder)
-              });
-              break;
-            } catch (e) {}
-          }
+        if (!updatedSession && ref) {
+          updatedSession = {
+            id: Date.now(),
+            payment_ref: ref,
+            utr_number: cleanUtr,
+            payment_screenshot: payload.paymentScreenshot,
+            status: 'Verification Pending',
+            payment_proof_submitted_at: new Date().toISOString()
+          };
+          memorySessionsStore.unshift(updatedSession);
         }
 
         return res.status(200).json({
           success: true,
           message: 'Payment proof submitted successfully! Verification is pending.',
-          order: updatedOrder
+          session: updatedSession
         });
       }
 
-      // Create new order
-      const orderNum = orderData.order_number || `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
-
-      const rawItems = orderData.items || [];
+      // 2. Create Temporary Payment Session (Proceed to Payment)
+      const rawItems = payload.items || [];
       const items = rawItems.map(i => {
         const itemName = i.item_name || i.name || 'South Indian Dish';
         const itemPrice = parseFloat(i.price || i.item_price || 0);
         const qty = parseInt(i.quantity || 1, 10);
-        const itemSubtotal = itemPrice * qty;
-
         return {
           id: i.id || 1,
           menuItemId: i.id || 1,
@@ -141,150 +149,134 @@ module.exports = async function handler(req, res) {
           name: itemName,
           price: itemPrice,
           quantity: qty,
-          subtotal: itemSubtotal
+          subtotal: itemPrice * qty
         };
       });
 
-      const calculatedSubtotal = items.reduce((sum, i) => sum + (parseFloat(i.subtotal) || 0), 0);
-      const subtotal = parseFloat(orderData.subtotal) > 0 ? parseFloat(orderData.subtotal) : calculatedSubtotal;
+      const subtotal = items.reduce((sum, i) => sum + i.subtotal, 0);
+      const packing_charge = parseFloat(payload.packingFee || payload.packing_charge) || (payload.orderType === 'Dine In' ? 0 : 15);
+      const delivery_charge = parseFloat(payload.deliveryFee || payload.delivery_charge) || (payload.orderType === 'Home Delivery' ? 30 : 0);
+      const tax = parseFloat(payload.tax) || parseFloat((subtotal * 0.05).toFixed(2));
+      const discount_amount = parseFloat(payload.discountAmount || payload.discount_amount) || 0;
+      const total_amount = subtotal + tax + packing_charge + delivery_charge - discount_amount;
 
-      const packing_charge = parseFloat(orderData.packingFee || orderData.packing_charge) || (orderData.orderType === 'Dine In' || orderData.orderType === 'Dine-In' ? 0 : 15);
-      const delivery_charge = parseFloat(orderData.deliveryFee || orderData.delivery_charge) || (orderData.orderType === 'Home Delivery' ? 30 : 0);
-      const tax = parseFloat(orderData.tax) || parseFloat((subtotal * 0.05).toFixed(2));
-      const discount_amount = parseFloat(orderData.discountAmount || orderData.discount_amount) || 0;
-
-      const calculatedTotal = subtotal + tax + packing_charge + delivery_charge - discount_amount;
-      const total_amount = parseFloat(orderData.totalAmount || orderData.total_amount) > 0
-        ? parseFloat(orderData.totalAmount || orderData.total_amount)
-        : calculatedTotal;
-
+      const paymentRef = payload.paymentRef || `PAY-DJ-${Math.floor(1000 + Math.random() * 9000)}`;
       const upiId = '11424716@indus';
       const formattedAmount = total_amount.toFixed(2);
-      const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=Dosa%20Junction&am=${formattedAmount}&cu=INR&tn=${encodeURIComponent(orderNum)}`;
-      const isUpi = !orderData.paymentMethod || (orderData.paymentMethod.includes('UPI') || orderData.paymentMethod.includes('QR'));
+      const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=Dosa%20Junction&am=${formattedAmount}&cu=INR&tn=${encodeURIComponent(paymentRef)}`;
 
-      const newOrder = {
+      const newSession = {
         id: Date.now(),
-        order_number: orderNum,
-        customer_name: orderData.customerName || orderData.customer_name || 'Customer',
-        customer_phone: orderData.phone || orderData.customerPhone || orderData.customer_phone || '',
-        customer_email: orderData.email || orderData.customerEmail || '',
-        delivery_address: orderData.deliveryAddress || orderData.address || '',
-        order_type: orderData.orderType || orderData.order_type || 'Home Delivery',
-        payment_method: orderData.paymentMethod || orderData.payment_method || 'UPI / Dynamic QR Code',
-        payment_status: isUpi ? 'Payment Verification Pending' : (orderData.payment_status || 'PENDING'),
-        status: orderData.status || 'Pending',
-        subtotal: subtotal,
-        tax: tax,
-        packing_charge: packing_charge,
-        delivery_charge: delivery_charge,
-        discount_amount: discount_amount,
-        total_amount: total_amount,
-        items: items,
+        payment_ref: paymentRef,
+        customer_name: payload.customerName || payload.customer_name || 'Customer',
+        customer_phone: payload.phone || payload.customerPhone || payload.customer_phone || '',
+        customer_email: payload.email || payload.customerEmail || '',
+        delivery_address: payload.deliveryAddress || payload.address || '',
+        order_type: payload.orderType || payload.order_type || 'Home Delivery',
+        payment_method: 'Online UPI Payment',
+        subtotal,
+        tax,
+        packing_charge,
+        delivery_charge,
+        discount_amount,
+        total_amount,
+        cart_items: items,
+        status: 'Created',
         upi_id: upiId,
         upi_uri: upiUri,
-        created_at: orderData.created_at || new Date().toISOString()
+        created_at: new Date().toISOString()
       };
 
-      // Add to memory store immediately
-      memoryOrdersStore = [newOrder, ...memoryOrdersStore.filter(o => o.order_number !== newOrder.order_number)];
-
-      // Sync to cloud token
-      for (const token of CRUDCRUD_TOKENS) {
-        try {
-          const cloudRes = await fetch(`https://crudcrud.com/api/${token}/orders`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newOrder)
-          });
-          if (cloudRes.ok) break;
-        } catch (e) {}
-      }
+      memorySessionsStore = [newSession, ...memorySessionsStore.filter(s => s.payment_ref !== paymentRef)];
 
       return res.status(201).json({
         success: true,
-        message: 'Order placed successfully!',
-        orderNumber: orderNum,
+        message: 'Temporary payment session created. Please complete UPI payment.',
+        paymentRef,
+        totalAmount: total_amount,
         upiUri,
         upiId,
-        order: newOrder
+        session: newSession
       });
     }
 
     if (req.method === 'PATCH' || req.method === 'PUT') {
-      const updateData = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
-      const targetId = updateData.id || updateData.order_id;
-      const targetNum = updateData.order_number || updateData.orderNumber;
-      const action = updateData.action;
+      const payload = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
+      const sessionId = payload.id || payload.session_id;
+      const ref = payload.paymentRef || payload.payment_ref;
+      const action = payload.action;
 
-      let newStatus = updateData.status;
-      let newPayStatus = updateData.payment_status || updateData.paymentStatus;
-      let rejectionReason = updateData.rejectionReason;
+      let updatedSession = null;
+      let createdOrder = null;
 
       if (action === 'approve') {
-        newPayStatus = 'Payment Verified';
-        newStatus = 'Confirmed';
-      } else if (action === 'reject') {
-        newPayStatus = 'Payment Rejected';
-      }
+        const targetSession = memorySessionsStore.find(s => String(s.id) === String(sessionId) || String(s.payment_ref) === String(ref));
 
-      await fetchCloudOrders();
+        if (targetSession) {
+          if (targetSession.order_number) {
+            createdOrder = memoryOrdersStore.find(o => String(o.order_number) === String(targetSession.order_number));
+          }
 
-      let updatedOrder = null;
-      memoryOrdersStore = memoryOrdersStore.map(ord => {
-        const isMatch = (targetId && String(ord.id) === String(targetId)) ||
-                        (targetNum && String(ord.order_number) === String(targetNum)) ||
-                        (targetId && String(ord.order_number) === String(targetId)) ||
-                        (targetNum && String(ord.id) === String(targetNum));
-        if (isMatch) {
-          updatedOrder = {
-            ...ord,
-            ...(newStatus ? { status: newStatus } : {}),
-            ...(newPayStatus ? { payment_status: newPayStatus } : {}),
-            ...(rejectionReason ? { rejection_reason: rejectionReason } : (action === 'approve' ? { rejection_reason: null } : {}))
+          if (!createdOrder) {
+            const orderNum = `DJ-${Math.floor(1000 + Math.random() * 9000)}`;
+            const cartItems = typeof targetSession.cart_items === 'string' ? JSON.parse(targetSession.cart_items) : (targetSession.cart_items || []);
+
+            createdOrder = {
+              id: Date.now(),
+              order_number: orderNum,
+              customer_name: targetSession.customer_name,
+              customer_phone: targetSession.customer_phone,
+              customer_email: targetSession.customer_email,
+              delivery_address: targetSession.delivery_address,
+              order_type: targetSession.order_type,
+              payment_method: 'Online UPI Payment',
+              payment_status: 'Payment Verified',
+              status: 'Confirmed',
+              subtotal: targetSession.subtotal,
+              tax: targetSession.tax,
+              packing_charge: targetSession.packing_charge,
+              delivery_charge: targetSession.delivery_charge,
+              discount_amount: targetSession.discount_amount,
+              total_amount: targetSession.total_amount,
+              items: cartItems,
+              utr_number: targetSession.utr_number,
+              payment_screenshot: targetSession.payment_screenshot,
+              created_at: new Date().toISOString()
+            };
+            memoryOrdersStore.unshift(createdOrder);
+          }
+
+          updatedSession = {
+            ...targetSession,
+            status: 'Approved',
+            order_id: createdOrder.id,
+            order_number: createdOrder.order_number
           };
-          return updatedOrder;
-        }
-        return ord;
-      });
 
-      if (!updatedOrder && (targetId || targetNum)) {
-        updatedOrder = {
-          id: targetId || Date.now(),
-          order_number: targetNum || targetId,
-          status: newStatus || 'Confirmed',
-          payment_status: newPayStatus || 'Payment Verified',
-          created_at: new Date().toISOString()
-        };
-        memoryOrdersStore.unshift(updatedOrder);
-      }
-
-      if (updatedOrder) {
-        for (const token of CRUDCRUD_TOKENS) {
-          try {
-            await fetch(`https://crudcrud.com/api/${token}/orders`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(updatedOrder)
-            });
-            break;
-          } catch (e) {}
+          memorySessionsStore = memorySessionsStore.map(s => s.id === targetSession.id ? updatedSession : s);
         }
+      } else if (action === 'reject') {
+        memorySessionsStore = memorySessionsStore.map(s => {
+          if (String(s.id) === String(sessionId) || String(s.payment_ref) === String(ref)) {
+            updatedSession = {
+              ...s,
+              status: 'Rejected',
+              rejection_reason: payload.rejectionReason || 'Verification failed.'
+            };
+            return updatedSession;
+          }
+          return s;
+        });
       }
 
       return res.status(200).json({
         success: true,
-        message: 'Order status updated successfully',
-        order: updatedOrder,
-        orders: memoryOrdersStore
+        message: action === 'approve' ? `Payment approved! Order #${createdOrder?.order_number} placed.` : 'Payment rejected.',
+        order: createdOrder,
+        session: updatedSession
       });
     }
 
-    return res.status(200).json({
-      success: true,
-      count: memoryOrdersStore.length,
-      orders: memoryOrdersStore
-    });
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });
   }
