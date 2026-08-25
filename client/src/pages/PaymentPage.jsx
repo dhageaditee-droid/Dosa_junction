@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate, Link } from 'react-router-dom';
-import { QRCodeSVG } from 'qrcode.react';
 import { Clock, ShieldCheck, CheckCircle2, AlertTriangle, ExternalLink, Upload, FileCheck, ArrowRight, Compass, RefreshCw, Copy } from 'lucide-react';
 import SEOHead from '../components/SEOHead';
 import { apiService } from '../services/api';
@@ -54,19 +53,12 @@ const PaymentPage = () => {
   const totalAmountFormatted = totalAmountNum.toFixed(2);
   const upiId = (session?.upi_id || '11424716@indus').trim();
 
-  // 1, 2, 3. Standard NPCI UPI URI Structure:
-  // upi://pay?pa=UPI_ID&pn=Dosa%20Junction&am=ORDER_AMOUNT&cu=INR&tn=PAYMENT_REFERENCE
-  const cleanRef = (paymentRef || 'PAYDJ1001').replace(/[^a-zA-Z0-9]/g, '');
-  const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent('Dosa Junction')}&am=${totalAmountFormatted}&cu=INR&tn=${cleanRef}`;
-
-  // 4. Log generated UPI URI in development mode
-  useEffect(() => {
-    if (session && upiUri) {
-      if (process.env.NODE_ENV !== 'production' || window.location.hostname === 'localhost') {
-        console.log('[UPI Deep Link Generated]:', upiUri);
-      }
-    }
-  }, [session, upiUri]);
+  // Clean UPI URIs (without am & tn parameters to avoid P2P VPA intent errors)
+  const encodedName = encodeURIComponent('Dosa Junction');
+  const cleanUpiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodedName}`;
+  const phonepeUri = `phonepe://pay?pa=${encodeURIComponent(upiId)}&pn=${encodedName}`;
+  const gpayUri = `gpay://upi/pay?pa=${encodeURIComponent(upiId)}&pn=${encodedName}`;
+  const paytmUri = `paytmmp://pay?pa=${encodeURIComponent(upiId)}&pn=${encodedName}`;
 
   const copyToClipboard = (text, typeLabel) => {
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -80,56 +72,6 @@ const PaymentPage = () => {
       document.execCommand('copy');
       document.body.removeChild(input);
       if (addToast) addToast(`${typeLabel} copied to clipboard!`, 'success');
-    }
-  };
-
-  // 6, 7, 8, 9, 10. Handler for "Pay with UPI App" button
-  const handlePayWithUpiApp = (e) => {
-    e.preventDefault();
-    setErrorMsg('');
-
-    // 8. Pre-launch Validation Guard
-    if (!upiId || typeof upiId !== 'string' || !upiId.includes('@')) {
-      setErrorMsg('Invalid UPI ID configured.');
-      return;
-    }
-
-    if (isNaN(totalAmountNum) || totalAmountNum <= 0) {
-      setErrorMsg('Payment amount must be greater than ₹0.00.');
-      return;
-    }
-
-    if (!/^\d+(\.\d{1,2})?$/.test(totalAmountFormatted)) {
-      setErrorMsg('Amount formatting invalid.');
-      return;
-    }
-
-    if (!paymentRef || !paymentRef.trim()) {
-      setErrorMsg('Payment reference missing.');
-      return;
-    }
-
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-    // 7. Desktop Scoping: Do not redirect desktop users directly
-    if (!isMobile) {
-      if (addToast) addToast('Desktop detected: Please scan the QR code using your mobile UPI app.', 'info');
-      return;
-    }
-
-    // 6 & 9. On mobile, launch via window.location.href = upiUri with fallback error catch
-    try {
-      const startTime = Date.now();
-      window.location.href = upiUri;
-
-      // 9. Fallback if UPI app fails to open
-      setTimeout(() => {
-        if (Date.now() - startTime < 2000 && !document.hidden) {
-          setErrorMsg('Unable to open UPI app. Please scan the QR code instead.');
-        }
-      }, 1500);
-    } catch (err) {
-      setErrorMsg('Unable to open UPI app. Please scan the QR code instead.');
     }
   };
 
@@ -248,7 +190,7 @@ const PaymentPage = () => {
             margin: '0.5rem 0 1.2rem 0'
           }}>
             <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', display: 'block', textTransform: 'uppercase', fontWeight: 700 }}>
-              Amount to Pay
+              Payable Amount
             </span>
             <span style={{ fontSize: '2.4rem', fontWeight: 900, color: '#D97706', letterSpacing: '-0.5px' }}>
               ₹{totalAmountFormatted}
@@ -324,7 +266,7 @@ const PaymentPage = () => {
 
         </div>
 
-        {/* Dynamic UPI QR Box (Only shown if NOT approved) */}
+        {/* Static UPI Scanner Box (Only shown if NOT approved) */}
         {!isApproved && (
           <div style={{
             backgroundColor: '#FFFFFF',
@@ -336,7 +278,7 @@ const PaymentPage = () => {
             marginBottom: '2rem'
           }}>
             <span style={{ fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--color-text-muted)', fontWeight: 700, letterSpacing: '0.5px' }}>
-              Dynamic Order UPI QR Code
+              Dosa Junction Official Scanner
             </span>
             
             <h2 style={{
@@ -349,7 +291,7 @@ const PaymentPage = () => {
               Pay ₹{totalAmountFormatted}
             </h2>
 
-            {/* Dosa Junction Official Scanner */}
+            {/* User Static QR Image */}
             <div style={{
               display: 'inline-block',
               backgroundColor: '#FFFFFF',
@@ -409,7 +351,7 @@ const PaymentPage = () => {
 
               <div style={{ borderTop: '1px dashed #F59E0B', paddingTop: '0.6rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
                 <div style={{ textAlign: 'left' }}>
-                  <span style={{ fontSize: '0.76rem', color: '#B45309', fontWeight: 700, display: 'block', textTransform: 'uppercase' }}>Exact Payable Amount:</span>
+                  <span style={{ fontSize: '0.76rem', color: '#B45309', fontWeight: 700, display: 'block', textTransform: 'uppercase' }}>Payable Amount:</span>
                   <strong style={{ fontSize: '1.1rem', color: '#78350F' }}>₹{totalAmountFormatted}</strong>
                 </div>
                 <button
@@ -423,40 +365,84 @@ const PaymentPage = () => {
               </div>
             </div>
 
-            {/* 5, 6, 7. Mobile "Pay with UPI App" Button Uses EXACT SAME upiUri */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem', marginBottom: '1.2rem' }}>
-              <button
-                type="button"
-                onClick={handlePayWithUpiApp}
-                className="btn btn-primary"
+            {/* Direct App Deep Links */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', width: '100%', maxWidth: '420px', margin: '0 auto 1.2rem auto' }}>
+              <a
+                href={cleanUpiUri}
+                className="btn"
                 style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  backgroundColor: 'var(--color-emerald)',
+                  backgroundColor: '#0F3825',
                   color: '#FFFFFF',
-                  padding: '0.85rem 2rem',
-                  borderRadius: '14px',
+                  padding: '0.85rem 1.4rem',
+                  borderRadius: '12px',
                   fontWeight: 800,
-                  fontSize: '1rem',
-                  cursor: 'pointer',
-                  boxShadow: '0 4px 14px rgba(6, 78, 59, 0.3)'
+                  fontSize: '0.95rem',
+                  textDecoration: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  boxShadow: '0 4px 12px rgba(15, 56, 37, 0.25)'
                 }}
               >
-                <ExternalLink size={18} /> Pay with UPI App (GPay / PhonePe / Paytm)
-              </button>
-              
-              <span style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>
-                💡 If automatic app launch shows an error on your phone:
-                <br />
-                <strong>Click "Copy UPI ID" above → Open GPay/PhonePe/Paytm → Send ₹{totalAmountFormatted} to {upiId}</strong>
-              </span>
+                <ExternalLink size={18} /> Open Any UPI App (GPay / PhonePe / Paytm)
+              </a>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
+                <a
+                  href={phonepeUri}
+                  style={{
+                    backgroundColor: '#5F259F',
+                    color: '#FFFFFF',
+                    padding: '0.65rem 0.5rem',
+                    borderRadius: '10px',
+                    fontWeight: 800,
+                    fontSize: '0.82rem',
+                    textDecoration: 'none',
+                    textAlign: 'center'
+                  }}
+                >
+                  💜 PhonePe
+                </a>
+
+                <a
+                  href={gpayUri}
+                  style={{
+                    backgroundColor: '#1A73E8',
+                    color: '#FFFFFF',
+                    padding: '0.65rem 0.5rem',
+                    borderRadius: '10px',
+                    fontWeight: 800,
+                    fontSize: '0.82rem',
+                    textDecoration: 'none',
+                    textAlign: 'center'
+                  }}
+                >
+                  💙 Google Pay
+                </a>
+
+                <a
+                  href={paytmUri}
+                  style={{
+                    backgroundColor: '#00BAF2',
+                    color: '#FFFFFF',
+                    padding: '0.65rem 0.5rem',
+                    borderRadius: '10px',
+                    fontWeight: 800,
+                    fontSize: '0.82rem',
+                    textDecoration: 'none',
+                    textAlign: 'center'
+                  }}
+                >
+                  🔷 Paytm
+                </a>
+              </div>
             </div>
 
           </div>
         )}
 
-        {/* 11. Payment Proof Submission Form (Required: Screenshot + UTR) */}
+        {/* Payment Proof Submission Form (Required: Screenshot + UTR) */}
         {!isApproved && (
           <form onSubmit={handleSubmitProof} style={{
             backgroundColor: '#FFFFFF',
