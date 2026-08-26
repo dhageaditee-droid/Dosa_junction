@@ -102,14 +102,15 @@ const PaymentPage = () => {
     try {
       setSubmitting(true);
       setErrorMsg('');
+      const generatedProofRef = utrNumber.trim() || `PROOF-${Date.now()}`;
       const res = await apiService.submitPaymentSessionProof(paymentRef, {
-        utrNumber: utrNumber ? utrNumber.trim() : '',
+        utrNumber: generatedProofRef,
         paymentScreenshot: screenshotPreview
       });
 
       if (res && res.success) {
         setSession(res.session);
-        if (addToast) addToast('Payment proof submitted! Verification is pending.', 'success');
+        if (addToast) addToast('Payment screenshot submitted! Verification is pending.', 'success');
       }
     } catch (err) {
       const msg = err.message || 'Failed to submit payment proof.';
@@ -457,10 +458,10 @@ const PaymentPage = () => {
               alignItems: 'center',
               gap: '8px'
             }}>
-              <FileCheck size={22} color="var(--color-gold)" /> Payment completed? Upload payment screenshot
+              <FileCheck size={22} color="var(--color-gold)" /> Already paid? Submit payment proof
             </h3>
             <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>
-              Please upload your payment screenshot below. Your order will be confirmed after admin verification.
+              Please upload your payment completion screenshot below to verify your payment.
             </p>
 
             {errorMsg && (

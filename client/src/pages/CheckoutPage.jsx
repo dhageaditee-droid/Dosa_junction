@@ -458,7 +458,7 @@ const CheckoutPage = () => {
                 className="btn btn-primary"
                 style={{ width: '100%', padding: '0.9rem', fontSize: '1rem', fontWeight: 800, borderRadius: '12px' }}
               >
-                {placingOrder ? 'Creating Payment Session...' : 'Proceed to Payment'} <CheckCircle2 size={20} />
+                {placingOrder ? 'Placing Order...' : 'Place Order Now'} <CheckCircle2 size={20} />
               </button>
 
             </div>

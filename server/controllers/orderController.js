@@ -241,11 +241,15 @@ const submitPaymentSessionProof = async (req, res, next) => {
     const { paymentRef } = req.params;
     const { utrNumber, paymentScreenshot } = req.body;
 
+    if (!utrNumber || !utrNumber.trim()) {
+      return res.status(400).json({ success: false, message: 'UPI Transaction ID / UTR is required.' });
+    }
+
     if (!paymentScreenshot || !paymentScreenshot.trim()) {
       return res.status(400).json({ success: false, message: 'Payment screenshot proof is required.' });
     }
 
-    const cleanUtr = utrNumber && utrNumber.trim() ? utrNumber.trim() : null;
+    const cleanUtr = utrNumber.trim();
 
     const sessionRes = await client.query('SELECT * FROM payment_sessions WHERE payment_ref = $1', [paymentRef.trim()]);
     if (sessionRes.rows.length === 0) {
@@ -253,36 +257,34 @@ const submitPaymentSessionProof = async (req, res, next) => {
     }
     const session = sessionRes.rows[0];
 
-    if (cleanUtr) {
-      // Check duplicate UTR across all other non-rejected payment sessions & orders
-      const dupSession = await client.query(
-        `SELECT id, payment_ref FROM payment_sessions 
-         WHERE LOWER(utr_number) = LOWER($1) 
-           AND id != $2 
-           AND status != 'Rejected'`,
-        [cleanUtr, session.id]
-      );
+    // Check duplicate UTR across all other non-rejected payment sessions & orders
+    const dupSession = await client.query(
+      `SELECT id, payment_ref FROM payment_sessions 
+       WHERE LOWER(utr_number) = LOWER($1) 
+         AND id != $2 
+         AND status != 'Rejected'`,
+      [cleanUtr, session.id]
+    );
 
-      if (dupSession.rows.length > 0) {
-        return res.status(400).json({
-          success: false,
-          message: `This UTR number (${cleanUtr}) has already been submitted for payment session #${dupSession.rows[0].payment_ref}. Duplicate UTR numbers cannot be reused.`
-        });
-      }
+    if (dupSession.rows.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `This UTR number (${cleanUtr}) has already been submitted for payment session #${dupSession.rows[0].payment_ref}. Duplicate UTR numbers cannot be reused.`
+      });
+    }
 
-      const dupOrder = await client.query(
-        `SELECT id, order_number FROM orders 
-         WHERE LOWER(utr_number) = LOWER($1) 
-           AND payment_status != 'Payment Rejected'`,
-        [cleanUtr]
-      );
+    const dupOrder = await client.query(
+      `SELECT id, order_number FROM orders 
+       WHERE LOWER(utr_number) = LOWER($1) 
+         AND payment_status != 'Payment Rejected'`,
+      [cleanUtr]
+    );
 
-      if (dupOrder.rows.length > 0) {
-        return res.status(400).json({
-          success: false,
-          message: `This UTR number (${cleanUtr}) has already been used for order #${dupOrder.rows[0].order_number}.`
-        });
-      }
+    if (dupOrder.rows.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `This UTR number (${cleanUtr}) has already been used for order #${dupOrder.rows[0].order_number}.`
+      });
     }
 
     const updatedRes = await client.query(
