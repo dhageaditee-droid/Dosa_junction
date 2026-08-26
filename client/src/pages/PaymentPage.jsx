@@ -159,10 +159,6 @@ const PaymentPage = () => {
 
   const handleSubmitProof = async (e) => {
     e.preventDefault();
-    if (!utrNumber.trim()) {
-      setErrorMsg('Please enter your 12-digit UPI UTR / Transaction ID.');
-      return;
-    }
     if (!screenshotPreview) {
       setErrorMsg('Please upload your payment screenshot.');
       return;
@@ -171,8 +167,9 @@ const PaymentPage = () => {
     try {
       setSubmitting(true);
       setErrorMsg('');
+      const finalUtrRef = utrNumber.trim() || `PROOF-${Date.now()}`;
       const res = await apiService.submitPaymentSessionProof(paymentRef, {
-        utrNumber: utrNumber.trim(),
+        utrNumber: finalUtrRef,
         paymentScreenshot: screenshotPreview
       });
 
@@ -778,21 +775,20 @@ const PaymentPage = () => {
               <FileCheck size={22} color="#D97706" /> Payment completed? Upload payment screenshot
             </h3>
             <p style={{ fontSize: '0.84rem', color: '#6B7280', marginBottom: '1.4rem' }}>
-              Please upload your payment screenshot and enter your 12-digit UTR / Transaction ID below to verify your payment.
+              Please upload your payment screenshot to verify your payment. (UTR number is optional)
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-              {/* Mandatory 12-digit UTR Input */}
+              {/* Optional 12-digit UTR Input */}
               <div>
                 <label style={{ display: 'block', fontSize: '0.86rem', fontWeight: 800, color: '#064E3B', marginBottom: '6px' }}>
-                  Enter UTR / Transaction ID *
+                  Enter UTR / Transaction ID (Optional)
                 </label>
                 <input
                   type="text"
                   value={utrNumber}
                   onChange={(e) => setUtrNumber(e.target.value)}
-                  placeholder="e.g. 423456789012"
-                  required
+                  placeholder="e.g. 423456789012 (Optional)"
                   style={{
                     width: '100%',
                     padding: '0.8rem 1rem',
