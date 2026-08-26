@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate, Link } from 'react-router-dom';
-import { Clock, ShieldCheck, CheckCircle2, AlertTriangle, ExternalLink, Upload, FileCheck, ArrowRight, Compass, RefreshCw, Copy } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
+import { Clock, ShieldCheck, CheckCircle2, AlertTriangle, ExternalLink, Upload, FileCheck, ArrowRight, Compass, RefreshCw, Copy, Smartphone, Monitor } from 'lucide-react';
 import SEOHead from '../components/SEOHead';
 import { apiService } from '../services/api';
 import { useToast } from '../context/ToastContext';
@@ -18,6 +19,14 @@ const PaymentPage = () => {
   const [screenshotPreview, setScreenshotPreview] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+    };
+    checkMobile();
+  }, []);
 
   const fetchSessionDetails = async () => {
     if (!paymentRef) return;
@@ -44,21 +53,31 @@ const PaymentPage = () => {
 
   useEffect(() => {
     fetchSessionDetails();
-    // Auto-poll session status every 5 seconds to detect Admin approval/rejection
+    // Auto-poll session status every 5 seconds for Admin approval/rejection
     const interval = setInterval(fetchSessionDetails, 5000);
     return () => clearInterval(interval);
   }, [paymentRef]);
 
   const totalAmountNum = parseFloat(session?.total_amount || 0);
   const totalAmountFormatted = totalAmountNum.toFixed(2);
-  const upiId = (session?.upi_id || '11424716@indus').trim();
+  const upiId = (session?.upi_id || 'Pos.11424716@indus').trim();
 
-  // Clean UPI URIs (without am & tn parameters to avoid P2P VPA intent errors)
-  const encodedName = encodeURIComponent('Dosa Junction');
-  const cleanUpiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodedName}`;
-  const phonepeUri = `phonepe://pay?pa=${encodeURIComponent(upiId)}&pn=${encodedName}`;
-  const gpayUri = `gpay://upi/pay?pa=${encodeURIComponent(upiId)}&pn=${encodedName}`;
-  const paytmUri = `paytmmp://pay?pa=${encodeURIComponent(upiId)}&pn=${encodedName}`;
+  // 3 & 4. Standard POS UPI Payment URI format:
+  // upi://pay?pa=Pos.11424716@indus&pn=Dosa%20Junction&am={TOTAL_AMOUNT}&cu=INR&tn={ORDER_ID}
+  const cleanRef = (paymentRef || 'DJ1001').replace(/[^a-zA-Z0-9]/g, '');
+  const exactUpiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent('Dosa Junction')}&am=${totalAmountFormatted}&cu=INR&tn=${cleanRef}`;
+  const phonepeUri = `phonepe://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent('Dosa Junction')}&am=${totalAmountFormatted}&cu=INR&tn=${cleanRef}`;
+  const gpayUri = `gpay://upi/pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent('Dosa Junction')}&am=${totalAmountFormatted}&cu=INR&tn=${cleanRef}`;
+  const paytmUri = `paytmmp://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent('Dosa Junction')}&am=${totalAmountFormatted}&cu=INR&tn=${cleanRef}`;
+
+  // Log exact generated URI in development mode
+  useEffect(() => {
+    if (session && exactUpiUri) {
+      if (process.env.NODE_ENV !== 'production' || window.location.hostname === 'localhost') {
+        console.log('[UPI Deep Link Generated]:', exactUpiUri);
+      }
+    }
+  }, [session, exactUpiUri]);
 
   const copyToClipboard = (text, typeLabel) => {
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -72,6 +91,39 @@ const PaymentPage = () => {
       document.execCommand('copy');
       document.body.removeChild(input);
       if (addToast) addToast(`${typeLabel} copied to clipboard!`, 'success');
+    }
+  };
+
+  // 2, 5, 6, 7, 15. Mobile device pay button click handler
+  const handlePayWithUpiApp = (e) => {
+    if (e) e.preventDefault();
+    setErrorMsg('');
+
+    if (!isMobile) {
+      if (addToast) addToast('Please open this checkout page on your mobile to pay using PhonePe.', 'info');
+      return;
+    }
+
+    try {
+      const startTime = Date.now();
+      
+      // Try PhonePe intent first, fallback to standard UPI intent
+      window.location.href = phonepeUri;
+
+      setTimeout(() => {
+        if (Date.now() - startTime < 2000 && !document.hidden) {
+          window.location.href = exactUpiUri;
+        }
+      }, 800);
+
+      // 15. Fallback error message if app fails to launch
+      setTimeout(() => {
+        if (Date.now() - startTime < 2500 && !document.hidden) {
+          setErrorMsg('Payment was not completed. Please try again.');
+        }
+      }, 2000);
+    } catch (err) {
+      setErrorMsg('Payment was not completed. Please try again.');
     }
   };
 
@@ -92,25 +144,29 @@ const PaymentPage = () => {
     reader.readAsDataURL(file);
   };
 
+  // 9, 13. Customer Proof Submission (Screenshot + UTR)
   const handleSubmitProof = async (e) => {
     e.preventDefault();
+    if (!utrNumber.trim()) {
+      setErrorMsg('Please enter your 12-digit UPI UTR / Transaction ID.');
+      return;
+    }
     if (!screenshotPreview) {
-      setErrorMsg('Please upload a screenshot of your payment completion screen.');
+      setErrorMsg('Please upload your payment screenshot.');
       return;
     }
 
     try {
       setSubmitting(true);
       setErrorMsg('');
-      const generatedProofRef = utrNumber.trim() || `PROOF-${Date.now()}`;
       const res = await apiService.submitPaymentSessionProof(paymentRef, {
-        utrNumber: generatedProofRef,
+        utrNumber: utrNumber.trim(),
         paymentScreenshot: screenshotPreview
       });
 
       if (res && res.success) {
         setSession(res.session);
-        if (addToast) addToast('Payment screenshot submitted! Verification is pending.', 'success');
+        if (addToast) addToast('Payment proof submitted! Verification is pending.', 'success');
       }
     } catch (err) {
       const msg = err.message || 'Failed to submit payment proof.';
@@ -156,7 +212,7 @@ const PaymentPage = () => {
   const cartItems = typeof session.cart_items === 'string' ? JSON.parse(session.cart_items) : (session.cart_items || []);
 
   return (
-    <div style={{ backgroundColor: 'var(--color-cream)', padding: '3rem 0 5rem 0', minHeight: '85vh' }}>
+    <div style={{ backgroundColor: 'var(--color-cream)', padding: '2.5rem 0 5rem 0', minHeight: '85vh' }}>
       <SEOHead title={`Payment for Dosa Junction #${paymentRef}`} />
 
       <div className="container" style={{ maxWidth: '750px' }}>
@@ -178,6 +234,7 @@ const PaymentPage = () => {
             Payment Reference: <strong style={{ color: 'var(--color-emerald)', fontFamily: 'monospace' }}>{paymentRef}</strong>
           </div>
 
+          {/* 1. Payable Amount Display */}
           <div style={{
             display: 'inline-block',
             backgroundColor: '#FFF8EE',
@@ -190,11 +247,11 @@ const PaymentPage = () => {
               Payable Amount
             </span>
             <span style={{ fontSize: '2.4rem', fontWeight: 900, color: '#D97706', letterSpacing: '-0.5px' }}>
-              ₹{totalAmountFormatted}
+              Pay ₹{totalAmountFormatted}
             </span>
           </div>
 
-          {/* Status Badges */}
+          {/* 10, 11, 12, 14. Status Badges */}
           {isApproved ? (
             <div style={{
               backgroundColor: '#DCFCE7',
@@ -205,7 +262,7 @@ const PaymentPage = () => {
               textAlign: 'center'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#15803D', fontWeight: 900, fontSize: '1.3rem' }}>
-                <CheckCircle2 size={28} color="#16A34A" /> Payment Verified ✓
+                <CheckCircle2 size={28} color="#16A34A" /> Payment Verified / Order Confirmed ✓
               </div>
               <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#064E3B', margin: '0.4rem 0 0.2rem 0' }}>
                 Order Placed Successfully! 🎉
@@ -231,13 +288,13 @@ const PaymentPage = () => {
               textAlign: 'center'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#1E40AF', fontWeight: 800, fontSize: '1.15rem' }}>
-                <Clock size={24} color="#3B82F6" className="spin-slow" /> Payment Status: Verification Pending
+                <Clock size={24} color="#3B82F6" className="spin-slow" /> Payment Status: Payment Pending (Verification in progress)
               </div>
               <p style={{ margin: '0.6rem 0 0 0', color: '#1E3A8A', fontSize: '0.95rem', fontWeight: 700 }}>
-                Payment submitted successfully.
+                Payment proof submitted.
               </p>
               <p style={{ margin: '0.2rem 0 0 0', color: '#2563EB', fontSize: '0.88rem' }}>
-                Your payment is being verified by restaurant. Your order will be placed after payment verification.
+                Your payment is being verified by restaurant admin. Your order status will be updated to "Order Confirmed" after verification.
               </p>
             </div>
           ) : isRejected ? (
@@ -263,7 +320,7 @@ const PaymentPage = () => {
 
         </div>
 
-        {/* Static UPI Scanner Box (Only shown if NOT approved) */}
+        {/* Payment Action Section (Shown if NOT approved) */}
         {!isApproved && (
           <div style={{
             backgroundColor: '#FFFFFF',
@@ -274,51 +331,128 @@ const PaymentPage = () => {
             textAlign: 'center',
             marginBottom: '2rem'
           }}>
-            <span style={{ fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--color-text-muted)', fontWeight: 700, letterSpacing: '0.5px' }}>
-              Dosa Junction Official Scanner
-            </span>
             
-            <h2 style={{
-              fontSize: '1.9rem',
-              fontWeight: 900,
-              color: 'var(--color-emerald)',
-              fontFamily: 'var(--font-heading)',
-              margin: '4px 0 1.2rem 0'
-            }}>
-              Pay ₹{totalAmountFormatted}
-            </h2>
+            {/* 16. Desktop Scoping Notice */}
+            {!isMobile && (
+              <div style={{
+                backgroundColor: '#EFF6FF',
+                border: '1.5px solid #3B82F6',
+                borderRadius: '16px',
+                padding: '1.2rem',
+                marginBottom: '1.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                textAlign: 'left'
+              }}>
+                <Monitor size={32} color="#2563EB" style={{ flexShrink: 0 }} />
+                <div>
+                  <strong style={{ color: '#1E40AF', fontSize: '1rem', display: 'block' }}>Desktop Device Detected</strong>
+                  <p style={{ margin: '2px 0 0 0', color: '#1D4ED8', fontSize: '0.88rem', fontWeight: 600 }}>
+                    Please open this checkout page on your mobile to pay using PhonePe.
+                  </p>
+                </div>
+              </div>
+            )}
 
-            {/* User Static QR Image */}
-            <div style={{
-              display: 'inline-block',
-              backgroundColor: '#FFFFFF',
-              padding: '1rem',
-              borderRadius: '20px',
-              boxShadow: '0 10px 25px rgba(0,0,0,0.08)',
-              border: '2px dashed var(--color-gold)',
-              marginBottom: '1.2rem'
-            }}>
-              <img
-                src="/assets/dosa_junction_qr.png"
-                alt="Dosa Junction Official UPI QR Code"
+            {/* 15. Payment Error Notice */}
+            {errorMsg && (
+              <div style={{
+                backgroundColor: '#FEF2F2',
+                color: '#991B1B',
+                padding: '0.85rem 1.1rem',
+                borderRadius: '12px',
+                fontSize: '0.9rem',
+                fontWeight: 700,
+                marginBottom: '1.2rem',
+                border: '1.5px solid #FCA5A5'
+              }}>
+                ⚠️ {errorMsg}
+              </div>
+            )}
+
+            {/* 18. Primary Pay Button clearly displaying exact amount */}
+            <div style={{ marginBottom: '1.5rem' }}>
+              <button
+                type="button"
+                onClick={handlePayWithUpiApp}
+                className="btn btn-primary"
                 style={{
-                  width: '240px',
-                  height: '240px',
-                  borderRadius: '12px',
-                  objectFit: 'contain',
-                  display: 'block'
+                  width: '100%',
+                  maxWidth: '420px',
+                  padding: '1rem 1.8rem',
+                  borderRadius: '16px',
+                  fontWeight: 900,
+                  fontSize: '1.15rem',
+                  backgroundColor: '#5F259F', // PhonePe Purple
+                  color: '#FFFFFF',
+                  border: 'none',
+                  boxShadow: '0 6px 20px rgba(95, 37, 159, 0.35)',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '10px'
                 }}
-              />
+              >
+                <Smartphone size={22} /> Pay ₹{totalAmountFormatted} with UPI
+              </button>
+              
+              <span style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', display: 'block', marginTop: '6px' }}>
+                💜 Opens PhonePe, Google Pay, Paytm, or BHIM with exact ₹{totalAmountFormatted} pre-filled.
+              </span>
             </div>
 
-            <p style={{
-              fontSize: '0.95rem',
-              fontWeight: 800,
-              color: 'var(--color-emerald)',
-              margin: '0.5rem 0 1rem 0'
-            }}>
-              Scan with Google Pay, PhonePe, Paytm or any UPI app
-            </p>
+            {/* Direct App Deep Links */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.6rem', maxWidth: '420px', margin: '0 auto 1.4rem auto' }}>
+              <a
+                href={phonepeUri}
+                style={{
+                  backgroundColor: '#5F259F',
+                  color: '#FFFFFF',
+                  padding: '0.7rem 0.5rem',
+                  borderRadius: '12px',
+                  fontWeight: 800,
+                  fontSize: '0.82rem',
+                  textDecoration: 'none',
+                  textAlign: 'center'
+                }}
+              >
+                💜 PhonePe
+              </a>
+
+              <a
+                href={gpayUri}
+                style={{
+                  backgroundColor: '#1A73E8',
+                  color: '#FFFFFF',
+                  padding: '0.7rem 0.5rem',
+                  borderRadius: '12px',
+                  fontWeight: 800,
+                  fontSize: '0.82rem',
+                  textDecoration: 'none',
+                  textAlign: 'center'
+                }}
+              >
+                💙 Google Pay
+              </a>
+
+              <a
+                href={paytmUri}
+                style={{
+                  backgroundColor: '#00BAF2',
+                  color: '#FFFFFF',
+                  padding: '0.7rem 0.5rem',
+                  borderRadius: '12px',
+                  fontWeight: 800,
+                  fontSize: '0.82rem',
+                  textDecoration: 'none',
+                  textAlign: 'center'
+                }}
+              >
+                🔷 Paytm
+              </a>
+            </div>
 
             {/* Quick Copy UPI ID & Amount Banner */}
             <div style={{
@@ -333,7 +467,7 @@ const PaymentPage = () => {
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
                 <div style={{ textAlign: 'left' }}>
-                  <span style={{ fontSize: '0.76rem', color: '#B45309', fontWeight: 700, display: 'block', textTransform: 'uppercase' }}>Dosa Junction UPI ID:</span>
+                  <span style={{ fontSize: '0.76rem', color: '#B45309', fontWeight: 700, display: 'block', textTransform: 'uppercase' }}>Merchant POS UPI ID:</span>
                   <strong style={{ fontSize: '1.1rem', color: '#78350F', fontFamily: 'monospace' }}>{upiId}</strong>
                 </div>
                 <button
@@ -348,7 +482,7 @@ const PaymentPage = () => {
 
               <div style={{ borderTop: '1px dashed #F59E0B', paddingTop: '0.6rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
                 <div style={{ textAlign: 'left' }}>
-                  <span style={{ fontSize: '0.76rem', color: '#B45309', fontWeight: 700, display: 'block', textTransform: 'uppercase' }}>Payable Amount:</span>
+                  <span style={{ fontSize: '0.76rem', color: '#B45309', fontWeight: 700, display: 'block', textTransform: 'uppercase' }}>Exact Payable Amount:</span>
                   <strong style={{ fontSize: '1.1rem', color: '#78350F' }}>₹{totalAmountFormatted}</strong>
                 </div>
                 <button
@@ -362,84 +496,27 @@ const PaymentPage = () => {
               </div>
             </div>
 
-            {/* Direct App Deep Links */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', width: '100%', maxWidth: '420px', margin: '0 auto 1.2rem auto' }}>
-              <a
-                href={cleanUpiUri}
-                className="btn"
-                style={{
-                  backgroundColor: '#0F3825',
-                  color: '#FFFFFF',
-                  padding: '0.85rem 1.4rem',
-                  borderRadius: '12px',
-                  fontWeight: 800,
-                  fontSize: '0.95rem',
-                  textDecoration: 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  boxShadow: '0 4px 12px rgba(15, 56, 37, 0.25)'
-                }}
-              >
-                <ExternalLink size={18} /> Open Any UPI App (GPay / PhonePe / Paytm)
-              </a>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
-                <a
-                  href={phonepeUri}
-                  style={{
-                    backgroundColor: '#5F259F',
-                    color: '#FFFFFF',
-                    padding: '0.65rem 0.5rem',
-                    borderRadius: '10px',
-                    fontWeight: 800,
-                    fontSize: '0.82rem',
-                    textDecoration: 'none',
-                    textAlign: 'center'
-                  }}
-                >
-                  💜 PhonePe
-                </a>
-
-                <a
-                  href={gpayUri}
-                  style={{
-                    backgroundColor: '#1A73E8',
-                    color: '#FFFFFF',
-                    padding: '0.65rem 0.5rem',
-                    borderRadius: '10px',
-                    fontWeight: 800,
-                    fontSize: '0.82rem',
-                    textDecoration: 'none',
-                    textAlign: 'center'
-                  }}
-                >
-                  💙 Google Pay
-                </a>
-
-                <a
-                  href={paytmUri}
-                  style={{
-                    backgroundColor: '#00BAF2',
-                    color: '#FFFFFF',
-                    padding: '0.65rem 0.5rem',
-                    borderRadius: '10px',
-                    fontWeight: 800,
-                    fontSize: '0.82rem',
-                    textDecoration: 'none',
-                    textAlign: 'center'
-                  }}
-                >
-                  🔷 Paytm
-                </a>
+            {/* 16. Desktop Fallback QR Code Box */}
+            {!isMobile && (
+              <div style={{
+                display: 'inline-block',
+                backgroundColor: '#FFFFFF',
+                padding: '1.2rem',
+                borderRadius: '20px',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+                border: '2px dashed var(--color-gold)'
+              }}>
+                <span style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', fontWeight: 700, display: 'block', marginBottom: '8px', textTransform: 'uppercase' }}>
+                  Desktop QR Fallback
+                </span>
+                <QRCodeSVG value={exactUpiUri} size={200} level="H" includeMargin={true} />
               </div>
-            </div>
+            )}
 
           </div>
         )}
 
-        {/* Payment Proof Submission Form (Required: Screenshot + UTR) */}
+        {/* 9, 13. Customer Proof Submission Form (Required: Screenshot + UTR) */}
         {!isApproved && (
           <form onSubmit={handleSubmitProof} style={{
             backgroundColor: '#FFFFFF',
@@ -458,29 +535,40 @@ const PaymentPage = () => {
               alignItems: 'center',
               gap: '8px'
             }}>
-              <FileCheck size={22} color="var(--color-gold)" /> Already paid? Submit payment proof
+              <FileCheck size={22} color="var(--color-gold)" /> Payment completed? Upload payment screenshot
             </h3>
             <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>
-              Please upload your payment completion screenshot below to verify your payment.
+              Please upload your payment screenshot and enter your 12-digit UTR / Transaction ID below to verify your payment.
             </p>
 
-            {errorMsg && (
-              <div style={{
-                backgroundColor: '#FEF2F2',
-                color: '#991B1B',
-                padding: '0.85rem 1.1rem',
-                borderRadius: '12px',
-                fontSize: '0.88rem',
-                fontWeight: 700,
-                marginBottom: '1.2rem',
-                border: '1.5px solid #FCA5A5'
-              }}>
-                ⚠️ {errorMsg}
-              </div>
-            )}
-
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.4rem' }}>
-              {/* Mandatory Screenshot Upload */}
+              {/* 13. Mandatory 12-digit UTR Input */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 800, color: 'var(--color-emerald)', marginBottom: '6px' }}>
+                  Enter UTR / Transaction ID *
+                </label>
+                <input
+                  type="text"
+                  value={utrNumber}
+                  onChange={(e) => setUtrNumber(e.target.value)}
+                  placeholder="e.g. 423456789012"
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '0.8rem 1rem',
+                    borderRadius: '12px',
+                    border: '1px solid var(--color-border)',
+                    fontSize: '1rem',
+                    fontFamily: 'monospace',
+                    letterSpacing: '1px'
+                  }}
+                />
+                <span style={{ fontSize: '0.76rem', color: 'var(--color-text-muted)', marginTop: '4px', display: 'block' }}>
+                  Find this 12-digit UTR / Ref ID in your PhonePe, GPay, or Paytm payment receipt.
+                </span>
+              </div>
+
+              {/* 13. Mandatory Screenshot Upload */}
               <div>
                 <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 800, color: 'var(--color-emerald)', marginBottom: '6px' }}>
                   Payment Screenshot *
@@ -542,7 +630,7 @@ const PaymentPage = () => {
           </form>
         )}
 
-        {/* Cart & Customer Summary Box */}
+        {/* Cart Summary */}
         <div style={{
           backgroundColor: '#FFFFFF',
           borderRadius: '24px',
