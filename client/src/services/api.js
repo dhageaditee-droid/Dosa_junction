@@ -463,7 +463,7 @@ export const apiService = {
     const discountAmount = parseFloat(sessionData.discountAmount || sessionData.discount_amount) || 0;
     const totalAmount = parseFloat(sessionData.totalAmount || sessionData.total_amount) || (subtotal + tax + packingFee + deliveryFee - discountAmount);
 
-    const upiId = 'Pos.11424716@indus';
+    const upiId = '11424716@indus';
     const formattedAmount = totalAmount.toFixed(2);
     const cleanRef = (ref || 'PAYDJ1001').replace(/[^a-zA-Z0-9]/g, '');
     const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent('Dosa Junction')}&am=${formattedAmount}&cu=INR&tn=${cleanRef}`;

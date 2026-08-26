@@ -161,7 +161,7 @@ module.exports = async function handler(req, res) {
       const total_amount = subtotal + tax + packing_charge + delivery_charge - discount_amount;
 
       const paymentRef = payload.paymentRef || `PAY-DJ-${Math.floor(1000 + Math.random() * 9000)}`;
-      const upiId = 'Pos.11424716@indus';
+      const upiId = '11424716@indus';
       const formattedAmount = total_amount.toFixed(2);
       const cleanRef = (paymentRef || 'PAYDJ1001').replace(/[^a-zA-Z0-9]/g, '');
       const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent('Dosa Junction')}&am=${formattedAmount}&cu=INR&tn=${cleanRef}`;

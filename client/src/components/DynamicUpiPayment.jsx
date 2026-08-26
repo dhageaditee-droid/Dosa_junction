@@ -16,7 +16,7 @@ const DynamicUpiPayment = ({ order, onPaymentSubmitted }) => {
 
   const orderTotal = parseFloat(order.total_amount || 0).toFixed(2);
   const orderNumber = order.order_number;
-  const upiId = order.upi_id || 'Pos.11424716@indus';
+  const upiId = order.upi_id || '11424716@indus';
 
   // Construct official dynamic UPI payment URI
   // upi://pay?pa=YOUR_UPI_ID&pn=Dosa%20Junction&am=ORDER_AMOUNT&cu=INR&tn=ORDER_ID
@@ -46,11 +46,6 @@ const DynamicUpiPayment = ({ order, onPaymentSubmitted }) => {
 
   const handleSubmitProof = async (e) => {
     e.preventDefault();
-    if (!utrNumber.trim()) {
-      setErrorMsg('Please enter your 12-digit UPI Transaction ID / UTR.');
-      return;
-    }
-
     if (!screenshotPreview) {
       setErrorMsg('Please upload a screenshot of your payment completion screen.');
       return;
@@ -60,7 +55,7 @@ const DynamicUpiPayment = ({ order, onPaymentSubmitted }) => {
       setSubmitting(true);
       setErrorMsg('');
       const res = await apiService.submitPaymentProof(orderNumber, {
-        utrNumber: utrNumber.trim(),
+        utrNumber: utrNumber ? utrNumber.trim() : '',
         paymentScreenshot: screenshotPreview
       });
 
@@ -284,33 +279,7 @@ const DynamicUpiPayment = ({ order, onPaymentSubmitted }) => {
           )}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-            {/* 12. Enter UPI Transaction ID / UTR */}
-            <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-emerald)', marginBottom: '6px' }}>
-                UPI Transaction ID / UTR Number *
-              </label>
-              <input
-                type="text"
-                value={utrNumber}
-                onChange={(e) => setUtrNumber(e.target.value)}
-                placeholder="e.g. 423456789012"
-                required
-                style={{
-                  width: '100%',
-                  padding: '0.75rem 1rem',
-                  borderRadius: '10px',
-                  border: '1px solid var(--color-border)',
-                  fontSize: '0.95rem',
-                  fontFamily: 'monospace',
-                  letterSpacing: '1px'
-                }}
-              />
-              <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '4px', display: 'block' }}>
-                Find this 12-digit UTR / Ref ID in your GPay / PhonePe / Paytm payment receipt.
-              </span>
-            </div>
-
-            {/* 12. Upload Payment Screenshot */}
+            {/* Upload Payment Screenshot */}
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-emerald)', marginBottom: '6px' }}>
                 Upload Payment Screenshot *

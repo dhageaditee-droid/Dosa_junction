@@ -363,16 +363,16 @@ const CheckoutPage = () => {
                   </div>
                   <div>
                     <strong style={{ display: 'block', fontSize: '1.05rem', color: 'var(--color-emerald)' }}>
-                      Online UPI Payment
+                      Online UPI Payment (Dynamic QR Code)
                     </strong>
                     <p style={{ fontSize: '0.82rem', color: '#B45309', margin: '4px 0 0 0', lineHeight: 1.4 }}>
-                      Pay with PhonePe, GPay, Paytm, or BHIM for exact order total on the next page.
+                      Scan dynamic UPI QR code or pay with GPay, PhonePe, Paytm, or BHIM for exact order total on the next page.
                     </p>
                   </div>
                 </div>
 
                 <div style={{ marginTop: '1rem', fontSize: '0.8rem', color: '#065F46', backgroundColor: '#ECFDF5', padding: '0.75rem 1rem', borderRadius: '12px', fontWeight: 600 }}>
-                  🔒 Direct & Secure: Pay exact order amount using your UPI app on the next page.
+                  🔒 Direct & Secure: Dynamic QR code with your exact order amount will be generated instantly after placing order.
                 </div>
               </div>
 
