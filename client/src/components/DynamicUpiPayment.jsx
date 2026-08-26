@@ -16,7 +16,7 @@ const DynamicUpiPayment = ({ order, onPaymentSubmitted }) => {
 
   const orderTotal = parseFloat(order.total_amount || 0).toFixed(2);
   const orderNumber = order.order_number;
-  const upiId = order.upi_id || '11424716@indus';
+  const upiId = order.upi_id || 'Pos.11424716@indus';
 
   // Construct official dynamic UPI payment URI
   // upi://pay?pa=YOUR_UPI_ID&pn=Dosa%20Junction&am=ORDER_AMOUNT&cu=INR&tn=ORDER_ID

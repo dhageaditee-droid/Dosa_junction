@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate, Link } from 'react-router-dom';
-import { Clock, ShieldCheck, CheckCircle2, AlertTriangle, Upload, FileCheck, ArrowRight, Compass, RefreshCw, Copy, Smartphone, QrCode } from 'lucide-react';
+import { Clock, ShieldCheck, CheckCircle2, AlertTriangle, Upload, FileCheck, Compass, RefreshCw, Copy, Smartphone, ExternalLink, QrCode } from 'lucide-react';
 import SEOHead from '../components/SEOHead';
 import { apiService } from '../services/api';
 import { useToast } from '../context/ToastContext';
@@ -18,6 +18,7 @@ const PaymentPage = () => {
   const [screenshotPreview, setScreenshotPreview] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [showDesktopQr, setShowDesktopQr] = useState(false);
 
   const fetchSessionDetails = async () => {
     if (!paymentRef) return;
@@ -51,7 +52,23 @@ const PaymentPage = () => {
 
   const totalAmountNum = parseFloat(session?.total_amount || 0);
   const totalAmountFormatted = totalAmountNum.toFixed(2);
-  const upiId = (session?.upi_id || '11424716@indus').trim();
+  
+  // 4. pa = Pos.11424716@indus
+  const upiId = (session?.upi_id || 'Pos.11424716@indus').trim();
+
+  // 3 & 19. Standard UPI Payment URI:
+  // upi://pay?pa=Pos.11424716@indus&pn=Dosa%20Junction&am={TOTAL_AMOUNT}&cu=INR&tn={ORDER_ID}
+  const cleanRef = (paymentRef || 'PAYDJ1001').replace(/[^a-zA-Z0-9]/g, '');
+  const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent('Dosa Junction')}&am=${totalAmountFormatted}&cu=INR&tn=${cleanRef}`;
+
+  // Log the generated URI in development mode
+  useEffect(() => {
+    if (session && upiUri) {
+      if (process.env.NODE_ENV !== 'production' || window.location.hostname === 'localhost') {
+        console.log('[UPI Deep Link Generated]:', upiUri);
+      }
+    }
+  }, [session, upiUri]);
 
   const copyToClipboard = (text, typeLabel) => {
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -65,6 +82,51 @@ const PaymentPage = () => {
       document.execCommand('copy');
       document.body.removeChild(input);
       if (addToast) addToast(`${typeLabel} copied to clipboard!`, 'success');
+    }
+  };
+
+  // 2, 5, 6, 7. Mobile UPI Launch Handler
+  const handlePayWithUpiApp = (e) => {
+    e.preventDefault();
+    setErrorMsg('');
+
+    if (!upiId || typeof upiId !== 'string' || !upiId.includes('@')) {
+      setErrorMsg('Invalid UPI ID configured.');
+      return;
+    }
+
+    if (isNaN(totalAmountNum) || totalAmountNum <= 0) {
+      setErrorMsg('Payment amount must be greater than ₹0.00.');
+      return;
+    }
+
+    if (!paymentRef || !paymentRef.trim()) {
+      setErrorMsg('Payment reference missing.');
+      return;
+    }
+
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    // 16. Desktop Behavior: Show message on desktop
+    if (!isMobile) {
+      if (addToast) addToast('Please open this checkout page on your mobile to pay using PhonePe.', 'info');
+      setShowDesktopQr(true);
+      return;
+    }
+
+    // 2, 5, 6, 7. Launch UPI payment intent on mobile
+    try {
+      const startTime = Date.now();
+      window.location.href = upiUri;
+
+      // 15. If app fails to open or is cancelled
+      setTimeout(() => {
+        if (Date.now() - startTime < 2000 && !document.hidden) {
+          setErrorMsg('Payment was not completed. Please try again.');
+        }
+      }, 1500);
+    } catch (err) {
+      setErrorMsg('Payment was not completed. Please try again.');
     }
   };
 
@@ -146,7 +208,7 @@ const PaymentPage = () => {
   }
   
   const isApproved = session.status === 'Approved' || !!session.order_number;
-  const isPending = session.status === 'Verification Pending';
+  const isPending = session.status === 'Verification Pending' || session.status === 'Payment Pending' || session.status === 'Created';
   const isRejected = session.status === 'Rejected';
 
   const cartItems = typeof session.cart_items === 'string' ? JSON.parse(session.cart_items) : (session.cart_items || []);
@@ -201,7 +263,7 @@ const PaymentPage = () => {
               textAlign: 'center'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#15803D', fontWeight: 900, fontSize: '1.3rem' }}>
-                <CheckCircle2 size={28} color="#16A34A" /> Payment Verified ✓
+                <CheckCircle2 size={28} color="#16A34A" /> Payment Verified / Order Confirmed ✓
               </div>
               <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#064E3B', margin: '0.4rem 0 0.2rem 0' }}>
                 Order Placed Successfully! 🎉
@@ -217,7 +279,7 @@ const PaymentPage = () => {
                 <Compass size={18} /> Track Order Progress
               </button>
             </div>
-          ) : isPending ? (
+          ) : session.utr_number ? (
             <div style={{
               backgroundColor: '#EFF6FF',
               border: '2px solid #3B82F6',
@@ -230,13 +292,31 @@ const PaymentPage = () => {
                 <Clock size={24} color="#3B82F6" className="spin-slow" /> Payment Status: Verification Pending
               </div>
               <p style={{ margin: '0.6rem 0 0 0', color: '#1E3A8A', fontSize: '0.95rem', fontWeight: 700 }}>
-                Payment submitted successfully.
+                Payment proof submitted.
               </p>
               <p style={{ margin: '0.2rem 0 0 0', color: '#2563EB', fontSize: '0.88rem' }}>
-                Your payment is being verified by restaurant. Your order will be placed after payment verification.
+                Your payment is being verified by admin. Your order will be confirmed after payment verification.
               </p>
             </div>
-          ) : isRejected ? (
+          ) : (
+            <div style={{
+              backgroundColor: '#FEF3C7',
+              border: '2px solid #F59E0B',
+              borderRadius: '16px',
+              padding: '1.25rem',
+              marginTop: '1rem',
+              textAlign: 'center'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#B45309', fontWeight: 800, fontSize: '1.1rem' }}>
+                <Clock size={22} color="#F59E0B" /> Payment Status: Payment Pending
+              </div>
+              <p style={{ margin: '0.4rem 0 0 0', color: '#78350F', fontSize: '0.88rem' }}>
+                Please click the button below to pay ₹{totalAmountFormatted} with UPI and submit your payment screenshot.
+              </p>
+            </div>
+          )}
+
+          {isRejected && (
             <div style={{
               backgroundColor: '#FEF2F2',
               border: '2px solid #EF4444',
@@ -255,11 +335,11 @@ const PaymentPage = () => {
                 Please re-check your payment screenshot and 12-digit UTR number below, then click "Submit Payment Proof" to re-submit.
               </p>
             </div>
-          ) : null}
+          )}
 
         </div>
 
-        {/* Payment Instructions & Static QR Box (Only shown if NOT approved) */}
+        {/* Primary Direct UPI Payment Box (No QR code by default on mobile) */}
         {!isApproved && (
           <div style={{
             backgroundColor: '#FFFFFF',
@@ -271,17 +351,36 @@ const PaymentPage = () => {
             marginBottom: '2rem'
           }}>
             
-            <h2 style={{
-              fontSize: '1.8rem',
-              fontWeight: 900,
-              color: 'var(--color-emerald)',
-              fontFamily: 'var(--font-heading)',
-              margin: '0 0 0.5rem 0'
-            }}>
-              Direct UPI Payment
-            </h2>
-            <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>
-              Copy the UPI ID below to pay directly in <strong>PhonePe, Google Pay, or Paytm</strong>, or scan the QR Code.
+            {/* 18. Pay Button clearly displaying exact amount */}
+            <div style={{ marginBottom: '1.5rem' }}>
+              <button
+                type="button"
+                onClick={handlePayWithUpiApp}
+                className="btn btn-primary"
+                style={{
+                  width: '100%',
+                  maxWidth: '480px',
+                  padding: '1.1rem 2rem',
+                  fontSize: '1.25rem',
+                  fontWeight: 900,
+                  borderRadius: '16px',
+                  backgroundColor: '#5F259F', // Signature PhonePe/UPI purple
+                  color: '#FFFFFF',
+                  border: 'none',
+                  boxShadow: '0 8px 24px rgba(95, 37, 159, 0.35)',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '10px'
+                }}
+              >
+                <Smartphone size={24} /> Pay ₹{totalAmountFormatted} with UPI
+              </button>
+            </div>
+
+            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>
+              Clicking above will open PhonePe or your installed UPI app with <strong>₹{totalAmountFormatted}</strong> pre-filled to <strong>Pos.11424716@indus</strong>.
             </p>
 
             {/* Quick Copy UPI ID & Amount Card */}
@@ -289,130 +388,96 @@ const PaymentPage = () => {
               backgroundColor: '#FEF3C7',
               borderRadius: '20px',
               padding: '1.25rem',
-              marginBottom: '1.8rem',
-              border: '2px solid #F59E0B',
-              boxShadow: '0 4px 14px rgba(217, 119, 6, 0.12)'
+              marginBottom: '1.5rem',
+              border: '1.5px solid #FCD34D'
             }}>
-              
-              {/* UPI ID Row */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.6rem', marginBottom: '0.8rem' }}>
                 <div style={{ textAlign: 'left' }}>
                   <span style={{ fontSize: '0.78rem', color: '#B45309', fontWeight: 800, display: 'block', textTransform: 'uppercase' }}>
-                    1. Restaurant UPI ID:
+                    Dosa Junction Merchant UPI ID:
                   </span>
-                  <strong style={{ fontSize: '1.25rem', color: '#78350F', fontFamily: 'monospace' }}>
+                  <strong style={{ fontSize: '1.15rem', color: '#78350F', fontFamily: 'monospace' }}>
                     {upiId}
                   </strong>
                 </div>
                 <button
                   type="button"
-                  onClick={() => copyToClipboard(upiId, 'UPI ID')}
-                  className="btn"
-                  style={{
-                    backgroundColor: '#D97706',
-                    color: '#FFFFFF',
-                    border: 'none',
-                    fontWeight: 800,
-                    borderRadius: '10px',
-                    padding: '0.5rem 1.1rem',
-                    fontSize: '0.9rem',
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px'
-                  }}
+                  onClick={() => copyToClipboard(upiId, 'Merchant UPI ID')}
+                  className="btn btn-sm"
+                  style={{ backgroundColor: '#D97706', color: '#FFFFFF', border: 'none', fontWeight: 800, borderRadius: '8px', padding: '0.4rem 0.8rem', fontSize: '0.85rem', cursor: 'pointer' }}
                 >
-                  <Copy size={16} /> Copy UPI ID
+                  <Copy size={14} /> Copy UPI ID
                 </button>
               </div>
 
-              {/* Amount Row */}
-              <div style={{ borderTop: '1px dashed #F59E0B', paddingTop: '0.8rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.6rem' }}>
+              <div style={{ borderTop: '1px dashed #F59E0B', paddingTop: '0.6rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.6rem' }}>
                 <div style={{ textAlign: 'left' }}>
                   <span style={{ fontSize: '0.78rem', color: '#B45309', fontWeight: 800, display: 'block', textTransform: 'uppercase' }}>
-                    2. Payable Amount:
+                    Exact Order Amount:
                   </span>
-                  <strong style={{ fontSize: '1.35rem', color: '#78350F' }}>
+                  <strong style={{ fontSize: '1.2rem', color: '#78350F' }}>
                     ₹{totalAmountFormatted}
                   </strong>
                 </div>
                 <button
                   type="button"
                   onClick={() => copyToClipboard(totalAmountFormatted, 'Amount')}
-                  className="btn"
-                  style={{
-                    backgroundColor: '#B45309',
-                    color: '#FFFFFF',
-                    border: 'none',
-                    fontWeight: 800,
-                    borderRadius: '10px',
-                    padding: '0.5rem 1.1rem',
-                    fontSize: '0.9rem',
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px'
-                  }}
+                  className="btn btn-sm"
+                  style={{ backgroundColor: '#B45309', color: '#FFFFFF', border: 'none', fontWeight: 800, borderRadius: '8px', padding: '0.4rem 0.8rem', fontSize: '0.85rem', cursor: 'pointer' }}
                 >
-                  <Copy size={16} /> Copy Amount
+                  <Copy size={14} /> Copy Amount
                 </button>
               </div>
-
             </div>
 
-            {/* How to Pay Steps Box */}
-            <div style={{
-              backgroundColor: '#ECFDF5',
-              border: '1.5px solid #A7F3D0',
-              borderRadius: '16px',
-              padding: '1rem 1.25rem',
-              textAlign: 'left',
-              marginBottom: '1.8rem',
-              fontSize: '0.88rem',
-              color: '#065F46'
-            }}>
-              <div style={{ fontWeight: 800, fontSize: '0.95rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '6px', color: '#047857' }}>
-                <Smartphone size={18} /> २ मिनिटांत मोबाईलवरून पेमेंट कसे करावे (How to Pay):
-              </div>
-              <ol style={{ margin: 0, paddingLeft: '1.2rem', lineHeight: '1.6', fontWeight: 600 }}>
-                <li>वर दिलेले <strong>"Copy UPI ID"</strong> बटण दाबून <strong>{upiId}</strong> कॉपी करा.</li>
-                <li>तुमचे <strong>PhonePe / Google Pay / Paytm</strong> उघडून <strong>"Pay to UPI ID"</strong> मध्ये जा.</li>
-                <li><strong>{upiId}</strong> पेस्ट करा आणि अचूक <strong>₹{totalAmountFormatted}</strong> रक्कम पाठवा.</li>
-                <li>पेमेंट झाल्यावर **१२ अंकांचा UTR / Ref Number** व **Screenshot** खाली सबमिट करा!</li>
-              </ol>
-            </div>
-
-            {/* User Static QR Image */}
-            <div style={{
-              display: 'inline-block',
-              backgroundColor: '#FFFFFF',
-              padding: '1rem',
-              borderRadius: '20px',
-              boxShadow: '0 10px 25px rgba(0,0,0,0.08)',
-              border: '2px dashed var(--color-gold)',
-              marginBottom: '0.8rem'
-            }}>
-              <img
-                src="/assets/dosa_junction_qr.png"
-                alt="Dosa Junction Official UPI QR Code"
+            {/* 16. Desktop Scoping / QR Fallback Toggle */}
+            <div style={{ textAlign: 'center' }}>
+              <button
+                type="button"
+                onClick={() => setShowDesktopQr(!showDesktopQr)}
                 style={{
-                  width: '240px',
-                  height: '240px',
-                  borderRadius: '12px',
-                  objectFit: 'contain',
-                  display: 'block'
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--color-emerald)',
+                  fontWeight: 800,
+                  fontSize: '0.88rem',
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px'
                 }}
-              />
-            </div>
+              >
+                <QrCode size={16} /> {showDesktopQr ? 'Hide QR Code' : 'On Desktop or paying from another phone? View QR Code'}
+              </button>
 
-            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0 }}>
-              किंवा तुमच्या दुसऱ्या मोबाईलने हा QR Code स्कॅन करा.
-            </p>
+              {showDesktopQr && (
+                <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px dashed var(--color-border)' }}>
+                  <p style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--color-emerald)', marginBottom: '0.8rem' }}>
+                    Please open this checkout page on your mobile to pay using PhonePe, or scan the official QR code below:
+                  </p>
+                  <div style={{
+                    display: 'inline-block',
+                    backgroundColor: '#FFFFFF',
+                    padding: '1rem',
+                    borderRadius: '20px',
+                    boxShadow: '0 10px 25px rgba(0,0,0,0.08)',
+                    border: '2px dashed var(--color-gold)'
+                  }}>
+                    <img
+                      src="/assets/dosa_junction_qr.png"
+                      alt="Dosa Junction Official Merchant QR Code"
+                      style={{ width: '220px', height: '220px', borderRadius: '12px', objectFit: 'contain' }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
 
           </div>
         )}
 
-        {/* Payment Proof Submission Form (Required: Screenshot + UTR) */}
+        {/* 9, 13, 14. Payment Proof Submission Form (Required: Screenshot + UTR) */}
         {!isApproved && (
           <form onSubmit={handleSubmitProof} style={{
             backgroundColor: '#FFFFFF',
@@ -431,10 +496,10 @@ const PaymentPage = () => {
               alignItems: 'center',
               gap: '8px'
             }}>
-              <FileCheck size={22} color="var(--color-gold)" /> Already paid? Submit payment proof
+              <FileCheck size={22} color="var(--color-gold)" /> Payment completed? Upload payment screenshot
             </h3>
             <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>
-              Please upload your payment screenshot and enter the 12-digit UPI UTR / Transaction ID below to verify your payment.
+              Please upload your payment screenshot and enter the 12-digit UPI UTR / Transaction ID below. Your order will be confirmed after admin verification.
             </p>
 
             {errorMsg && (
@@ -453,10 +518,10 @@ const PaymentPage = () => {
             )}
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.4rem' }}>
-              {/* Mandatory 12-digit UTR Input */}
+              {/* 9 & 13. Mandatory 12-digit UTR Input */}
               <div>
                 <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 800, color: 'var(--color-emerald)', marginBottom: '6px' }}>
-                  UPI UTR / Transaction ID *
+                  Enter UTR / Transaction ID *
                 </label>
                 <input
                   type="text"
@@ -475,14 +540,14 @@ const PaymentPage = () => {
                   }}
                 />
                 <span style={{ fontSize: '0.76rem', color: 'var(--color-text-muted)', marginTop: '4px', display: 'block' }}>
-                  Find this 12-digit UTR / Ref ID in your GPay, PhonePe, or Paytm receipt.
+                  Find this 12-digit UTR / Ref ID in your PhonePe, GPay, or Paytm receipt.
                 </span>
               </div>
 
-              {/* Mandatory Screenshot Upload */}
+              {/* 9 & 13. Mandatory Screenshot Upload */}
               <div>
                 <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 800, color: 'var(--color-emerald)', marginBottom: '6px' }}>
-                  Payment Screenshot *
+                  Upload Payment Screenshot *
                 </label>
 
                 <div style={{
