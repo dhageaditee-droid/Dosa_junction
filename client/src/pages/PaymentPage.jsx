@@ -430,10 +430,9 @@ const PaymentPage = () => {
               </div>
             )}
 
-            {/* Main Orange Pay Button */}
-            <button
-              type="button"
-              onClick={handlePayWithUpiApp}
+            {/* Main Orange Pay Button (Direct Anchor Link for Instant 1-Click Launch) */}
+            <a
+              href={exactUpiUri}
               style={{
                 width: '100%',
                 padding: '1.1rem 1.4rem',
@@ -446,7 +445,9 @@ const PaymentPage = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                marginBottom: '1rem'
+                marginBottom: '1rem',
+                textDecoration: 'none',
+                boxSizing: 'border-box'
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -477,7 +478,7 @@ const PaymentPage = () => {
               }}>
                 <ArrowRight size={20} color="#FFFFFF" />
               </div>
-            </button>
+            </a>
 
             {/* Redirect Notice */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.82rem', color: '#6B7280', marginBottom: '1.4rem' }}>
