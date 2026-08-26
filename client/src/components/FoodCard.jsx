@@ -27,6 +27,10 @@ const FoodCard = ({ item, onClickDetail }) => {
           alt={translatedName}
           className="food-card-img"
           loading="lazy"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=600&q=80';
+          }}
         />
 
         {/* Veg / Non-Veg Indicator Symbol */}
