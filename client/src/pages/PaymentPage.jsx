@@ -776,35 +776,10 @@ const PaymentPage = () => {
               <FileCheck size={22} color="#D97706" /> Payment completed? Upload payment screenshot
             </h3>
             <p style={{ fontSize: '0.84rem', color: '#6B7280', marginBottom: '1.4rem' }}>
-              Please upload your payment screenshot to verify your payment. (UTR number is optional)
+              Please upload your payment screenshot to verify your payment.
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-              {/* Optional 12-digit UTR Input */}
-              <div>
-                <label style={{ display: 'block', fontSize: '0.86rem', fontWeight: 800, color: '#064E3B', marginBottom: '6px' }}>
-                  Enter UTR / Transaction ID (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={utrNumber}
-                  onChange={(e) => setUtrNumber(e.target.value)}
-                  placeholder="e.g. 423456789012 (Optional)"
-                  style={{
-                    width: '100%',
-                    padding: '0.8rem 1rem',
-                    borderRadius: '12px',
-                    border: '1px solid #D1D5DB',
-                    fontSize: '1rem',
-                    fontFamily: 'monospace',
-                    letterSpacing: '1px'
-                  }}
-                />
-                <span style={{ fontSize: '0.76rem', color: '#6B7280', marginTop: '4px', display: 'block' }}>
-                  Find this 12-digit UTR / Ref ID in your PhonePe, GPay, or Paytm payment receipt.
-                </span>
-              </div>
-
               {/* Mandatory Screenshot Upload */}
               <div>
                 <label style={{ display: 'block', fontSize: '0.86rem', fontWeight: 800, color: '#064E3B', marginBottom: '6px' }}>
