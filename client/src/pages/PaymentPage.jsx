@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate, Link } from 'react-router-dom';
-import { Clock, ShieldCheck, CheckCircle2, AlertTriangle, ExternalLink, Upload, FileCheck, ArrowRight, Compass, RefreshCw, Copy } from 'lucide-react';
+import { Clock, ShieldCheck, CheckCircle2, AlertTriangle, Upload, FileCheck, ArrowRight, Compass, RefreshCw, Copy, Smartphone, QrCode } from 'lucide-react';
 import SEOHead from '../components/SEOHead';
 import { apiService } from '../services/api';
 import { useToast } from '../context/ToastContext';
@@ -52,13 +52,6 @@ const PaymentPage = () => {
   const totalAmountNum = parseFloat(session?.total_amount || 0);
   const totalAmountFormatted = totalAmountNum.toFixed(2);
   const upiId = (session?.upi_id || '11424716@indus').trim();
-
-  // Clean UPI URIs (without am & tn parameters to avoid P2P VPA intent errors)
-  const encodedName = encodeURIComponent('Dosa Junction');
-  const cleanUpiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodedName}`;
-  const phonepeUri = `phonepe://pay?pa=${encodeURIComponent(upiId)}&pn=${encodedName}`;
-  const gpayUri = `gpay://upi/pay?pa=${encodeURIComponent(upiId)}&pn=${encodedName}`;
-  const paytmUri = `paytmmp://pay?pa=${encodeURIComponent(upiId)}&pn=${encodedName}`;
 
   const copyToClipboard = (text, typeLabel) => {
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -266,7 +259,7 @@ const PaymentPage = () => {
 
         </div>
 
-        {/* Static UPI Scanner Box (Only shown if NOT approved) */}
+        {/* Payment Instructions & Static QR Box (Only shown if NOT approved) */}
         {!isApproved && (
           <div style={{
             backgroundColor: '#FFFFFF',
@@ -277,19 +270,117 @@ const PaymentPage = () => {
             textAlign: 'center',
             marginBottom: '2rem'
           }}>
-            <span style={{ fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--color-text-muted)', fontWeight: 700, letterSpacing: '0.5px' }}>
-              Dosa Junction Official Scanner
-            </span>
             
             <h2 style={{
-              fontSize: '1.9rem',
+              fontSize: '1.8rem',
               fontWeight: 900,
               color: 'var(--color-emerald)',
               fontFamily: 'var(--font-heading)',
-              margin: '4px 0 1.2rem 0'
+              margin: '0 0 0.5rem 0'
             }}>
-              Pay ₹{totalAmountFormatted}
+              Direct UPI Payment
             </h2>
+            <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>
+              Copy the UPI ID below to pay directly in <strong>PhonePe, Google Pay, or Paytm</strong>, or scan the QR Code.
+            </p>
+
+            {/* Quick Copy UPI ID & Amount Card */}
+            <div style={{
+              backgroundColor: '#FEF3C7',
+              borderRadius: '20px',
+              padding: '1.25rem',
+              marginBottom: '1.8rem',
+              border: '2px solid #F59E0B',
+              boxShadow: '0 4px 14px rgba(217, 119, 6, 0.12)'
+            }}>
+              
+              {/* UPI ID Row */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.6rem', marginBottom: '0.8rem' }}>
+                <div style={{ textAlign: 'left' }}>
+                  <span style={{ fontSize: '0.78rem', color: '#B45309', fontWeight: 800, display: 'block', textTransform: 'uppercase' }}>
+                    1. Restaurant UPI ID:
+                  </span>
+                  <strong style={{ fontSize: '1.25rem', color: '#78350F', fontFamily: 'monospace' }}>
+                    {upiId}
+                  </strong>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => copyToClipboard(upiId, 'UPI ID')}
+                  className="btn"
+                  style={{
+                    backgroundColor: '#D97706',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    fontWeight: 800,
+                    borderRadius: '10px',
+                    padding: '0.5rem 1.1rem',
+                    fontSize: '0.9rem',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <Copy size={16} /> Copy UPI ID
+                </button>
+              </div>
+
+              {/* Amount Row */}
+              <div style={{ borderTop: '1px dashed #F59E0B', paddingTop: '0.8rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.6rem' }}>
+                <div style={{ textAlign: 'left' }}>
+                  <span style={{ fontSize: '0.78rem', color: '#B45309', fontWeight: 800, display: 'block', textTransform: 'uppercase' }}>
+                    2. Payable Amount:
+                  </span>
+                  <strong style={{ fontSize: '1.35rem', color: '#78350F' }}>
+                    ₹{totalAmountFormatted}
+                  </strong>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => copyToClipboard(totalAmountFormatted, 'Amount')}
+                  className="btn"
+                  style={{
+                    backgroundColor: '#B45309',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    fontWeight: 800,
+                    borderRadius: '10px',
+                    padding: '0.5rem 1.1rem',
+                    fontSize: '0.9rem',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <Copy size={16} /> Copy Amount
+                </button>
+              </div>
+
+            </div>
+
+            {/* How to Pay Steps Box */}
+            <div style={{
+              backgroundColor: '#ECFDF5',
+              border: '1.5px solid #A7F3D0',
+              borderRadius: '16px',
+              padding: '1rem 1.25rem',
+              textAlign: 'left',
+              marginBottom: '1.8rem',
+              fontSize: '0.88rem',
+              color: '#065F46'
+            }}>
+              <div style={{ fontWeight: 800, fontSize: '0.95rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '6px', color: '#047857' }}>
+                <Smartphone size={18} /> २ मिनिटांत मोबाईलवरून पेमेंट कसे करावे (How to Pay):
+              </div>
+              <ol style={{ margin: 0, paddingLeft: '1.2rem', lineHeight: '1.6', fontWeight: 600 }}>
+                <li>वर दिलेले <strong>"Copy UPI ID"</strong> बटण दाबून <strong>{upiId}</strong> कॉपी करा.</li>
+                <li>तुमचे <strong>PhonePe / Google Pay / Paytm</strong> उघडून <strong>"Pay to UPI ID"</strong> मध्ये जा.</li>
+                <li><strong>{upiId}</strong> पेस्ट करा आणि अचूक <strong>₹{totalAmountFormatted}</strong> रक्कम पाठवा.</li>
+                <li>पेमेंट झाल्यावर **१२ अंकांचा UTR / Ref Number** व **Screenshot** खाली सबमिट करा!</li>
+              </ol>
+            </div>
 
             {/* User Static QR Image */}
             <div style={{
@@ -299,7 +390,7 @@ const PaymentPage = () => {
               borderRadius: '20px',
               boxShadow: '0 10px 25px rgba(0,0,0,0.08)',
               border: '2px dashed var(--color-gold)',
-              marginBottom: '1.2rem'
+              marginBottom: '0.8rem'
             }}>
               <img
                 src="/assets/dosa_junction_qr.png"
@@ -314,130 +405,9 @@ const PaymentPage = () => {
               />
             </div>
 
-            <p style={{
-              fontSize: '0.95rem',
-              fontWeight: 800,
-              color: 'var(--color-emerald)',
-              margin: '0.5rem 0 1rem 0'
-            }}>
-              Scan with Google Pay, PhonePe, Paytm or any UPI app
+            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0 }}>
+              किंवा तुमच्या दुसऱ्या मोबाईलने हा QR Code स्कॅन करा.
             </p>
-
-            {/* Quick Copy UPI ID & Amount Banner */}
-            <div style={{
-              backgroundColor: '#FEF3C7',
-              borderRadius: '16px',
-              padding: '1rem 1.25rem',
-              marginBottom: '1.4rem',
-              border: '1.5px solid #FCD34D',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '0.8rem'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-                <div style={{ textAlign: 'left' }}>
-                  <span style={{ fontSize: '0.76rem', color: '#B45309', fontWeight: 700, display: 'block', textTransform: 'uppercase' }}>Dosa Junction UPI ID:</span>
-                  <strong style={{ fontSize: '1.1rem', color: '#78350F', fontFamily: 'monospace' }}>{upiId}</strong>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => copyToClipboard(upiId, 'UPI ID')}
-                  className="btn btn-sm"
-                  style={{ backgroundColor: '#D97706', color: '#FFFFFF', border: 'none', fontWeight: 800, borderRadius: '8px', padding: '0.4rem 0.8rem', fontSize: '0.82rem', cursor: 'pointer' }}
-                >
-                  📋 Copy UPI ID
-                </button>
-              </div>
-
-              <div style={{ borderTop: '1px dashed #F59E0B', paddingTop: '0.6rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-                <div style={{ textAlign: 'left' }}>
-                  <span style={{ fontSize: '0.76rem', color: '#B45309', fontWeight: 700, display: 'block', textTransform: 'uppercase' }}>Payable Amount:</span>
-                  <strong style={{ fontSize: '1.1rem', color: '#78350F' }}>₹{totalAmountFormatted}</strong>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => copyToClipboard(totalAmountFormatted, 'Amount')}
-                  className="btn btn-sm"
-                  style={{ backgroundColor: '#B45309', color: '#FFFFFF', border: 'none', fontWeight: 800, borderRadius: '8px', padding: '0.4rem 0.8rem', fontSize: '0.82rem', cursor: 'pointer' }}
-                >
-                  📋 Copy Amount
-                </button>
-              </div>
-            </div>
-
-            {/* Direct App Deep Links */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', width: '100%', maxWidth: '420px', margin: '0 auto 1.2rem auto' }}>
-              <a
-                href={cleanUpiUri}
-                className="btn"
-                style={{
-                  backgroundColor: '#0F3825',
-                  color: '#FFFFFF',
-                  padding: '0.85rem 1.4rem',
-                  borderRadius: '12px',
-                  fontWeight: 800,
-                  fontSize: '0.95rem',
-                  textDecoration: 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  boxShadow: '0 4px 12px rgba(15, 56, 37, 0.25)'
-                }}
-              >
-                <ExternalLink size={18} /> Open Any UPI App (GPay / PhonePe / Paytm)
-              </a>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
-                <a
-                  href={phonepeUri}
-                  style={{
-                    backgroundColor: '#5F259F',
-                    color: '#FFFFFF',
-                    padding: '0.65rem 0.5rem',
-                    borderRadius: '10px',
-                    fontWeight: 800,
-                    fontSize: '0.82rem',
-                    textDecoration: 'none',
-                    textAlign: 'center'
-                  }}
-                >
-                  💜 PhonePe
-                </a>
-
-                <a
-                  href={gpayUri}
-                  style={{
-                    backgroundColor: '#1A73E8',
-                    color: '#FFFFFF',
-                    padding: '0.65rem 0.5rem',
-                    borderRadius: '10px',
-                    fontWeight: 800,
-                    fontSize: '0.82rem',
-                    textDecoration: 'none',
-                    textAlign: 'center'
-                  }}
-                >
-                  💙 Google Pay
-                </a>
-
-                <a
-                  href={paytmUri}
-                  style={{
-                    backgroundColor: '#00BAF2',
-                    color: '#FFFFFF',
-                    padding: '0.65rem 0.5rem',
-                    borderRadius: '10px',
-                    fontWeight: 800,
-                    fontSize: '0.82rem',
-                    textDecoration: 'none',
-                    textAlign: 'center'
-                  }}
-                >
-                  🔷 Paytm
-                </a>
-              </div>
-            </div>
 
           </div>
         )}
