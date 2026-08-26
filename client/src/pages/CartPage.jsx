@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, ArrowRight, Trash2, ArrowLeft, Truck, Tag, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { ShoppingBag, ArrowRight, Trash2, ArrowLeft, Truck, Tag, ShieldCheck, CheckCircle2, Heart, Award, Utensils } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import CartItem from '../components/CartItem';
 import EmptyState from '../components/EmptyState';
@@ -31,7 +31,7 @@ const CartPage = () => {
 
   if (cartItems.length === 0) {
     return (
-      <div style={{ backgroundColor: 'var(--color-cream)', padding: '3rem 0', minHeight: '80vh' }}>
+      <div style={{ backgroundColor: '#FAF8F5', padding: '3rem 0', minHeight: '80vh' }}>
         <SEOHead title="Your Cart | Dosa Junction" />
         <div className="container">
           <EmptyState
@@ -54,34 +54,35 @@ const CartPage = () => {
   };
 
   return (
-    <div style={{ backgroundColor: 'var(--color-cream)', padding: '2.5rem 0 5rem 0', minHeight: '85vh' }}>
-      <SEOHead title={`Shopping Cart (${cartItems.length} items)`} />
+    <div style={{ backgroundColor: '#FAF8F5', padding: '2rem 0 5rem 0', minHeight: '85vh' }}>
+      <SEOHead title={`Your Cart (${cartItems.length} items) | Dosa Junction`} />
 
-      <div className="container">
+      <div className="container" style={{ maxWidth: '1140px' }}>
         
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+        {/* Top Header Row */}
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
           <div>
-            <span style={{ fontSize: '0.85rem', color: 'var(--color-gold)', fontWeight: 700, textTransform: 'uppercase' }}>
+            <span style={{ fontSize: '0.85rem', color: '#D97706', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
               Order Review
             </span>
-            <h1 style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--color-emerald)', fontFamily: 'var(--font-heading)', margin: 0 }}>
-              Shopping Cart
+            <h1 style={{ fontSize: '2.5rem', fontWeight: 900, color: '#064E3B', fontFamily: 'var(--font-heading)', margin: 0, lineHeight: 1.1 }}>
+              Your Cart
             </h1>
           </div>
 
           <button
             onClick={clearCart}
             style={{
-              display: 'flex',
+              display: 'inline-flex',
               alignItems: 'center',
               gap: '0.4rem',
-              color: '#EF4444',
-              backgroundColor: '#FEE2E2',
-              border: 'none',
-              borderRadius: '10px',
-              padding: '8px 14px',
+              color: '#DC2626',
+              backgroundColor: '#FEF2F2',
+              border: '1px solid #FCA5A5',
+              borderRadius: '12px',
+              padding: '8px 16px',
               fontSize: '0.85rem',
-              fontWeight: 700,
+              fontWeight: 800,
               cursor: 'pointer'
             }}
           >
@@ -91,73 +92,117 @@ const CartPage = () => {
 
         {/* Free Delivery Bar */}
         <div style={{
-          backgroundColor: '#FFFFFF',
-          padding: '1rem 1.5rem',
-          borderRadius: '16px',
+          backgroundColor: '#FFFBEB',
+          padding: '1.1rem 1.6rem',
+          borderRadius: '20px',
           marginBottom: '2rem',
-          border: '1px solid var(--color-border)',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
+          border: '1.5px solid #FCD34D',
+          boxShadow: '0 4px 14px rgba(0,0,0,0.02)'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '0.9rem', color: 'var(--color-emerald)', fontWeight: 700, marginBottom: '0.5rem' }}>
-            <Truck size={20} color="var(--color-gold)" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '0.92rem', color: '#78350F', fontWeight: 800, marginBottom: '0.6rem' }}>
+            <Truck size={20} color="#D97706" />
             {subtotal >= freeDeliveryThreshold ? (
               <span>🎉 Congratulations! You have unlocked <strong>FREE Delivery</strong>!</span>
             ) : (
               <span>Add <strong>₹{remainingForFreeDelivery.toFixed(2)}</strong> more to get FREE Delivery!</span>
             )}
           </div>
-          <div style={{ width: '100%', height: '8px', backgroundColor: '#E2E8F0', borderRadius: '4px', overflow: 'hidden' }}>
+          <div style={{ width: '100%', height: '10px', backgroundColor: '#FDE68A', borderRadius: '6px', overflow: 'hidden' }}>
             <div style={{
               width: `${progressToFreeDelivery}%`,
               height: '100%',
-              backgroundColor: subtotal >= freeDeliveryThreshold ? '#16A34A' : 'var(--color-gold)',
+              background: subtotal >= freeDeliveryThreshold ? '#16A34A' : 'linear-gradient(to right, #EA580C, #D97706)',
+              borderRadius: '6px',
               transition: 'width 0.4s ease'
             }} />
           </div>
         </div>
 
-        {/* Layout Grid: Items Left, Bill Summary Right */}
+        {/* Layout Grid: Items Left, Bill Details Right */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(330px, 1fr))',
           gap: '2rem',
           alignItems: 'start'
         }}>
           
-          {/* Left Column: Cart Items & Coupon */}
+          {/* Left Column: Cart Items & Navigation */}
           <div>
             <div style={{
               backgroundColor: '#FFFFFF',
-              borderRadius: '20px',
+              borderRadius: '24px',
               padding: '1.5rem 1.8rem',
               border: '1px solid var(--color-border)',
-              boxShadow: '0 4px 14px rgba(0,0,0,0.04)',
+              boxShadow: '0 6px 20px rgba(0,0,0,0.03)',
               marginBottom: '1.5rem'
             }}>
               {cartItems.map((item) => (
                 <CartItem key={item.id} item={item} />
               ))}
 
-              <div style={{ paddingTop: '1.2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Link to="/menu" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--color-emerald)', fontWeight: 700, fontSize: '0.9rem', textDecoration: 'none' }}>
+              <div style={{ paddingTop: '1.2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--color-border)' }}>
+                <Link to="/menu" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', color: '#064E3B', fontWeight: 800, fontSize: '0.92rem', textDecoration: 'none' }}>
                   <ArrowLeft size={16} /> Continue Browsing Menu
                 </Link>
               </div>
             </div>
 
-
+            {/* Coupon Code Section */}
+            <div style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '20px',
+              padding: '1.25rem 1.5rem',
+              border: '1px solid var(--color-border)',
+              boxShadow: '0 4px 14px rgba(0,0,0,0.03)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem', fontWeight: 800, color: '#064E3B', marginBottom: '0.8rem' }}>
+                <Tag size={18} color="#D97706" /> Apply Discount Coupon
+              </div>
+              
+              {appliedCoupon ? (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#ECFDF5', border: '1px solid #A7F3D0', padding: '0.75rem 1rem', borderRadius: '12px' }}>
+                  <div>
+                    <strong style={{ color: '#065F46', fontSize: '0.95rem' }}>{appliedCoupon.code}</strong>
+                    <span style={{ fontSize: '0.8rem', color: '#047857', display: 'block' }}>Coupon Applied Successfully!</span>
+                  </div>
+                  <button onClick={removeCoupon} style={{ border: 'none', background: 'none', color: '#DC2626', fontWeight: 800, fontSize: '0.82rem', cursor: 'pointer' }}>
+                    Remove
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleApplyCoupon} style={{ display: 'flex', gap: '0.6rem' }}>
+                  <input
+                    type="text"
+                    value={couponInput}
+                    onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                    placeholder="Enter Coupon Code (e.g. DOSA10)"
+                    style={{ flexGrow: 1, padding: '0.6rem 1rem', borderRadius: '10px', border: '1px solid var(--color-border)', fontSize: '0.88rem', outline: 'none' }}
+                  />
+                  <button
+                    type="submit"
+                    disabled={applyingCoupon}
+                    className="btn btn-primary"
+                    style={{ padding: '0.6rem 1.2rem', fontSize: '0.88rem', fontWeight: 800, borderRadius: '10px', flexShrink: 0 }}
+                  >
+                    Apply
+                  </button>
+                </form>
+              )}
+            </div>
 
           </div>
 
-          {/* Right Column: Bill Details */}
+          {/* Right Column: Bill Details Card */}
           <div style={{
             backgroundColor: '#FFFFFF',
-            borderRadius: '20px',
-            padding: '1.8rem',
+            borderRadius: '24px',
+            padding: '1.8rem 2rem',
             border: '1px solid var(--color-border)',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.05)'
+            boxShadow: '0 6px 20px rgba(0,0,0,0.04)',
+            position: 'sticky',
+            top: '90px'
           }}>
-            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.4rem', color: 'var(--color-emerald)', marginBottom: '1.2rem', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.6rem' }}>
+            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.4rem', fontWeight: 900, color: '#064E3B', marginBottom: '1.2rem', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.6rem' }}>
               Bill Details
             </h3>
 
@@ -193,33 +238,99 @@ const CartPage = () => {
               <div style={{
                 display: 'flex',
                 justifyContent: 'space-between',
-                fontSize: '1.35rem',
-                fontWeight: 800,
-                color: 'var(--color-emerald)',
+                fontSize: '1.4rem',
+                fontWeight: 900,
+                color: '#064E3B',
                 borderTop: '2px dashed var(--color-border)',
                 paddingTop: '1rem',
                 marginTop: '0.5rem'
               }}>
                 <span>To Pay</span>
-                <span style={{ color: 'var(--color-gold)' }}>₹{grandTotal.toFixed(2)}</span>
+                <span style={{ color: '#EA580C' }}>₹{grandTotal.toFixed(2)}</span>
               </div>
 
             </div>
 
             <button
               onClick={() => navigate('/checkout')}
-              className="btn btn-primary"
-              style={{ width: '100%', padding: '0.9rem', fontSize: '1rem', fontWeight: 800, borderRadius: '12px' }}
+              style={{
+                width: '100%',
+                padding: '1.05rem',
+                fontSize: '1.1rem',
+                fontWeight: 900,
+                borderRadius: '16px',
+                backgroundColor: '#EA580C',
+                color: '#FFFFFF',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                boxShadow: '0 6px 20px rgba(234, 88, 12, 0.35)',
+                transition: 'var(--transition-fast)'
+              }}
             >
               Proceed to Checkout <ArrowRight size={20} />
             </button>
 
-            <div style={{ marginTop: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+            <div style={{ marginTop: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', fontSize: '0.8rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>
               <ShieldCheck size={16} color="#16A34A" /> 100% Fresh & Authentic Quality Guaranteed
             </div>
 
           </div>
 
+        </div>
+
+        {/* Why Order From Dosa Junction? Section */}
+        <div style={{ marginTop: '4rem', textAlign: 'center' }}>
+          <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.8rem', fontWeight: 900, color: '#064E3B', marginBottom: '2rem' }}>
+            Why Order From Dosa Junction?
+          </h2>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem' }}>
+            
+            <div style={{ backgroundColor: '#FFFFFF', padding: '1.5rem', borderRadius: '20px', border: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', gap: '1rem', textAlign: 'left' }}>
+              <div style={{ backgroundColor: '#FFF7ED', color: '#EA580C', borderRadius: '50%', width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <Utensils size={24} />
+              </div>
+              <div>
+                <strong style={{ display: 'block', fontSize: '0.95rem', color: '#064E3B' }}>Authentic Taste</strong>
+                <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>South Indian Flavors</span>
+              </div>
+            </div>
+
+            <div style={{ backgroundColor: '#FFFFFF', padding: '1.5rem', borderRadius: '20px', border: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', gap: '1rem', textAlign: 'left' }}>
+              <div style={{ backgroundColor: '#ECFDF5', color: '#16A34A', borderRadius: '50%', width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <Award size={24} />
+              </div>
+              <div>
+                <strong style={{ display: 'block', fontSize: '0.95rem', color: '#064E3B' }}>Fresh Ingredients</strong>
+                <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Daily Sourced</span>
+              </div>
+            </div>
+
+            <div style={{ backgroundColor: '#FFFFFF', padding: '1.5rem', borderRadius: '20px', border: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', gap: '1rem', textAlign: 'left' }}>
+              <div style={{ backgroundColor: '#FFF7ED', color: '#EA580C', borderRadius: '50%', width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <Truck size={24} />
+              </div>
+              <div>
+                <strong style={{ display: 'block', fontSize: '0.95rem', color: '#064E3B' }}>Fast Delivery</strong>
+                <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>At Your Doorstep</span>
+              </div>
+            </div>
+
+            <div style={{ backgroundColor: '#FFFFFF', padding: '1.5rem', borderRadius: '20px', border: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', gap: '1rem', textAlign: 'left' }}>
+              <div style={{ backgroundColor: '#FEF2F2', color: '#EF4444', borderRadius: '50%', width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <Heart size={24} />
+              </div>
+              <div>
+                <strong style={{ display: 'block', fontSize: '0.95rem', color: '#064E3B' }}>Happy Customers</strong>
+                <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Loved by Thousands</span>
+              </div>
+            </div>
+
+          </div>
         </div>
 
       </div>
