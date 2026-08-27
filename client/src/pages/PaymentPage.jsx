@@ -93,9 +93,9 @@ const PaymentPage = () => {
   });
 
   const exactUpiUri = `upi://pay?${upiParams.toString()}`;
-  const phonepeUri = exactUpiUri;
-  const gpayUri = exactUpiUri;
-  const paytmUri = exactUpiUri;
+  const phonepeUri = `phonepe://pay?${upiParams.toString()}`;
+  const gpayUri = `gpay://upi/pay?${upiParams.toString()}`;
+  const paytmUri = `paytmmp://pay?${upiParams.toString()}`;
 
   useEffect(() => {
     if (session && exactUpiUri) {
