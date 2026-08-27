@@ -18,7 +18,7 @@ const AdminSettings = () => {
     delivery_charge: '30.0',
     free_delivery_threshold: '400.0',
     is_accepting_orders: 'true',
-    upi_id: '9158075480@axl'
+    upi_id: 'Pos.11424716@indus'
   });
 
   const [loading, setLoading] = useState(true);

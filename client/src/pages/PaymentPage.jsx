@@ -78,11 +78,11 @@ const PaymentPage = () => {
 
   const totalAmountNum = parseFloat(session?.total_amount || 0);
   const totalAmountFormatted = totalAmountNum.toFixed(2);
-  const upiId = '9158075480@axl';
+  const upiId = 'Pos.11424716@indus';
   const cleanRef = (paymentRef || 'DJ1001').replace(/[^a-zA-Z0-9]/g, '');
 
   // Safely construct standard UPI Payment URI using URLSearchParams
-  // pa = 9158075480@axl, pn = Dosa Junction, tr = UNIQUE_REFERENCE, tn = Order UNIQUE_REFERENCE, am = EXACT_FINAL_AMOUNT, cu = INR
+  // pa = Pos.11424716@indus, pn = Dosa Junction, tr = UNIQUE_REFERENCE, tn = Order UNIQUE_REFERENCE, am = EXACT_FINAL_AMOUNT, cu = INR
   const upiParams = new URLSearchParams({
     pa: upiId,
     pn: 'Dosa Junction',

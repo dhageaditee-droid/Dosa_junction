@@ -15,7 +15,7 @@ const DynamicUpiPayment = ({ order, onPaymentSubmitted }) => {
 
   const orderTotal = parseFloat(order.total_amount || 0).toFixed(2);
   const orderNumber = order.order_number;
-  const upiId = order.upi_id || '9158075480@axl';
+  const upiId = order.upi_id || 'Pos.11424716@indus';
 
   const cleanNum = (orderNumber || 'DJ1001').replace(/[^a-zA-Z0-9]/g, '');
   const upiParams = new URLSearchParams({

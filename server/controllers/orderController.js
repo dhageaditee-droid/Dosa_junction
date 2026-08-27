@@ -13,7 +13,7 @@ const generatePaymentRef = () => {
 };
 
 // Helper to attach UPI URI and UPI ID to order response
-const attachUpiDetails = (order, upiId = '9158075480@axl') => {
+const attachUpiDetails = (order, upiId = 'Pos.11424716@indus') => {
   if (!order) return order;
   const formattedAmount = parseFloat(order.total_amount || 0).toFixed(2);
   const cleanRef = (order.order_number || 'DJ1001').replace(/[^a-zA-Z0-9]/g, '');
@@ -39,7 +39,7 @@ const attachUpiDetails = (order, upiId = '9158075480@axl') => {
 };
 
 // Helper to attach UPI URI and UPI ID to payment session response
-const attachSessionUpiDetails = (session, upiId = '9158075480@axl') => {
+const attachSessionUpiDetails = (session, upiId = 'Pos.11424716@indus') => {
   if (!session) return session;
   const formattedAmount = parseFloat(session.total_amount || 0).toFixed(2);
   const cleanRef = (session.payment_ref || 'PAYDJ1001').replace(/[^a-zA-Z0-9]/g, '');
@@ -96,7 +96,7 @@ const createPaymentSession = async (req, res, next) => {
     const defaultPacking = parseFloat(settingsMap.packing_charge || '15.0');
     const defaultDelivery = parseFloat(settingsMap.delivery_charge || '30.0');
     const freeDeliveryThreshold = parseFloat(settingsMap.free_delivery_threshold || '400.0');
-    const upiId = settingsMap.upi_id || '9158075480@axl';
+    const upiId = settingsMap.upi_id || 'Pos.11424716@indus';
 
     let calculatedSubtotal = 0;
     const validatedItems = [];
@@ -226,7 +226,7 @@ const getPaymentSession = async (req, res, next) => {
 
     const session = sessionRes.rows[0];
     const upiRes = await db.query("SELECT value FROM restaurant_settings WHERE key = 'upi_id'");
-    const upiId = (upiRes.rows[0] && upiRes.rows[0].value) ? upiRes.rows[0].value.trim() : '9158075480@axl';
+    const upiId = (upiRes.rows[0] && upiRes.rows[0].value) ? upiRes.rows[0].value.trim() : 'Pos.11424716@indus';
 
     const formattedSession = attachSessionUpiDetails(session, upiId);
 
@@ -317,7 +317,7 @@ const submitPaymentSessionProof = async (req, res, next) => {
     );
 
     const upiRes = await client.query("SELECT value FROM restaurant_settings WHERE key = 'upi_id'");
-    const upiId = (upiRes.rows[0] && upiRes.rows[0].value) ? upiRes.rows[0].value.trim() : '9158075480@axl';
+    const upiId = (upiRes.rows[0] && upiRes.rows[0].value) ? upiRes.rows[0].value.trim() : 'Pos.11424716@indus';
     const formattedSession = attachSessionUpiDetails(updatedRes.rows[0], upiId);
 
     res.json({
@@ -353,7 +353,7 @@ const getAdminPaymentSessions = async (req, res, next) => {
 
     const result = await db.query(queryText, params);
     const upiRes = await db.query("SELECT value FROM restaurant_settings WHERE key = 'upi_id'");
-    const upiId = (upiRes.rows[0] && upiRes.rows[0].value) ? upiRes.rows[0].value.trim() : '9158075480@axl';
+    const upiId = (upiRes.rows[0] && upiRes.rows[0].value) ? upiRes.rows[0].value.trim() : 'Pos.11424716@indus';
 
     const formattedSessions = result.rows.map(s => attachSessionUpiDetails(s, upiId));
 
@@ -454,7 +454,7 @@ const verifyPaymentSession = async (req, res, next) => {
 
       const itemsRes = await client.query('SELECT * FROM order_items WHERE order_id = $1', [createdOrder.id]);
       const upiRes = await client.query("SELECT value FROM restaurant_settings WHERE key = 'upi_id'");
-      const upiId = (upiRes.rows[0] && upiRes.rows[0].value) ? upiRes.rows[0].value.trim() : '9158075480@axl';
+      const upiId = (upiRes.rows[0] && upiRes.rows[0].value) ? upiRes.rows[0].value.trim() : 'Pos.11424716@indus';
       const formattedOrder = attachUpiDetails(createdOrder, upiId);
 
       res.json({
@@ -512,7 +512,7 @@ const getOrderByNumber = async (req, res, next) => {
     const itemsRes = await db.query('SELECT * FROM order_items WHERE order_id = $1', [order.id]);
     
     const upiRes = await db.query("SELECT value FROM restaurant_settings WHERE key = 'upi_id'");
-    const upiId = (upiRes.rows[0] && upiRes.rows[0].value) ? upiRes.rows[0].value.trim() : '9158075480@axl';
+    const upiId = (upiRes.rows[0] && upiRes.rows[0].value) ? upiRes.rows[0].value.trim() : 'Pos.11424716@indus';
     const formattedOrder = attachUpiDetails(order, upiId);
 
     res.json({
@@ -552,7 +552,7 @@ const getMyOrders = async (req, res, next) => {
 
     const result = await db.query(queryText, params);
     const upiRes = await db.query("SELECT value FROM restaurant_settings WHERE key = 'upi_id'");
-    const upiId = (upiRes.rows[0] && upiRes.rows[0].value) ? upiRes.rows[0].value.trim() : '9158075480@axl';
+    const upiId = (upiRes.rows[0] && upiRes.rows[0].value) ? upiRes.rows[0].value.trim() : 'Pos.11424716@indus';
 
     const ordersWithItems = await Promise.all(result.rows.map(async (ord) => {
       const itemsRes = await db.query('SELECT * FROM order_items WHERE order_id = $1', [ord.id]);
@@ -601,7 +601,7 @@ const getAdminOrders = async (req, res, next) => {
 
     const result = await db.query(queryText, params);
     const upiRes = await db.query("SELECT value FROM restaurant_settings WHERE key = 'upi_id'");
-    const upiId = (upiRes.rows[0] && upiRes.rows[0].value) ? upiRes.rows[0].value.trim() : '9158075480@axl';
+    const upiId = (upiRes.rows[0] && upiRes.rows[0].value) ? upiRes.rows[0].value.trim() : 'Pos.11424716@indus';
 
     const ordersWithItems = await Promise.all(result.rows.map(async (ord) => {
       const itemsRes = await db.query('SELECT * FROM order_items WHERE order_id = $1', [ord.id]);
@@ -643,7 +643,7 @@ const updateOrderStatus = async (req, res, next) => {
     }
 
     const upiRes = await db.query("SELECT value FROM restaurant_settings WHERE key = 'upi_id'");
-    const upiId = (upiRes.rows[0] && upiRes.rows[0].value) ? upiRes.rows[0].value.trim() : '9158075480@axl';
+    const upiId = (upiRes.rows[0] && upiRes.rows[0].value) ? upiRes.rows[0].value.trim() : 'Pos.11424716@indus';
     const formattedOrder = attachUpiDetails(result.rows[0], upiId);
 
     res.json({
@@ -699,7 +699,7 @@ const updatePaymentStatus = async (req, res, next) => {
     await client.query('COMMIT');
 
     const upiRes = await client.query("SELECT value FROM restaurant_settings WHERE key = 'upi_id'");
-    const upiId = (upiRes.rows[0] && upiRes.rows[0].value) ? upiRes.rows[0].value.trim() : '9158075480@axl';
+    const upiId = (upiRes.rows[0] && upiRes.rows[0].value) ? upiRes.rows[0].value.trim() : 'Pos.11424716@indus';
     const formattedOrder = attachUpiDetails(updatedOrderRes.rows[0], upiId);
 
     res.json({
@@ -727,7 +727,7 @@ const getDashboardStats = async (req, res, next) => {
 
     const recentOrdersRes = await db.query(`SELECT * FROM orders ORDER BY created_at DESC LIMIT 6`);
     const upiRes = await db.query("SELECT value FROM restaurant_settings WHERE key = 'upi_id'");
-    const upiId = (upiRes.rows[0] && upiRes.rows[0].value) ? upiRes.rows[0].value.trim() : '9158075480@axl';
+    const upiId = (upiRes.rows[0] && upiRes.rows[0].value) ? upiRes.rows[0].value.trim() : 'Pos.11424716@indus';
 
     const recentOrdersWithItems = await Promise.all(recentOrdersRes.rows.map(async (ord) => {
       const itemsRes = await db.query('SELECT * FROM order_items WHERE order_id = $1', [ord.id]);

@@ -123,4 +123,4 @@ INSERT INTO restaurant_settings (key, value) VALUES
 ('delivery_charge', '30.0'),
 ('free_delivery_threshold', '250.0'),
 ('opening_hours', '7:00 AM - 11:00 PM Daily'),
-('upi_id', '9158075480@axl');
+('upi_id', 'Pos.11424716@indus');
