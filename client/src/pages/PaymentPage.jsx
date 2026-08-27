@@ -81,13 +81,21 @@ const PaymentPage = () => {
   const upiId = 'Pos.11424716@indus';
   const cleanRef = (paymentRef || 'DJ1001').replace(/[^a-zA-Z0-9]/g, '');
 
-  // Exact UPI Payment URIs
-  // upi://pay?pa=Pos.11424716@indus&pn=Dosa%20Junction&am={EXACT_AMOUNT}&cu=INR&tn={ORDER_ID}
-  const encodedName = encodeURIComponent('Dosa Junction');
-  const exactUpiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodedName}&am=${totalAmountFormatted}&cu=INR&tn=${cleanRef}`;
-  const phonepeUri = `phonepe://pay?pa=${encodeURIComponent(upiId)}&pn=${encodedName}&am=${totalAmountFormatted}&cu=INR&tn=${cleanRef}`;
-  const gpayUri = `gpay://upi/pay?pa=${encodeURIComponent(upiId)}&pn=${encodedName}&am=${totalAmountFormatted}&cu=INR&tn=${cleanRef}`;
-  const paytmUri = `paytmmp://pay?pa=${encodeURIComponent(upiId)}&pn=${encodedName}&am=${totalAmountFormatted}&cu=INR&tn=${cleanRef}`;
+  // Safely construct standard UPI Payment URI using URLSearchParams
+  // pa = Pos.11424716@indus, pn = Dosa Junction, tr = UNIQUE_REFERENCE, tn = Order UNIQUE_REFERENCE, am = EXACT_FINAL_AMOUNT, cu = INR
+  const upiParams = new URLSearchParams({
+    pa: upiId,
+    pn: 'Dosa Junction',
+    tr: cleanRef,
+    tn: `Order ${cleanRef}`,
+    am: totalAmountFormatted,
+    cu: 'INR'
+  });
+
+  const exactUpiUri = `upi://pay?${upiParams.toString()}`;
+  const phonepeUri = exactUpiUri;
+  const gpayUri = exactUpiUri;
+  const paytmUri = exactUpiUri;
 
   useEffect(() => {
     if (session && exactUpiUri) {

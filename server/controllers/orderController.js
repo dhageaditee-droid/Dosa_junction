@@ -17,7 +17,15 @@ const attachUpiDetails = (order, upiId = 'Pos.11424716@indus') => {
   if (!order) return order;
   const formattedAmount = parseFloat(order.total_amount || 0).toFixed(2);
   const cleanRef = (order.order_number || 'DJ1001').replace(/[^a-zA-Z0-9]/g, '');
-  const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent('Dosa Junction')}&am=${formattedAmount}&cu=INR&tn=${cleanRef}`;
+  const upiParams = new URLSearchParams({
+    pa: upiId,
+    pn: 'Dosa Junction',
+    tr: cleanRef,
+    tn: `Order ${cleanRef}`,
+    am: formattedAmount,
+    cu: 'INR'
+  });
+  const upiUri = `upi://pay?${upiParams.toString()}`;
   
   if (process.env.NODE_ENV !== 'production') {
     console.log('[UPI Deep Link Generated]:', upiUri);
@@ -35,7 +43,15 @@ const attachSessionUpiDetails = (session, upiId = 'Pos.11424716@indus') => {
   if (!session) return session;
   const formattedAmount = parseFloat(session.total_amount || 0).toFixed(2);
   const cleanRef = (session.payment_ref || 'PAYDJ1001').replace(/[^a-zA-Z0-9]/g, '');
-  const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent('Dosa Junction')}&am=${formattedAmount}&cu=INR&tn=${cleanRef}`;
+  const upiParams = new URLSearchParams({
+    pa: upiId,
+    pn: 'Dosa Junction',
+    tr: cleanRef,
+    tn: `Order ${cleanRef}`,
+    am: formattedAmount,
+    cu: 'INR'
+  });
+  const upiUri = `upi://pay?${upiParams.toString()}`;
 
   if (process.env.NODE_ENV !== 'production') {
     console.log('[UPI Deep Link Generated]:', upiUri);
