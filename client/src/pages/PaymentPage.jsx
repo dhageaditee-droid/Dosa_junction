@@ -391,6 +391,24 @@ const PaymentPage = () => {
                   </div>
                 )}
 
+                {/* Helpful Bank Decline Notice for IndusInd POS VPAs */}
+                <div style={{
+                  backgroundColor: '#EFF6FF',
+                  border: '1.5px solid #BFDBFE',
+                  borderRadius: '16px',
+                  padding: '0.9rem 1.1rem',
+                  marginBottom: '1.2rem',
+                  textAlign: 'left',
+                  fontSize: '0.84rem',
+                  lineHeight: 1.45,
+                  color: '#1E40AF'
+                }}>
+                  <div style={{ fontWeight: 800, color: '#1D4ED8', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                    <Info size={16} color="#2563EB" /> Bank Declined Note for PhonePe / GPay:
+                  </div>
+                  If PhonePe shows <em>"Bank declined for security reasons"</em>, please scan the <strong>Official Dosa Junction QR Code</strong> below or click <strong>COPY UPI ID</strong> to pay directly.
+                </div>
+
                 {/* Option 1: Large Primary "Pay Now" Button */}
                 <a
                   href={exactUpiUri}
@@ -524,19 +542,47 @@ const PaymentPage = () => {
                     Scan using any UPI app
                   </span>
 
-                  {/* Dynamically Generated SVG QR for EXACT Order Amount */}
-                  <div style={{
-                    backgroundColor: '#FFFFFF',
-                    padding: '0.85rem',
-                    borderRadius: '16px',
-                    display: 'inline-block',
-                    boxShadow: '0 4px 14px rgba(0,0,0,0.06)'
-                  }}>
-                    <QRCodeSVG value={exactUpiUri} size={190} level="H" includeMargin={true} />
+                  {/* Dynamically Generated SVG QR & Official Scanner Image */}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'center', alignItems: 'center' }}>
+                    {/* Dynamic SVG QR */}
+                    <div style={{
+                      backgroundColor: '#FFFFFF',
+                      padding: '0.85rem',
+                      borderRadius: '16px',
+                      boxShadow: '0 4px 14px rgba(0,0,0,0.06)'
+                    }}>
+                      <QRCodeSVG value={exactUpiUri} size={180} level="H" includeMargin={true} />
+                      <span style={{ fontSize: '0.75rem', color: '#166534', fontWeight: 800, display: 'block', marginTop: '4px' }}>
+                        Dynamic Amount: ₹{totalAmountFormatted}
+                      </span>
+                    </div>
+
+                    {/* Official Dosa Junction Static QR Scanner */}
+                    <div style={{
+                      backgroundColor: '#FFFFFF',
+                      padding: '0.85rem',
+                      borderRadius: '16px',
+                      boxShadow: '0 4px 14px rgba(0,0,0,0.06)'
+                    }}>
+                      <img
+                        src="/assets/dosa_junction_qr.png"
+                        alt="Dosa Junction Official UPI QR Code"
+                        style={{
+                          width: '180px',
+                          height: '180px',
+                          borderRadius: '12px',
+                          objectFit: 'contain',
+                          display: 'block'
+                        }}
+                      />
+                      <span style={{ fontSize: '0.75rem', color: '#B45309', fontWeight: 800, display: 'block', marginTop: '4px' }}>
+                        Official POS Scanner QR
+                      </span>
+                    </div>
                   </div>
 
-                  <span style={{ fontSize: '0.78rem', color: '#B45309', fontWeight: 800, display: 'block', marginTop: '8px' }}>
-                    Exact Amount: ₹{totalAmountFormatted}
+                  <span style={{ fontSize: '0.8rem', color: '#B45309', fontWeight: 800, display: 'block', marginTop: '10px' }}>
+                    Scan with PhonePe, Google Pay, Paytm, or BHIM to pay ₹{totalAmountFormatted} directly!
                   </span>
                 </div>
 
