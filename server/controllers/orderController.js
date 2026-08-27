@@ -13,7 +13,7 @@ const generatePaymentRef = () => {
 };
 
 // Helper to attach UPI URI and UPI ID to order response
-const attachUpiDetails = (order, upiId = 'Pos.11424716@indus') => {
+const attachUpiDetails = (order, upiId = '11424716@indus') => {
   if (!order) return order;
   const formattedAmount = parseFloat(order.total_amount || 0).toFixed(2);
   const cleanRef = (order.order_number || 'DJ1001').replace(/[^a-zA-Z0-9]/g, '');
@@ -31,7 +31,7 @@ const attachUpiDetails = (order, upiId = 'Pos.11424716@indus') => {
 };
 
 // Helper to attach UPI URI and UPI ID to payment session response
-const attachSessionUpiDetails = (session, upiId = 'Pos.11424716@indus') => {
+const attachSessionUpiDetails = (session, upiId = '11424716@indus') => {
   if (!session) return session;
   const formattedAmount = parseFloat(session.total_amount || 0).toFixed(2);
   const cleanRef = (session.payment_ref || 'PAYDJ1001').replace(/[^a-zA-Z0-9]/g, '');

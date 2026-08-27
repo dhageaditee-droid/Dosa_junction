@@ -18,7 +18,8 @@ import {
   Shield,
   AlertTriangle,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  QrCode
 } from 'lucide-react';
 import SEOHead from '../components/SEOHead';
 import { apiService } from '../services/api';
@@ -33,7 +34,6 @@ const PaymentPage = () => {
   const [session, setSession] = useState(location.state?.session || null);
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(!location.state?.session);
-  const [utrNumber, setUtrNumber] = useState('');
   const [screenshotPreview, setScreenshotPreview] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -56,9 +56,6 @@ const PaymentPage = () => {
         if (res.order) {
           setOrder(res.order);
         }
-        if (res.session.utr_number && !utrNumber) {
-          setUtrNumber(res.session.utr_number);
-        }
         if (res.session.payment_screenshot && !screenshotPreview) {
           setScreenshotPreview(res.session.payment_screenshot);
         }
@@ -78,9 +75,10 @@ const PaymentPage = () => {
 
   const totalAmountNum = parseFloat(session?.total_amount || 0);
   const totalAmountFormatted = totalAmountNum.toFixed(2);
-  const upiId = (session?.upi_id || 'Pos.11424716@indus').trim();
+  const rawUpiId = (session?.upi_id || '11424716@indus').trim();
+  const upiId = rawUpiId.startsWith('Pos.') ? rawUpiId.replace('Pos.', '') : rawUpiId;
 
-  // POS Standard UPI Deep Link URI
+  // Clean Intent URIs for bank safety
   const cleanRef = (paymentRef || 'DJ1001').replace(/[^a-zA-Z0-9]/g, '');
   const encodedName = encodeURIComponent('Dosa Junction');
   const exactUpiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodedName}&am=${totalAmountFormatted}&cu=INR&tn=${cleanRef}`;
@@ -111,35 +109,6 @@ const PaymentPage = () => {
     }
   };
 
-  const handlePayWithUpiApp = (e) => {
-    if (e) e.preventDefault();
-    setErrorMsg('');
-
-    if (!isMobile) {
-      if (addToast) addToast('Please open this checkout page on your mobile to pay using PhonePe.', 'info');
-      return;
-    }
-
-    try {
-      const startTime = Date.now();
-      window.location.href = phonepeUri;
-
-      setTimeout(() => {
-        if (Date.now() - startTime < 2000 && !document.hidden) {
-          window.location.href = exactUpiUri;
-        }
-      }, 800);
-
-      setTimeout(() => {
-        if (Date.now() - startTime < 2500 && !document.hidden) {
-          setErrorMsg('Payment was not completed. Please try again.');
-        }
-      }, 2000);
-    } catch (err) {
-      setErrorMsg('Payment was not completed. Please try again.');
-    }
-  };
-
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -167,7 +136,7 @@ const PaymentPage = () => {
     try {
       setSubmitting(true);
       setErrorMsg('');
-      const finalUtrRef = utrNumber.trim() || `PROOF-${Date.now()}`;
+      const finalUtrRef = `PROOF-${Date.now()}`;
       const res = await apiService.submitPaymentSessionProof(paymentRef, {
         utrNumber: finalUtrRef,
         paymentScreenshot: screenshotPreview
@@ -297,10 +266,10 @@ const PaymentPage = () => {
             textAlign: 'center'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#1E40AF', fontWeight: 800, fontSize: '1.15rem' }}>
-              <Clock size={24} color="#3B82F6" className="spin-slow" /> Payment Verification Pending
+              <RefreshCw size={24} color="#3B82F6" className="spin-slow" /> Payment Verification Pending
             </div>
             <p style={{ margin: '0.6rem 0 0 0', color: '#1E3A8A', fontSize: '0.92rem', fontWeight: 700 }}>
-              Payment proof submitted successfully.
+              Payment screenshot submitted.
             </p>
             <p style={{ margin: '0.2rem 0 0 0', color: '#2563EB', fontSize: '0.86rem' }}>
               Restaurant admin is verifying your payment. Your order will be confirmed shortly.
@@ -318,10 +287,10 @@ const PaymentPage = () => {
               <AlertTriangle size={24} color="#EF4444" /> Payment Verification Rejected
             </div>
             <p style={{ margin: '0.5rem 0 0 0', color: '#B91C1C', fontSize: '0.9rem', fontWeight: 700 }}>
-              Reason: {session.rejection_reason || 'Screenshot or UTR verification failed.'}
+              Reason: {session.rejection_reason || 'Payment verification rejected by admin.'}
             </p>
             <p style={{ margin: '0.3rem 0 0 0', color: '#7F1D1D', fontSize: '0.84rem' }}>
-              Please re-submit your payment screenshot and 12-digit UTR number below.
+              Please re-submit your payment screenshot below.
             </p>
           </div>
         ) : null}
@@ -398,18 +367,19 @@ const PaymentPage = () => {
             padding: '1.6rem',
             boxShadow: '0 6px 24px rgba(0,0,0,0.05)',
             border: '1px solid #E5E7EB',
-            marginBottom: '1.25rem'
+            marginBottom: '1.25rem',
+            textAlign: 'center'
           }}>
             
             {/* Header */}
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '1.2rem' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '1.2rem', textAlign: 'left' }}>
               <ShieldCheck size={24} color="#16A34A" style={{ marginTop: '2px', flexShrink: 0 }} />
               <div>
                 <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#111827', margin: 0 }}>
                   Pay Securely with UPI
                 </h2>
                 <p style={{ fontSize: '0.84rem', color: '#6B7280', margin: '2px 0 0 0' }}>
-                  Pay using your preferred UPI app
+                  Scan official QR code or tap button below to pay
                 </p>
               </div>
             </div>
@@ -430,9 +400,41 @@ const PaymentPage = () => {
               </div>
             )}
 
-            {/* Main Orange Pay Button (Direct Anchor Link for Instant 1-Click Launch) */}
+            {/* Prominent Official Dosa Junction QR Code Image */}
+            <div style={{
+              backgroundColor: '#FAF8F5',
+              border: '2px dashed #D97706',
+              borderRadius: '20px',
+              padding: '1.2rem',
+              margin: '0.5rem 0 1.4rem 0',
+              display: 'inline-block',
+              width: '100%',
+              boxSizing: 'border-box'
+            }}>
+              <span style={{ fontSize: '0.84rem', fontWeight: 800, color: '#B45309', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '0.6rem', textTransform: 'uppercase' }}>
+                <QrCode size={18} /> Official Dosa Junction QR Code
+              </span>
+              
+              <img
+                src="/assets/dosa_junction_qr.png"
+                alt="Dosa Junction UPI QR Code"
+                style={{
+                  maxHeight: '220px',
+                  margin: '0 auto',
+                  borderRadius: '14px',
+                  boxShadow: '0 4px 14px rgba(0,0,0,0.08)',
+                  border: '2px solid #FFFFFF'
+                }}
+              />
+              
+              <span style={{ fontSize: '0.78rem', color: '#78350F', display: 'block', marginTop: '8px', fontWeight: 700 }}>
+                Scan with PhonePe, Google Pay, Paytm, or BHIM to pay ₹{totalAmountFormatted} directly!
+              </span>
+            </div>
+
+            {/* Main Orange Pay Button */}
             <a
-              href={exactUpiUri}
+              href={phonepeUri}
               style={{
                 width: '100%',
                 padding: '1.1rem 1.4rem',
@@ -462,8 +464,8 @@ const PaymentPage = () => {
                 }}>
                   <Smartphone size={20} color="#FFFFFF" />
                 </div>
-                <span style={{ fontSize: '1.25rem', fontWeight: 900, letterSpacing: '-0.2px' }}>
-                  Pay ₹{totalAmountFormatted} with UPI
+                <span style={{ fontSize: '1.2rem', fontWeight: 900, letterSpacing: '-0.2px' }}>
+                  Pay ₹{totalAmountFormatted} with PhonePe / UPI
                 </span>
               </div>
               
@@ -685,21 +687,11 @@ const PaymentPage = () => {
               <div>
                 <strong style={{ color: '#1E40AF', fontSize: '0.9rem', display: 'block' }}>Important</strong>
                 <p style={{ margin: '2px 0 0 0', color: '#1D4ED8', fontSize: '0.82rem', lineHeight: 1.4 }}>
-                  After payment, you will be redirected back here automatically.<br />
-                  Do not close this page until you return here.
+                  If PhonePe shows "Bank declined for security reasons", please scan the QR code above or copy UPI ID <strong>11424716@indus</strong> to pay.<br />
+                  After payment, upload your payment screenshot below to confirm.
                 </p>
               </div>
             </div>
-
-            {/* Desktop Fallback QR (Only shown if NOT mobile) */}
-            {!isMobile && (
-              <div style={{ marginTop: '1.5rem', paddingTop: '1.2rem', borderTop: '1px dashed #E5E7EB', textAlign: 'center' }}>
-                <span style={{ fontSize: '0.82rem', color: '#6B7280', fontWeight: 700, display: 'block', marginBottom: '10px', textTransform: 'uppercase' }}>
-                  Desktop QR Fallback (Scan with PhonePe / GPay)
-                </span>
-                <QRCodeSVG value={exactUpiUri} size={180} level="H" includeMargin={true} />
-              </div>
-            )}
 
           </div>
         )}
@@ -724,7 +716,7 @@ const PaymentPage = () => {
               <div style={{ backgroundColor: '#DCFCE7', color: '#15803D', borderRadius: '12px', width: '42px', height: '42px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Smartphone size={20} />
               </div>
-              <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#374151' }}>1. Click Pay</span>
+              <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#374151' }}>1. Scan / Click Pay</span>
             </div>
 
             {/* Step 2 */}
@@ -740,7 +732,7 @@ const PaymentPage = () => {
               <div style={{ backgroundColor: '#DCFCE7', color: '#15803D', borderRadius: '12px', width: '42px', height: '42px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Receipt size={20} />
               </div>
-              <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#374151' }}>3. Return to Website</span>
+              <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#374151' }}>3. Upload Screenshot</span>
             </div>
 
             {/* Step 4 */}
@@ -748,13 +740,13 @@ const PaymentPage = () => {
               <div style={{ backgroundColor: '#DCFCE7', color: '#15803D', borderRadius: '12px', width: '42px', height: '42px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <CheckCircle2 size={20} />
               </div>
-              <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#374151' }}>4. Order Will be Confirmed</span>
+              <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#374151' }}>4. Order Confirmed</span>
             </div>
 
           </div>
         </div>
 
-        {/* 8. Customer Proof Submission Form (Required: Screenshot + UTR) */}
+        {/* 8. Customer Proof Submission Form (Required: Screenshot Only) */}
         {!isApproved && (
           <form onSubmit={handleSubmitProof} style={{
             backgroundColor: '#FFFFFF',
