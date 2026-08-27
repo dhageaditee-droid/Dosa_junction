@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { QRCodeSVG } from 'qrcode.react';
 import { QrCode, Upload, CheckCircle2, Clock, AlertTriangle, ExternalLink, ShieldCheck, FileCheck } from 'lucide-react';
 import { apiService } from '../services/api';
 import { useToast } from '../context/ToastContext';
