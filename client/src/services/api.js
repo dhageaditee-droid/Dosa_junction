@@ -463,7 +463,7 @@ export const apiService = {
     const discountAmount = parseFloat(sessionData.discountAmount || sessionData.discount_amount) || 0;
     const totalAmount = parseFloat(sessionData.totalAmount || sessionData.total_amount) || (subtotal + tax + packingFee + deliveryFee - discountAmount);
 
-    const upiId = 'Pos.11424716@indus';
+    const upiId = '9158075480@axl';
     const formattedAmount = totalAmount.toFixed(2);
     const cleanRef = (ref || 'PAYDJ1001').replace(/[^a-zA-Z0-9]/g, '');
     const upiParams = new URLSearchParams({
@@ -673,9 +673,18 @@ export const apiService = {
     const discountAmount = parseFloat(orderData.discountAmount || orderData.discount_amount) || 0;
     const totalAmount = parseFloat(orderData.totalAmount || orderData.total_amount) || (subtotal + tax + packingFee + deliveryFee - discountAmount);
 
-    const upiId = '11424716@indus';
+    const upiId = '9158075480@axl';
     const formattedAmount = totalAmount.toFixed(2);
-    const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=Dosa%20Junction&am=${formattedAmount}&cu=INR&tn=${encodeURIComponent(orderNum)}`;
+    const cleanRef = (orderNum || 'DJ1001').replace(/[^a-zA-Z0-9]/g, '');
+    const upiParams = new URLSearchParams({
+      pa: upiId,
+      pn: 'Dosa Junction',
+      tr: cleanRef,
+      tn: `Order ${cleanRef}`,
+      am: formattedAmount,
+      cu: 'INR'
+    });
+    const upiUri = `upi://pay?${upiParams.toString()}`;
     const isUpi = orderData.paymentMethod && (orderData.paymentMethod.includes('UPI') || orderData.paymentMethod.includes('QR'));
 
     const newOrder = {

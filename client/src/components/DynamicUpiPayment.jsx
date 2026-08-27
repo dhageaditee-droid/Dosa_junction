@@ -15,12 +15,18 @@ const DynamicUpiPayment = ({ order, onPaymentSubmitted }) => {
 
   const orderTotal = parseFloat(order.total_amount || 0).toFixed(2);
   const orderNumber = order.order_number;
-  const upiId = order.upi_id || '11424716@indus';
+  const upiId = order.upi_id || '9158075480@axl';
 
-  // Construct official dynamic UPI payment URI
-  // upi://pay?pa=YOUR_UPI_ID&pn=Dosa%20Junction&am=ORDER_AMOUNT&cu=INR&tn=ORDER_ID
   const cleanNum = (orderNumber || 'DJ1001').replace(/[^a-zA-Z0-9]/g, '');
-  const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent('Dosa Junction')}&am=${orderTotal}&cu=INR&tn=${cleanNum}`;
+  const upiParams = new URLSearchParams({
+    pa: upiId,
+    pn: 'Dosa Junction',
+    tr: cleanNum,
+    tn: `Order ${cleanNum}`,
+    am: orderTotal,
+    cu: 'INR'
+  });
+  const upiUri = `upi://pay?${upiParams.toString()}`;
 
   const isPendingVerification = order.payment_status === 'Payment Verification Pending' || order.payment_status === 'PENDING_VERIFICATION';
   const isVerified = order.payment_status === 'Payment Verified' || order.payment_status === 'PAID';
