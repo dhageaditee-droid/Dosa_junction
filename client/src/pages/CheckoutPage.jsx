@@ -51,8 +51,8 @@ const CheckoutPage = () => {
     orderType: 'Home Delivery',
     deliveryAddress: '',
     landmark: '',
-    city: 'Sangamner',
-    pincode: '422601',
+    city: '',
+    pincode: '',
     paymentMethod: 'Online UPI Payment',
     notes: ''
   });
@@ -253,7 +253,7 @@ const CheckoutPage = () => {
                           setFormData({ ...formData, customerName: e.target.value });
                           if (errors.customerName) setErrors({ ...errors, customerName: null });
                         }}
-                        placeholder="e.g. Anand Kumar"
+                        placeholder="Enter full name"
                         className="form-input"
                         style={{ borderColor: errors.customerName ? '#EF4444' : undefined, borderRadius: '12px' }}
                       />
@@ -271,7 +271,7 @@ const CheckoutPage = () => {
                           setFormData({ ...formData, customerPhone: val });
                           if (errors.customerPhone) setErrors({ ...errors, customerPhone: null });
                         }}
-                        placeholder="e.g. 9876543210"
+                        placeholder="Enter 10-digit mobile number"
                         className="form-input"
                         style={{ borderColor: errors.customerPhone ? '#EF4444' : undefined, borderRadius: '12px' }}
                       />
@@ -295,7 +295,7 @@ const CheckoutPage = () => {
                             setFormData({ ...formData, deliveryAddress: e.target.value });
                             if (errors.deliveryAddress) setErrors({ ...errors, deliveryAddress: null });
                           }}
-                          placeholder="e.g. Flat 201, Shanti Niwas, Station Road, Sangamner"
+                          placeholder="Enter house no, flat, street address"
                           className="form-input"
                           style={{ borderColor: errors.deliveryAddress ? '#EF4444' : undefined, borderRadius: '12px' }}
                         />
@@ -313,7 +313,7 @@ const CheckoutPage = () => {
                             type="text"
                             value={formData.landmark}
                             onChange={(e) => setFormData({ ...formData, landmark: e.target.value })}
-                            placeholder="Near Panchvati Hotel"
+                            placeholder="Enter landmark"
                             className="form-input"
                             style={{ borderRadius: '10px' }}
                           />
@@ -325,6 +325,7 @@ const CheckoutPage = () => {
                             type="text"
                             value={formData.city}
                             onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                            placeholder="Enter city"
                             className="form-input"
                             style={{ borderColor: errors.city ? '#EF4444' : undefined, borderRadius: '10px' }}
                           />
@@ -338,6 +339,7 @@ const CheckoutPage = () => {
                             maxLength={6}
                             value={formData.pincode}
                             onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
+                            placeholder="Enter PIN code"
                             className="form-input"
                             style={{ borderColor: errors.pincode ? '#EF4444' : undefined, borderRadius: '10px' }}
                           />
