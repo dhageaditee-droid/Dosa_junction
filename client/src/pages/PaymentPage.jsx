@@ -406,7 +406,7 @@ const PaymentPage = () => {
                   <div style={{ fontWeight: 800, color: '#1D4ED8', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                     <Info size={16} color="#2563EB" /> Bank Declined Note for PhonePe / GPay:
                   </div>
-                  If PhonePe shows <em>"Bank declined for security reasons"</em>, please scan the <strong>Official Dosa Junction QR Code</strong> below or click <strong>COPY UPI ID</strong> to pay directly.
+                  If PhonePe shows <em>"Bank declined for security reasons"</em>, please click <strong>COPY UPI ID</strong> below to pay directly on PhonePe / GPay.
                 </div>
 
                 {/* Option 1: Large Primary "Pay Now" Button */}
@@ -519,72 +519,7 @@ const PaymentPage = () => {
                   </a>
                 </div>
 
-                {/* OR Divider */}
-                <div style={{ position: 'relative', textAlign: 'center', margin: '1.4rem 0' }}>
-                  <div style={{ borderBottom: '1px solid #E5E7EB', position: 'absolute', top: '50%', left: 0, right: 0, zIndex: 1 }}></div>
-                  <span style={{ backgroundColor: '#FFFFFF', padding: '0 14px', fontSize: '0.82rem', fontWeight: 800, color: '#9CA3AF', position: 'relative', zIndex: 2 }}>
-                    OR
-                  </span>
-                </div>
 
-                {/* Option 2: Dynamic QR Payment Fallback ("Scan & Pay") */}
-                <div style={{
-                  backgroundColor: '#FAF8F5',
-                  border: '1.5px dashed #D97706',
-                  borderRadius: '20px',
-                  padding: '1.2rem',
-                  marginBottom: '1.4rem'
-                }}>
-                  <div style={{ fontSize: '1.05rem', fontWeight: 900, color: '#064E3B', marginBottom: '0.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-                    <QrCode size={20} color="#EA580C" /> Scan & Pay
-                  </div>
-                  <span style={{ fontSize: '0.8rem', color: '#6B7280', display: 'block', marginBottom: '0.8rem' }}>
-                    Scan using any UPI app
-                  </span>
-
-                  {/* Dynamically Generated SVG QR & Official Scanner Image */}
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'center', alignItems: 'center' }}>
-                    {/* Dynamic SVG QR */}
-                    <div style={{
-                      backgroundColor: '#FFFFFF',
-                      padding: '0.85rem',
-                      borderRadius: '16px',
-                      boxShadow: '0 4px 14px rgba(0,0,0,0.06)'
-                    }}>
-                      <QRCodeSVG value={exactUpiUri} size={180} level="H" includeMargin={true} />
-                      <span style={{ fontSize: '0.75rem', color: '#166534', fontWeight: 800, display: 'block', marginTop: '4px' }}>
-                        Dynamic Amount: ₹{totalAmountFormatted}
-                      </span>
-                    </div>
-
-                    {/* Official Dosa Junction Static QR Scanner */}
-                    <div style={{
-                      backgroundColor: '#FFFFFF',
-                      padding: '0.85rem',
-                      borderRadius: '16px',
-                      boxShadow: '0 4px 14px rgba(0,0,0,0.06)'
-                    }}>
-                      <img
-                        src="/assets/dosa_junction_qr.png"
-                        alt="Dosa Junction Official UPI QR Code"
-                        style={{
-                          width: '180px',
-                          height: '180px',
-                          borderRadius: '12px',
-                          objectFit: 'contain',
-                          display: 'block'
-                        }}
-                      />
-                      <span style={{ fontSize: '0.75rem', color: '#B45309', fontWeight: 800, display: 'block', marginTop: '4px' }}>
-                        Official POS Scanner QR
-                      </span>
-                    </div>
-                  </div>
-
-                  <span style={{ fontSize: '0.8rem', color: '#B45309', fontWeight: 800, display: 'block', marginTop: '10px' }}>
-                    Scan with PhonePe, Google Pay, Paytm, or BHIM to pay ₹{totalAmountFormatted} directly!
-                  </span>
-                </div>
 
                 {/* Copy UPI ID Bar */}
                 <div style={{
