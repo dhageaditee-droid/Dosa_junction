@@ -220,10 +220,7 @@ const CartPage = () => {
                 </div>
               )}
 
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: 'var(--color-text-muted)' }}>Tax (GST 5%)</span>
-                <span>₹{tax.toFixed(2)}</span>
-              </div>
+
 
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: 'var(--color-text-muted)' }}>Packing Charge</span>

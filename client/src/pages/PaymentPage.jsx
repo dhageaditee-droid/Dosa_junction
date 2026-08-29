@@ -707,10 +707,7 @@ const PaymentPage = () => {
                 </div>
               )}
 
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: '#6B7280' }}>GST (5%)</span>
-                <span>₹{parseFloat(session.tax || 0).toFixed(2)}</span>
-              </div>
+
 
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: '#6B7280' }}>Packing Charge</span>
