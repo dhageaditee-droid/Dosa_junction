@@ -154,11 +154,7 @@ const DynamicUpiPayment = ({ order, onPaymentSubmitted }) => {
           border: '2px dashed var(--color-gold, #D97706)',
           marginBottom: '2rem'
         }}>
-          {/* 6. Display clearly above QR: "Pay ₹{orderTotal}" */}
           <div style={{ marginBottom: '1.2rem' }}>
-            <span style={{ fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--color-text-muted)', fontWeight: 700, letterSpacing: '0.5px' }}>
-              Dynamic Order UPI QR Code
-            </span>
             <h2 style={{
               fontSize: '2rem',
               fontWeight: 900,
@@ -172,38 +168,6 @@ const DynamicUpiPayment = ({ order, onPaymentSubmitted }) => {
               Order ID: <strong style={{ color: 'var(--color-emerald)' }}>{orderNumber}</strong>
             </div>
           </div>
-
-          {/* Dosa Junction Official Scanner */}
-          <div style={{
-            display: 'inline-block',
-            backgroundColor: '#FFFFFF',
-            padding: '1rem',
-            borderRadius: '16px',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
-            marginBottom: '1rem'
-          }}>
-            <img
-              src="/assets/dosa_junction_qr.png"
-              alt="Dosa Junction Official UPI QR Code"
-              style={{
-                width: '230px',
-                height: '230px',
-                borderRadius: '12px',
-                objectFit: 'contain',
-                display: 'block'
-              }}
-            />
-          </div>
-
-          {/* 7. Display below QR: "Scan using Google Pay, PhonePe, Paytm or any UPI app." */}
-          <p style={{
-            fontSize: '0.9rem',
-            fontWeight: 700,
-            color: 'var(--color-emerald, #064E3B)',
-            margin: '0.5rem 0 1rem 0'
-          }}>
-            Scan using Google Pay, PhonePe, Paytm or any UPI app.
-          </p>
 
           {/* 8. Mobile-only "Pay with UPI App" button */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem' }}>
