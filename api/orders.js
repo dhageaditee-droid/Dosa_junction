@@ -155,8 +155,8 @@ module.exports = async function handler(req, res) {
 
       const subtotal = items.reduce((sum, i) => sum + i.subtotal, 0);
       const packing_charge = parseFloat(payload.packingFee || payload.packing_charge) || (payload.orderType === 'Dine In' ? 0 : 15);
-      const delivery_charge = parseFloat(payload.deliveryFee || payload.delivery_charge) || (payload.orderType === 'Home Delivery' ? 30 : 0);
-      const tax = parseFloat(payload.tax) || parseFloat((subtotal * 0.05).toFixed(2));
+      const delivery_charge = parseFloat(payload.deliveryFee || payload.delivery_charge) || (payload.orderType === 'Home Delivery' ? 29 : 0);
+      const tax = 0;
       const discount_amount = parseFloat(payload.discountAmount || payload.discount_amount) || 0;
       const total_amount = subtotal + tax + packing_charge + delivery_charge - discount_amount;
 

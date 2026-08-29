@@ -136,8 +136,8 @@ const fetchOrdersFromCloudSync = async () => {
     const subtotal = (parseFloat(ord.subtotal) > 0) ? parseFloat(ord.subtotal) : calculatedSubtotal;
 
     const packing = parseFloat(ord.packing_charge || ord.packingFee) || (ord.order_type === 'Dine-In' || ord.order_type === 'Dine In' ? 0 : 15);
-    const delivery = parseFloat(ord.delivery_charge || ord.deliveryFee) || (ord.order_type === 'Home Delivery' ? 30 : 0);
-    const tax = parseFloat(ord.tax) || parseFloat((subtotal * 0.05).toFixed(2));
+    const delivery = parseFloat(ord.delivery_charge || ord.deliveryFee) || (ord.order_type === 'Home Delivery' ? 29 : 0);
+    const tax = 0;
     const discount = parseFloat(ord.discount_amount || ord.discountAmount || 0);
 
     const calculatedTotal = subtotal + tax + packing + delivery - discount;
@@ -457,9 +457,9 @@ export const apiService = {
     }));
 
     const subtotal = parseFloat(sessionData.subtotal) || formattedItems.reduce((sum, i) => sum + i.subtotal, 0);
-    const tax = parseFloat(sessionData.tax) || parseFloat((subtotal * 0.05).toFixed(2));
+    const tax = parseFloat(sessionData.tax) || 0;
     const packingFee = parseFloat(sessionData.packingFee || sessionData.packing_charge) || 15;
-    const deliveryFee = parseFloat(sessionData.deliveryFee || sessionData.delivery_charge) || 30;
+    const deliveryFee = parseFloat(sessionData.deliveryFee || sessionData.delivery_charge) || 29;
     const discountAmount = parseFloat(sessionData.discountAmount || sessionData.discount_amount) || 0;
     const totalAmount = parseFloat(sessionData.totalAmount || sessionData.total_amount) || (subtotal + tax + packingFee + deliveryFee - discountAmount);
 
@@ -667,9 +667,9 @@ export const apiService = {
     });
 
     const subtotal = parseFloat(orderData.subtotal) || formattedItems.reduce((sum, i) => sum + i.subtotal, 0);
-    const tax = parseFloat(orderData.tax) || parseFloat((subtotal * 0.05).toFixed(2));
+    const tax = parseFloat(orderData.tax) || 0;
     const packingFee = parseFloat(orderData.packingFee || orderData.packing_charge) || 15;
-    const deliveryFee = parseFloat(orderData.deliveryFee || orderData.delivery_charge) || 30;
+    const deliveryFee = parseFloat(orderData.deliveryFee || orderData.delivery_charge) || 29;
     const discountAmount = parseFloat(orderData.discountAmount || orderData.discount_amount) || 0;
     const totalAmount = parseFloat(orderData.totalAmount || orderData.total_amount) || (subtotal + tax + packingFee + deliveryFee - discountAmount);
 

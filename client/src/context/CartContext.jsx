@@ -63,10 +63,10 @@ export const CartProvider = ({ children }) => {
   const discountAmount = 0;
 
   const netSubtotal = Math.max(0, subtotal - discountAmount);
-  const tax = parseFloat((netSubtotal * 0.05).toFixed(2));
+  const tax = 0;
   const packingFee = cartItems.length > 0 ? 15.0 : 0;
   const freeDeliveryThreshold = 400.0;
-  const deliveryFee = cartItems.length > 0 ? (subtotal >= freeDeliveryThreshold ? 0 : 30.0) : 0;
+  const deliveryFee = cartItems.length > 0 ? (subtotal >= freeDeliveryThreshold ? 0 : 29.0) : 0;
   const grandTotal = parseFloat((netSubtotal + tax + packingFee + deliveryFee).toFixed(2));
 
   const applyCoupon = async () => {

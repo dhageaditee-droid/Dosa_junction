@@ -92,9 +92,9 @@ const createPaymentSession = async (req, res, next) => {
     const settingsMap = {};
     settingsRes.rows.forEach(r => { settingsMap[r.key] = r.value; });
 
-    const taxPercent = parseFloat(settingsMap.tax_rate_percent || '5.0');
+    const taxPercent = 0;
     const defaultPacking = parseFloat(settingsMap.packing_charge || '15.0');
-    const defaultDelivery = parseFloat(settingsMap.delivery_charge || '30.0');
+    const defaultDelivery = parseFloat(settingsMap.delivery_charge || '29.0');
     const freeDeliveryThreshold = parseFloat(settingsMap.free_delivery_threshold || '400.0');
     const upiId = settingsMap.upi_id || 'Pos.11424716@indus';
 

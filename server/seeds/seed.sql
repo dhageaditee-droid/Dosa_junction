@@ -118,9 +118,9 @@ INSERT INTO restaurant_settings (key, value) VALUES
 ('address', '108 Indiranagar 100 Feet Road, Bengaluru, Karnataka 560038'),
 ('phone', '+91 98765 43210'),
 ('email', 'info@dakshinbhavan.com'),
-('tax_rate_percent', '5.0'),
+('tax_rate_percent', '0.0'),
 ('packing_charge', '15.0'),
-('delivery_charge', '30.0'),
+('delivery_charge', '29.0'),
 ('free_delivery_threshold', '250.0'),
 ('opening_hours', '7:00 AM - 11:00 PM Daily'),
 ('upi_id', 'Pos.11424716@indus');
