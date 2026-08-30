@@ -147,48 +147,7 @@ const CartPage = () => {
               </div>
             </div>
 
-            {/* Coupon Code Section */}
-            <div style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '20px',
-              padding: '1.25rem 1.5rem',
-              border: '1px solid var(--color-border)',
-              boxShadow: '0 4px 14px rgba(0,0,0,0.03)'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem', fontWeight: 800, color: '#064E3B', marginBottom: '0.8rem' }}>
-                <Tag size={18} color="#D97706" /> Apply Discount Coupon
-              </div>
-              
-              {appliedCoupon ? (
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#ECFDF5', border: '1px solid #A7F3D0', padding: '0.75rem 1rem', borderRadius: '12px' }}>
-                  <div>
-                    <strong style={{ color: '#065F46', fontSize: '0.95rem' }}>{appliedCoupon.code}</strong>
-                    <span style={{ fontSize: '0.8rem', color: '#047857', display: 'block' }}>Coupon Applied Successfully!</span>
-                  </div>
-                  <button onClick={removeCoupon} style={{ border: 'none', background: 'none', color: '#DC2626', fontWeight: 800, fontSize: '0.82rem', cursor: 'pointer' }}>
-                    Remove
-                  </button>
-                </div>
-              ) : (
-                <form onSubmit={handleApplyCoupon} style={{ display: 'flex', gap: '0.6rem' }}>
-                  <input
-                    type="text"
-                    value={couponInput}
-                    onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                    placeholder="Enter Coupon Code (e.g. DOSA10)"
-                    style={{ flexGrow: 1, padding: '0.6rem 1rem', borderRadius: '10px', border: '1px solid var(--color-border)', fontSize: '0.88rem', outline: 'none' }}
-                  />
-                  <button
-                    type="submit"
-                    disabled={applyingCoupon}
-                    className="btn btn-primary"
-                    style={{ padding: '0.6rem 1.2rem', fontSize: '0.88rem', fontWeight: 800, borderRadius: '10px', flexShrink: 0 }}
-                  >
-                    Apply
-                  </button>
-                </form>
-              )}
-            </div>
+
 
           </div>
 
