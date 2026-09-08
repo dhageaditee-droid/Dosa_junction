@@ -305,8 +305,8 @@ export const apiCall = async (endpoint, method = 'GET', data = null, customToken
 const getDynamicMenu = () => {
   try {
     const currentVer = localStorage.getItem('dakshin_menu_ver');
-    if (currentVer !== 'v18_mysore_masala_dosa_photo') {
-      localStorage.setItem('dakshin_menu_ver', 'v18_mysore_masala_dosa_photo');
+    if (currentVer !== 'v19_cut_masala_dosa_photo') {
+      localStorage.setItem('dakshin_menu_ver', 'v19_cut_masala_dosa_photo');
       localStorage.setItem('dakshin_custom_menu', JSON.stringify(FALLBACK_MENU_ITEMS));
       return FALLBACK_MENU_ITEMS;
     }
@@ -335,6 +335,9 @@ const getDynamicMenu = () => {
           }
           if (String(item.id) === '16' || (item.name && item.name.includes('Mysore Masala'))) {
             return { ...item, image_url: '/mysore-masala-dosa.jpg' };
+          }
+          if (String(item.id) === '20' || (item.name && item.name.includes('Cut Masala'))) {
+            return { ...item, image_url: '/cut-masala-dosa.jpg' };
           }
           return item;
         });
@@ -415,6 +418,9 @@ export const apiService = {
       }
       if (String(item.id) === '16' || (item.name && item.name.includes('Mysore Masala'))) {
         return { ...item, image_url: '/mysore-masala-dosa.jpg' };
+      }
+      if (String(item.id) === '20' || (item.name && item.name.includes('Cut Masala'))) {
+        return { ...item, image_url: '/cut-masala-dosa.jpg' };
       }
       return item;
     });
