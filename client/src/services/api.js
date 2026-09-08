@@ -305,15 +305,24 @@ export const apiCall = async (endpoint, method = 'GET', data = null, customToken
 const getDynamicMenu = () => {
   try {
     const currentVer = localStorage.getItem('dakshin_menu_ver');
-    if (currentVer !== 'v10_new_special_dosa_photo') {
-      localStorage.setItem('dakshin_menu_ver', 'v10_new_special_dosa_photo');
+    if (currentVer !== 'v12_ghee_namma_special_dosa_photo_v2') {
+      localStorage.setItem('dakshin_menu_ver', 'v12_ghee_namma_special_dosa_photo_v2');
       localStorage.setItem('dakshin_custom_menu', JSON.stringify(FALLBACK_MENU_ITEMS));
       return FALLBACK_MENU_ITEMS;
     }
     const saved = localStorage.getItem('dakshin_custom_menu');
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const sanitized = parsed.map(item => {
+          if (String(item.id) === '6' || (item.name && item.name.includes('Ghee Namma'))) {
+            return { ...item, image_url: '/ghee-namma-south-special-dosa.jpg' };
+          }
+          return item;
+        });
+        localStorage.setItem('dakshin_custom_menu', JSON.stringify(sanitized));
+        return sanitized;
+      }
     }
   } catch (e) {}
   try {
@@ -365,6 +374,14 @@ export const apiService = {
         itemsList = Array.from(dbMap.values());
       }
     } catch (err) {}
+
+    // Always enforce latest local image for Ghee Namma South Special Dosa
+    itemsList = itemsList.map(item => {
+      if (String(item.id) === '6' || (item.name && item.name.includes('Ghee Namma'))) {
+        return { ...item, image_url: '/ghee-namma-south-special-dosa.jpg' };
+      }
+      return item;
+    });
 
     // Filter out plain Cheese, Butter, Masala from extras if present
     itemsList = itemsList.filter(i => {
@@ -869,7 +886,7 @@ export const apiService = {
           discount_percentage: 0,
           discount_amount: 125,
           min_order_amount: 625,
-          image_url: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=800&q=80',
+          image_url: '/ghee-namma-south-special-dosa.jpg',
           end_date: '2026-12-31'
         }
       ]
