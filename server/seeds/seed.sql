@@ -39,7 +39,7 @@ INSERT INTO menu_items (id, category_id, name, description, price, image_url, is
 -- 3. Dosa / डोसा
 (13, 2, 'Plain Dosa', 'Golden crisp plain fermented crepe served with chutneys & sambar', 60.00, 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '10 mins', TRUE, FALSE, TRUE, 4.6),
 (14, 2, 'Masala Dosa', 'Classic crispy Dosa stuffed with spiced potato masala', 70.00, '/masala-dosa.jpg', TRUE, 'medium', '12 mins', TRUE, TRUE, TRUE, 4.8),
-(15, 2, 'Cheese Masala Dosa', 'Potato masala dosa topped with melted Amul cheese', 90.00, 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '12 mins', TRUE, TRUE, FALSE, 4.7),
+(15, 2, 'Cheese Masala Dosa', 'Potato masala dosa topped with melted Amul cheese', 90.00, '/cheese-masala-dosa.jpg', TRUE, 'mild', '12 mins', TRUE, TRUE, FALSE, 4.7),
 (16, 2, 'Mysore Masala Dosa', 'Red chili paste spread dosa loaded with spiced potato filling', 85.00, 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80', TRUE, 'spicy', '12 mins', TRUE, TRUE, TRUE, 4.7),
 (17, 2, 'Garlic Masala Dosa', 'Garlic spiced spicy potato masala dosa', 85.00, 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=600&q=80', TRUE, 'spicy', '12 mins', TRUE, FALSE, FALSE, 4.5),
 (18, 2, 'Pudina Masala Dosa', 'Refreshing mint herb paste spread masala dosa', 80.00, 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=600&q=80', TRUE, 'medium', '12 mins', TRUE, FALSE, FALSE, 4.5),
