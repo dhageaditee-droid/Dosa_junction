@@ -33,8 +33,8 @@ INSERT INTO menu_items (id, category_id, name, description, price, image_url, is
 (8, 3, 'Ghee Mysore Masala Dosa', 'Rich Ghee roasted Dosa smeared with red garlic chutney & potato filling', 115.00, '/ghee-mysore-masala-dosa.jpg', TRUE, 'spicy', '12 mins', TRUE, TRUE, FALSE, 4.8),
 (9, 3, 'Ghee Garlic Masala Dosa', 'Fragrant roasted Ghee & Garlic paste stuffed Masala Dosa', 115.00, 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=600&q=80', TRUE, 'medium', '12 mins', TRUE, FALSE, FALSE, 4.6),
 (10, 3, 'Ghee Pudina Masala Dosa', 'Fresh mint (pudina) chutney spread Dosa roasted in pure Ghee', 115.00, 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80', TRUE, 'medium', '12 mins', TRUE, FALSE, FALSE, 4.6),
-(11, 3, 'Loni Sponge Dosa 2 Pcs', 'Soft fluffy sponge dosas smeared with homemade white butter (Loni)', 50.00, 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '10 mins', TRUE, TRUE, TRUE, 4.9),
-(12, 3, 'Loni Sponge Dosa 3 Pcs', 'Triple set of soft butter sponge dosas', 70.00, 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '10 mins', TRUE, TRUE, FALSE, 4.8),
+(11, 3, 'Loni Sponge Dosa 2 Pcs', 'Soft fluffy sponge dosas smeared with homemade white butter (Loni)', 50.00, '/loni-sponge-dosa.jpg', TRUE, 'mild', '10 mins', TRUE, TRUE, TRUE, 4.9),
+(12, 3, 'Loni Sponge Dosa 3 Pcs', 'Triple set of soft butter sponge dosas', 70.00, '/loni-sponge-dosa.jpg', TRUE, 'mild', '10 mins', TRUE, TRUE, FALSE, 4.8),
 
 -- 3. Dosa / डोसा
 (13, 2, 'Plain Dosa', 'Golden crisp plain fermented crepe served with chutneys & sambar', 60.00, 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '10 mins', TRUE, FALSE, TRUE, 4.6),

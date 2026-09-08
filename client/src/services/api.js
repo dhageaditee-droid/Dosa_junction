@@ -305,8 +305,8 @@ export const apiCall = async (endpoint, method = 'GET', data = null, customToken
 const getDynamicMenu = () => {
   try {
     const currentVer = localStorage.getItem('dakshin_menu_ver');
-    if (currentVer !== 'v14_ghee_mysore_masala_dosa_photo') {
-      localStorage.setItem('dakshin_menu_ver', 'v14_ghee_mysore_masala_dosa_photo');
+    if (currentVer !== 'v15_loni_sponge_dosa_photo') {
+      localStorage.setItem('dakshin_menu_ver', 'v15_loni_sponge_dosa_photo');
       localStorage.setItem('dakshin_custom_menu', JSON.stringify(FALLBACK_MENU_ITEMS));
       return FALLBACK_MENU_ITEMS;
     }
@@ -323,6 +323,9 @@ const getDynamicMenu = () => {
           }
           if (String(item.id) === '8' || (item.name && item.name.includes('Ghee Mysore'))) {
             return { ...item, image_url: '/ghee-mysore-masala-dosa.jpg' };
+          }
+          if (String(item.id) === '11' || String(item.id) === '12' || (item.name && item.name.includes('Loni Sponge'))) {
+            return { ...item, image_url: '/loni-sponge-dosa.jpg' };
           }
           return item;
         });
@@ -381,7 +384,7 @@ export const apiService = {
       }
     } catch (err) {}
 
-    // Always enforce latest local image for Ghee Special Dosas
+    // Always enforce latest local image for Special Dosas
     itemsList = itemsList.map(item => {
       if (String(item.id) === '6' || (item.name && item.name.includes('Ghee Namma'))) {
         return { ...item, image_url: '/ghee-namma-south-special-dosa.jpg' };
@@ -391,6 +394,9 @@ export const apiService = {
       }
       if (String(item.id) === '8' || (item.name && item.name.includes('Ghee Mysore'))) {
         return { ...item, image_url: '/ghee-mysore-masala-dosa.jpg' };
+      }
+      if (String(item.id) === '11' || String(item.id) === '12' || (item.name && item.name.includes('Loni Sponge'))) {
+        return { ...item, image_url: '/loni-sponge-dosa.jpg' };
       }
       return item;
     });
