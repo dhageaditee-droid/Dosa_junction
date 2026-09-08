@@ -305,8 +305,8 @@ export const apiCall = async (endpoint, method = 'GET', data = null, customToken
 const getDynamicMenu = () => {
   try {
     const currentVer = localStorage.getItem('dakshin_menu_ver');
-    if (currentVer !== 'v31_fried_rice_photos') {
-      localStorage.setItem('dakshin_menu_ver', 'v31_fried_rice_photos');
+    if (currentVer !== 'v32_schezwan_rice_pav_bhaji_photos') {
+      localStorage.setItem('dakshin_menu_ver', 'v32_schezwan_rice_pav_bhaji_photos');
       localStorage.setItem('dakshin_custom_menu', JSON.stringify(FALLBACK_MENU_ITEMS));
       return FALLBACK_MENU_ITEMS;
     }
@@ -395,6 +395,12 @@ const getDynamicMenu = () => {
           }
           if (String(item.id) === '49' || String(item.id) === '53' || (item.name && item.name === 'Fried Rice')) {
             return { ...item, image_url: '/fried-rice.jpg' };
+          }
+          if (String(item.id) === '50' || String(item.id) === '54' || (item.name && item.name === 'Schezwan Rice')) {
+            return { ...item, image_url: '/schezwan-rice.jpg' };
+          }
+          if (String(item.id) === '51' || (item.name && item.name === 'Pav Bhaji')) {
+            return { ...item, image_url: '/pav-bhaji.jpg' };
           }
           return item;
         });
@@ -535,6 +541,12 @@ export const apiService = {
       }
       if (String(item.id) === '49' || String(item.id) === '53' || (item.name && item.name === 'Fried Rice')) {
         return { ...item, image_url: '/fried-rice.jpg' };
+      }
+      if (String(item.id) === '50' || String(item.id) === '54' || (item.name && item.name === 'Schezwan Rice')) {
+        return { ...item, image_url: '/schezwan-rice.jpg' };
+      }
+      if (String(item.id) === '51' || (item.name && item.name === 'Pav Bhaji')) {
+        return { ...item, image_url: '/pav-bhaji.jpg' };
       }
       return item;
     });
