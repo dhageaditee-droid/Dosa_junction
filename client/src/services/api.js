@@ -305,8 +305,8 @@ export const apiCall = async (endpoint, method = 'GET', data = null, customToken
 const getDynamicMenu = () => {
   try {
     const currentVer = localStorage.getItem('dakshin_menu_ver');
-    if (currentVer !== 'v27_masala_idli_photos') {
-      localStorage.setItem('dakshin_menu_ver', 'v27_masala_idli_photos');
+    if (currentVer !== 'v28_thatte_idli_photos') {
+      localStorage.setItem('dakshin_menu_ver', 'v28_thatte_idli_photos');
       localStorage.setItem('dakshin_custom_menu', JSON.stringify(FALLBACK_MENU_ITEMS));
       return FALLBACK_MENU_ITEMS;
     }
@@ -383,6 +383,9 @@ const getDynamicMenu = () => {
           }
           if (String(item.id) === '43' || (item.name && item.name === 'Masala Idli')) {
             return { ...item, image_url: '/masala-idli.jpg' };
+          }
+          if (String(item.id) === '44' || (item.name && item.name === 'Thatte Idli')) {
+            return { ...item, image_url: '/thatte-idli.jpg' };
           }
           return item;
         });
@@ -511,6 +514,9 @@ export const apiService = {
       }
       if (String(item.id) === '43' || (item.name && item.name === 'Masala Idli')) {
         return { ...item, image_url: '/masala-idli.jpg' };
+      }
+      if (String(item.id) === '44' || (item.name && item.name === 'Thatte Idli')) {
+        return { ...item, image_url: '/thatte-idli.jpg' };
       }
       return item;
     });
