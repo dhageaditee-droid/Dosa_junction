@@ -71,7 +71,7 @@ INSERT INTO menu_items (id, category_id, name, description, price, image_url, is
 
 -- 6. Vada / वडा
 (40, 6, 'Medu Vada 2 Pcs', 'Crispy golden fried lentil donuts served with coconut chutney & sambar', 60.00, '/medu-vada-2-pcs.jpg', TRUE, 'medium', '8 mins', TRUE, TRUE, TRUE, 4.8),
-(41, 6, 'Idli Medu Vada Combo 2 Pcs', 'Combo of 1 steamed Idli and 1 Medu Vada served with hot sambar', 40.00, 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '5 mins', TRUE, TRUE, TRUE, 4.9),
+(41, 6, 'Idli Medu Vada Combo 2 Pcs', 'Combo of 1 steamed Idli and 1 Medu Vada served with hot sambar', 40.00, '/idli-medu-vada-combo.jpg', TRUE, 'mild', '5 mins', TRUE, TRUE, TRUE, 4.9),
 
 -- 7. Idli / इटली
 (42, 5, 'Idli 1 Pc', 'Single soft steamed rice idli with sambar & chutney', 15.00, 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '5 mins', TRUE, TRUE, FALSE, 4.7),

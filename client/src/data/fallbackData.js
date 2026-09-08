@@ -66,7 +66,7 @@ export const FALLBACK_MENU_ITEMS = [
 
   // 6. Vada
   { id: 40, category_id: 6, category_slug: 'vada', name: 'Medu Vada 2 Pcs', description: 'Crispy golden fried lentil donuts served with coconut chutney & sambar', price: 60.00, image_url: '/medu-vada-2-pcs.jpg', is_veg: true, spice_level: 'medium', preparation_time: '8 mins', is_available: true, is_bestseller: true, rating: 4.8 },
-  { id: 41, category_id: 6, category_slug: 'vada', name: 'Idli, Medu Vada 2 Pcs', description: 'Combo of 1 steamed Idli and 1 Medu Vada served with hot sambar', price: 40.00, image_url: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80', is_veg: true, spice_level: 'mild', preparation_time: '5 mins', is_available: true, is_bestseller: true, rating: 4.9 },
+  { id: 41, category_id: 6, category_slug: 'vada', name: 'Idli, Medu Vada 2 Pcs', description: 'Combo of 1 steamed Idli and 1 Medu Vada served with hot sambar', price: 40.00, image_url: '/idli-medu-vada-combo.jpg', is_veg: true, spice_level: 'mild', preparation_time: '5 mins', is_available: true, is_bestseller: true, rating: 4.9 },
 
   // 7. Idli
   { id: 42, category_id: 5, category_slug: 'idli', name: 'Idli (1 Pc)', description: 'Single soft steamed rice idli with sambar & chutney', price: 15.00, image_url: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80', is_veg: true, spice_level: 'mild', preparation_time: '5 mins', is_available: true, is_bestseller: false, rating: 4.7 },
