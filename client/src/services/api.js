@@ -305,8 +305,8 @@ export const apiCall = async (endpoint, method = 'GET', data = null, customToken
 const getDynamicMenu = () => {
   try {
     const currentVer = localStorage.getItem('dakshin_menu_ver');
-    if (currentVer !== 'v19_cut_masala_dosa_photo') {
-      localStorage.setItem('dakshin_menu_ver', 'v19_cut_masala_dosa_photo');
+    if (currentVer !== 'v20_schezwan_butter_podi_dosa_photos') {
+      localStorage.setItem('dakshin_menu_ver', 'v20_schezwan_butter_podi_dosa_photos');
       localStorage.setItem('dakshin_custom_menu', JSON.stringify(FALLBACK_MENU_ITEMS));
       return FALLBACK_MENU_ITEMS;
     }
@@ -338,6 +338,12 @@ const getDynamicMenu = () => {
           }
           if (String(item.id) === '20' || (item.name && item.name.includes('Cut Masala'))) {
             return { ...item, image_url: '/cut-masala-dosa.jpg' };
+          }
+          if (String(item.id) === '21' || (item.name && item.name.includes('Schezwan Masala'))) {
+            return { ...item, image_url: '/schezwan-masala-dosa.jpg' };
+          }
+          if (String(item.id) === '22' || (item.name && item.name.includes('Butter Podi Masala'))) {
+            return { ...item, image_url: '/butter-podi-masala-dosa.jpg' };
           }
           return item;
         });
@@ -421,6 +427,12 @@ export const apiService = {
       }
       if (String(item.id) === '20' || (item.name && item.name.includes('Cut Masala'))) {
         return { ...item, image_url: '/cut-masala-dosa.jpg' };
+      }
+      if (String(item.id) === '21' || (item.name && item.name.includes('Schezwan Masala'))) {
+        return { ...item, image_url: '/schezwan-masala-dosa.jpg' };
+      }
+      if (String(item.id) === '22' || (item.name && item.name.includes('Butter Podi Masala'))) {
+        return { ...item, image_url: '/butter-podi-masala-dosa.jpg' };
       }
       return item;
     });
