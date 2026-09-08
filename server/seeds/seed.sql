@@ -81,7 +81,7 @@ INSERT INTO menu_items (id, category_id, name, description, price, image_url, is
 
 -- 8. Rice / राईस
 (46, 8, 'Masala Rice', 'Spiced South Indian rice tempered with mustard, chillies & spices', 90.00, '/masala-rice.jpg', TRUE, 'medium', '10 mins', TRUE, TRUE, FALSE, 4.6),
-(47, 8, 'Curd Rice', 'Soothing rice mixed with fresh curd, mustard & pomegranate', 90.00, 'https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '8 mins', TRUE, TRUE, TRUE, 4.9),
+(47, 8, 'Curd Rice', 'Soothing rice mixed with fresh curd, mustard & pomegranate', 90.00, '/curd-rice.jpg', TRUE, 'mild', '8 mins', TRUE, TRUE, TRUE, 4.9),
 (48, 8, 'Lemon Rice', 'Tangy steamed rice tempered with lemon juice, peanuts & curry leaves', 85.00, 'https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '10 mins', TRUE, TRUE, FALSE, 4.7),
 
 -- 9. Extras / एक्स्ट्रा
