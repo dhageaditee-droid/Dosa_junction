@@ -305,8 +305,8 @@ export const apiCall = async (endpoint, method = 'GET', data = null, customToken
 const getDynamicMenu = () => {
   try {
     const currentVer = localStorage.getItem('dakshin_menu_ver');
-    if (currentVer !== 'v21_paper_dosa_pizza_dosa_photos') {
-      localStorage.setItem('dakshin_menu_ver', 'v21_paper_dosa_pizza_dosa_photos');
+    if (currentVer !== 'v22_uttapam_photos') {
+      localStorage.setItem('dakshin_menu_ver', 'v22_uttapam_photos');
       localStorage.setItem('dakshin_custom_menu', JSON.stringify(FALLBACK_MENU_ITEMS));
       return FALLBACK_MENU_ITEMS;
     }
@@ -353,6 +353,15 @@ const getDynamicMenu = () => {
           }
           if (String(item.id) === '26' || (item.name && item.name.includes('Pizza Dosa'))) {
             return { ...item, image_url: '/pizza-dosa.jpg' };
+          }
+          if (String(item.id) === '28' || (item.name && item.name === 'Onion Uttapam')) {
+            return { ...item, image_url: '/onion-uttapam.jpg' };
+          }
+          if (String(item.id) === '30' || (item.name && item.name === 'Onion Tomato Uttapam')) {
+            return { ...item, image_url: '/onion-tomato-uttapam.jpg' };
+          }
+          if (String(item.id) === '35' || (item.name && item.name === 'Cheese Onion Uttapam')) {
+            return { ...item, image_url: '/cheese-onion-uttapam.jpg' };
           }
           return item;
         });
@@ -451,6 +460,15 @@ export const apiService = {
       }
       if (String(item.id) === '26' || (item.name && item.name.includes('Pizza Dosa'))) {
         return { ...item, image_url: '/pizza-dosa.jpg' };
+      }
+      if (String(item.id) === '28' || (item.name && item.name === 'Onion Uttapam')) {
+        return { ...item, image_url: '/onion-uttapam.jpg' };
+      }
+      if (String(item.id) === '30' || (item.name && item.name === 'Onion Tomato Uttapam')) {
+        return { ...item, image_url: '/onion-tomato-uttapam.jpg' };
+      }
+      if (String(item.id) === '35' || (item.name && item.name === 'Cheese Onion Uttapam')) {
+        return { ...item, image_url: '/cheese-onion-uttapam.jpg' };
       }
       return item;
     });
