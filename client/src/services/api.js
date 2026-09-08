@@ -305,8 +305,8 @@ export const apiCall = async (endpoint, method = 'GET', data = null, customToken
 const getDynamicMenu = () => {
   try {
     const currentVer = localStorage.getItem('dakshin_menu_ver');
-    if (currentVer !== 'v22_uttapam_photos') {
-      localStorage.setItem('dakshin_menu_ver', 'v22_uttapam_photos');
+    if (currentVer !== 'v23_cheese_uttapam_sheera_photos') {
+      localStorage.setItem('dakshin_menu_ver', 'v23_cheese_uttapam_sheera_photos');
       localStorage.setItem('dakshin_custom_menu', JSON.stringify(FALLBACK_MENU_ITEMS));
       return FALLBACK_MENU_ITEMS;
     }
@@ -330,7 +330,7 @@ const getDynamicMenu = () => {
           if (String(item.id) === '14' || (item.name && item.name === 'Masala Dosa')) {
             return { ...item, image_url: '/masala-dosa.jpg' };
           }
-          if (String(item.id) === '15' || (item.name && item.name.includes('Cheese Masala'))) {
+          if (String(item.id) === '15' || (item.name && item.name.includes('Cheese Masala Dosa'))) {
             return { ...item, image_url: '/cheese-masala-dosa.jpg' };
           }
           if (String(item.id) === '16' || (item.name && item.name.includes('Mysore Masala'))) {
@@ -362,6 +362,15 @@ const getDynamicMenu = () => {
           }
           if (String(item.id) === '35' || (item.name && item.name === 'Cheese Onion Uttapam')) {
             return { ...item, image_url: '/cheese-onion-uttapam.jpg' };
+          }
+          if (String(item.id) === '37' || (item.name && item.name === 'Cheese Masala Uttapam')) {
+            return { ...item, image_url: '/cheese-masala-uttapam.jpg' };
+          }
+          if (String(item.id) === '38' || (item.name && item.name === 'Cheese Corn Uttapam')) {
+            return { ...item, image_url: '/cheese-corn-uttapam.jpg' };
+          }
+          if (String(item.id) === '39' || (item.name && item.name === 'Pineapple Sheera')) {
+            return { ...item, image_url: '/pineapple-sheera.jpg' };
           }
           return item;
         });
@@ -469,6 +478,15 @@ export const apiService = {
       }
       if (String(item.id) === '35' || (item.name && item.name === 'Cheese Onion Uttapam')) {
         return { ...item, image_url: '/cheese-onion-uttapam.jpg' };
+      }
+      if (String(item.id) === '37' || (item.name && item.name === 'Cheese Masala Uttapam')) {
+        return { ...item, image_url: '/cheese-masala-uttapam.jpg' };
+      }
+      if (String(item.id) === '38' || (item.name && item.name === 'Cheese Corn Uttapam')) {
+        return { ...item, image_url: '/cheese-corn-uttapam.jpg' };
+      }
+      if (String(item.id) === '39' || (item.name && item.name === 'Pineapple Sheera')) {
+        return { ...item, image_url: '/pineapple-sheera.jpg' };
       }
       return item;
     });

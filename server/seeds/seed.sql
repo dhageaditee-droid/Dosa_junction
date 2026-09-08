@@ -63,11 +63,11 @@ INSERT INTO menu_items (id, category_id, name, description, price, image_url, is
 (34, 4, 'Schezwan Uttapam', 'Spicy Schezwan sauce layered Uttapam', 95.00, 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80', TRUE, 'spicy', '12 mins', TRUE, FALSE, FALSE, 4.5),
 (35, 4, 'Cheese Onion Uttapam', 'Onion Uttapam loaded with melted cheese', 95.00, '/cheese-onion-uttapam.jpg', TRUE, 'mild', '12 mins', TRUE, TRUE, FALSE, 4.7),
 (36, 4, 'Cheese Chilli Uttapam', 'Spicy green chillies & melted cheese Uttapam', 95.00, 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80', TRUE, 'spicy', '12 mins', TRUE, FALSE, FALSE, 4.6),
-(37, 4, 'Cheese Masala Uttapam', 'Potato masala & cheese topped savory Uttapam', 100.00, 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80', TRUE, 'medium', '15 mins', TRUE, TRUE, TRUE, 4.8),
-(38, 4, 'Cheese Corn Uttapam', 'Sweet corn & melted cheese Uttapam', 100.00, 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '15 mins', TRUE, TRUE, FALSE, 4.8),
+(37, 4, 'Cheese Masala Uttapam', 'Potato masala & cheese topped savory Uttapam', 100.00, '/cheese-masala-uttapam.jpg', TRUE, 'medium', '15 mins', TRUE, TRUE, TRUE, 4.8),
+(38, 4, 'Cheese Corn Uttapam', 'Sweet corn & melted cheese Uttapam', 100.00, '/cheese-corn-uttapam.jpg', TRUE, 'mild', '15 mins', TRUE, TRUE, FALSE, 4.8),
 
 -- 5. Sheera / शिरा
-(39, 7, 'Pineapple Sheera', 'Sweet semolina dessert cooked with fresh pineapple pieces, cashews & Ghee', 60.00, 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '8 mins', TRUE, TRUE, TRUE, 4.9),
+(39, 7, 'Pineapple Sheera', 'Sweet semolina dessert cooked with fresh pineapple pieces, cashews & Ghee', 60.00, '/pineapple-sheera.jpg', TRUE, 'mild', '8 mins', TRUE, TRUE, TRUE, 4.9),
 
 -- 6. Vada / वडा
 (40, 6, 'Medu Vada 2 Pcs', 'Crispy golden fried lentil donuts served with coconut chutney & sambar', 60.00, 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80', TRUE, 'medium', '8 mins', TRUE, TRUE, TRUE, 4.8),
