@@ -27,7 +27,7 @@ INSERT INTO menu_items (id, category_id, name, description, price, image_url, is
 (4, 1, 'Milk', 'Fresh hot milk', 20.00, 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '5 mins', TRUE, FALSE, FALSE, 4.4),
 
 -- 2. Special Dosa / स्पेशल डोसा
-(5, 3, 'Special Dosa', 'Signature South Indian crispy Special Dosa', 60.00, 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=600&q=80', TRUE, 'medium', '12 mins', TRUE, TRUE, TRUE, 4.8),
+(5, 3, 'South Indian Special Combo', 'Masala Dosa + 1 Pc Idli + 1 Pc Medu Vada + Pineapple Sheera + Chaha', 149.00, '/south-indian-special-combo.jpg', TRUE, 'medium', '15 mins', TRUE, TRUE, TRUE, 5.0),
 (6, 3, 'Ghee Namma South Special Dosa', 'Grand special dosa loaded with pure A2 Ghee & South Indian herbs', 125.00, '/ghee-namma-south-special-dosa.jpg', TRUE, 'medium', '15 mins', TRUE, TRUE, TRUE, 4.9),
 (7, 3, 'Ghee Podi Masala Dosa', 'Crispy Dosa layered with pure Ghee, spicy gun-powder podi & potato masala', 115.00, '/ghee-podi-masala-dosa.jpg', TRUE, 'spicy', '12 mins', TRUE, TRUE, TRUE, 4.8),
 (8, 3, 'Ghee Mysore Masala Dosa', 'Rich Ghee roasted Dosa smeared with red garlic chutney & potato filling', 115.00, '/ghee-mysore-masala-dosa.jpg', TRUE, 'spicy', '12 mins', TRUE, TRUE, FALSE, 4.8),

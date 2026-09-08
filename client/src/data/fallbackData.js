@@ -13,7 +13,7 @@ export const FALLBACK_CATEGORIES = [
 
 export const FALLBACK_MENU_ITEMS = [
   // 0. Combo Offer
-  { id: 99, category_id: 10, category_slug: 'combo', name: 'South Indian Special Combo', description: 'Masala Dosa + 1 Pc Idli + 1 Pc Medu Vada + Pineapple Sheera + Chaha', price: 149.00, image_url: 'https://images.unsplash.com/photo-1610192244261-3f33de3f55e4?auto=format&fit=crop&w=600&q=80', is_veg: true, spice_level: 'medium', preparation_time: '15 mins', is_available: true, is_bestseller: true, rating: 5.0 },
+  { id: 99, category_id: 10, category_slug: 'combo', name: 'South Indian Special Combo', description: 'Masala Dosa + 1 Pc Idli + 1 Pc Medu Vada + Pineapple Sheera + Chaha', price: 149.00, image_url: '/south-indian-special-combo.jpg', is_veg: true, spice_level: 'medium', preparation_time: '15 mins', is_available: true, is_bestseller: true, rating: 5.0 },
 
   // 1. Beverages
   { id: 1, category_id: 1, category_slug: 'beverages', name: 'Chaha', description: 'Traditional hot spiced Indian tea', price: 20.00, image_url: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=600&q=80', is_veg: true, spice_level: 'mild', preparation_time: '5 mins', is_available: true, is_bestseller: true, rating: 4.8 },
@@ -22,7 +22,7 @@ export const FALLBACK_MENU_ITEMS = [
   { id: 4, category_id: 1, category_slug: 'beverages', name: 'Milk', description: 'Fresh hot milk', price: 20.00, image_url: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=600&q=80', is_veg: true, spice_level: 'mild', preparation_time: '5 mins', is_available: true, is_bestseller: false, rating: 4.4 },
 
   // 2. Special Dosa
-  { id: 5, category_id: 3, category_slug: 'special-dosa', name: 'South Indian Special Combo', description: 'Masala Dosa + 1 Pc Idli + 1 Pc Medu Vada + Pineapple Sheera + Chaha', price: 149.00, image_url: 'https://images.unsplash.com/photo-1610192244261-3f33de3f55e4?auto=format&fit=crop&w=600&q=80', is_veg: true, spice_level: 'medium', preparation_time: '15 mins', is_available: true, is_bestseller: true, rating: 5.0 },
+  { id: 5, category_id: 3, category_slug: 'special-dosa', name: 'South Indian Special Combo', description: 'Masala Dosa + 1 Pc Idli + 1 Pc Medu Vada + Pineapple Sheera + Chaha', price: 149.00, image_url: '/south-indian-special-combo.jpg', is_veg: true, spice_level: 'medium', preparation_time: '15 mins', is_available: true, is_bestseller: true, rating: 5.0 },
   { id: 6, category_id: 3, category_slug: 'special-dosa', name: 'Ghee Namma South Special Dosa', description: 'Grand special dosa loaded with pure A2 Ghee & South Indian herbs', price: 125.00, image_url: '/ghee-namma-south-special-dosa.jpg', is_veg: true, spice_level: 'medium', preparation_time: '15 mins', is_available: true, is_bestseller: true, rating: 4.9 },
   { id: 7, category_id: 3, category_slug: 'special-dosa', name: 'Ghee Podi Masala Dosa', description: 'Crispy Dosa layered with pure Ghee, spicy gun-powder podi & potato masala', price: 115.00, image_url: '/ghee-podi-masala-dosa.jpg', is_veg: true, spice_level: 'spicy', preparation_time: '12 mins', is_available: true, is_bestseller: true, rating: 4.8 },
   { id: 8, category_id: 3, category_slug: 'special-dosa', name: 'Ghee Mysore Masala Dosa', description: 'Rich Ghee roasted Dosa smeared with red garlic chutney & potato filling', price: 115.00, image_url: '/ghee-mysore-masala-dosa.jpg', is_veg: true, spice_level: 'spicy', preparation_time: '12 mins', is_available: true, is_bestseller: true, rating: 4.8 },

@@ -305,8 +305,8 @@ export const apiCall = async (endpoint, method = 'GET', data = null, customToken
 const getDynamicMenu = () => {
   try {
     const currentVer = localStorage.getItem('dakshin_menu_ver');
-    if (currentVer !== 'v24_medu_vada_photos') {
-      localStorage.setItem('dakshin_menu_ver', 'v24_medu_vada_photos');
+    if (currentVer !== 'v25_combo_photos') {
+      localStorage.setItem('dakshin_menu_ver', 'v25_combo_photos');
       localStorage.setItem('dakshin_custom_menu', JSON.stringify(FALLBACK_MENU_ITEMS));
       return FALLBACK_MENU_ITEMS;
     }
@@ -315,6 +315,9 @@ const getDynamicMenu = () => {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {
         const sanitized = parsed.map(item => {
+          if (String(item.id) === '99' || String(item.id) === '5' || (item.name && item.name.includes('Special Combo'))) {
+            return { ...item, image_url: '/south-indian-special-combo.jpg' };
+          }
           if (String(item.id) === '6' || (item.name && item.name.includes('Ghee Namma'))) {
             return { ...item, image_url: '/ghee-namma-south-special-dosa.jpg' };
           }
@@ -434,6 +437,9 @@ export const apiService = {
 
     // Always enforce latest local image for Special Dosas & Masala Dosa variants
     itemsList = itemsList.map(item => {
+      if (String(item.id) === '99' || String(item.id) === '5' || (item.name && item.name.includes('Special Combo'))) {
+        return { ...item, image_url: '/south-indian-special-combo.jpg' };
+      }
       if (String(item.id) === '6' || (item.name && item.name.includes('Ghee Namma'))) {
         return { ...item, image_url: '/ghee-namma-south-special-dosa.jpg' };
       }
