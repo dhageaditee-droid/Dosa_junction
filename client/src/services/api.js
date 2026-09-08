@@ -305,8 +305,8 @@ export const apiCall = async (endpoint, method = 'GET', data = null, customToken
 const getDynamicMenu = () => {
   try {
     const currentVer = localStorage.getItem('dakshin_menu_ver');
-    if (currentVer !== 'v23_cheese_uttapam_sheera_photos') {
-      localStorage.setItem('dakshin_menu_ver', 'v23_cheese_uttapam_sheera_photos');
+    if (currentVer !== 'v24_medu_vada_photos') {
+      localStorage.setItem('dakshin_menu_ver', 'v24_medu_vada_photos');
       localStorage.setItem('dakshin_custom_menu', JSON.stringify(FALLBACK_MENU_ITEMS));
       return FALLBACK_MENU_ITEMS;
     }
@@ -371,6 +371,9 @@ const getDynamicMenu = () => {
           }
           if (String(item.id) === '39' || (item.name && item.name === 'Pineapple Sheera')) {
             return { ...item, image_url: '/pineapple-sheera.jpg' };
+          }
+          if (String(item.id) === '40' || (item.name && item.name.includes('Medu Vada 2 Pcs'))) {
+            return { ...item, image_url: '/medu-vada-2-pcs.jpg' };
           }
           return item;
         });
@@ -487,6 +490,9 @@ export const apiService = {
       }
       if (String(item.id) === '39' || (item.name && item.name === 'Pineapple Sheera')) {
         return { ...item, image_url: '/pineapple-sheera.jpg' };
+      }
+      if (String(item.id) === '40' || (item.name && item.name.includes('Medu Vada 2 Pcs'))) {
+        return { ...item, image_url: '/medu-vada-2-pcs.jpg' };
       }
       return item;
     });
