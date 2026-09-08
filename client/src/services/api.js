@@ -305,8 +305,8 @@ export const apiCall = async (endpoint, method = 'GET', data = null, customToken
 const getDynamicMenu = () => {
   try {
     const currentVer = localStorage.getItem('dakshin_menu_ver');
-    if (currentVer !== 'v26_idli_medu_vada_combo_photos') {
-      localStorage.setItem('dakshin_menu_ver', 'v26_idli_medu_vada_combo_photos');
+    if (currentVer !== 'v27_masala_idli_photos') {
+      localStorage.setItem('dakshin_menu_ver', 'v27_masala_idli_photos');
       localStorage.setItem('dakshin_custom_menu', JSON.stringify(FALLBACK_MENU_ITEMS));
       return FALLBACK_MENU_ITEMS;
     }
@@ -380,6 +380,9 @@ const getDynamicMenu = () => {
           }
           if (String(item.id) === '41' || (item.name && item.name.includes('Idli, Medu Vada') || item.name.includes('Idli Medu Vada'))) {
             return { ...item, image_url: '/idli-medu-vada-combo.jpg' };
+          }
+          if (String(item.id) === '43' || (item.name && item.name === 'Masala Idli')) {
+            return { ...item, image_url: '/masala-idli.jpg' };
           }
           return item;
         });
@@ -505,6 +508,9 @@ export const apiService = {
       }
       if (String(item.id) === '41' || (item.name && item.name.includes('Idli, Medu Vada') || item.name.includes('Idli Medu Vada'))) {
         return { ...item, image_url: '/idli-medu-vada-combo.jpg' };
+      }
+      if (String(item.id) === '43' || (item.name && item.name === 'Masala Idli')) {
+        return { ...item, image_url: '/masala-idli.jpg' };
       }
       return item;
     });

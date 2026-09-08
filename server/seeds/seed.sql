@@ -75,7 +75,7 @@ INSERT INTO menu_items (id, category_id, name, description, price, image_url, is
 
 -- 7. Idli / इटली
 (42, 5, 'Idli 1 Pc', 'Single soft steamed rice idli with sambar & chutney', 15.00, 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '5 mins', TRUE, TRUE, FALSE, 4.7),
-(43, 5, 'Masala Idli', 'Tossed idli pieces tempered with podi masala, curry leaves & ghee', 80.00, 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80', TRUE, 'medium', '8 mins', TRUE, TRUE, TRUE, 4.8),
+(43, 5, 'Masala Idli', 'Tossed idli pieces tempered with podi masala, curry leaves & ghee', 80.00, '/masala-idli.jpg', TRUE, 'medium', '8 mins', TRUE, TRUE, TRUE, 4.8),
 (44, 5, 'Thatte Idli', 'Traditional large plate-sized flat Karnataka soft Thatte Idli', 70.00, 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '8 mins', TRUE, TRUE, TRUE, 4.9),
 (45, 5, 'Button Idli', 'Mini bite-sized idlis dipped in hot sambar bowl', 60.00, 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '8 mins', TRUE, TRUE, FALSE, 4.7),
 
