@@ -305,8 +305,8 @@ export const apiCall = async (endpoint, method = 'GET', data = null, customToken
 const getDynamicMenu = () => {
   try {
     const currentVer = localStorage.getItem('dakshin_menu_ver');
-    if (currentVer !== 'v13_ghee_podi_masala_dosa_photo') {
-      localStorage.setItem('dakshin_menu_ver', 'v13_ghee_podi_masala_dosa_photo');
+    if (currentVer !== 'v14_ghee_mysore_masala_dosa_photo') {
+      localStorage.setItem('dakshin_menu_ver', 'v14_ghee_mysore_masala_dosa_photo');
       localStorage.setItem('dakshin_custom_menu', JSON.stringify(FALLBACK_MENU_ITEMS));
       return FALLBACK_MENU_ITEMS;
     }
@@ -320,6 +320,9 @@ const getDynamicMenu = () => {
           }
           if (String(item.id) === '7' || (item.name && item.name.includes('Ghee Podi'))) {
             return { ...item, image_url: '/ghee-podi-masala-dosa.jpg' };
+          }
+          if (String(item.id) === '8' || (item.name && item.name.includes('Ghee Mysore'))) {
+            return { ...item, image_url: '/ghee-mysore-masala-dosa.jpg' };
           }
           return item;
         });
@@ -378,13 +381,16 @@ export const apiService = {
       }
     } catch (err) {}
 
-    // Always enforce latest local image for Ghee Namma & Ghee Podi Special Dosas
+    // Always enforce latest local image for Ghee Special Dosas
     itemsList = itemsList.map(item => {
       if (String(item.id) === '6' || (item.name && item.name.includes('Ghee Namma'))) {
         return { ...item, image_url: '/ghee-namma-south-special-dosa.jpg' };
       }
       if (String(item.id) === '7' || (item.name && item.name.includes('Ghee Podi'))) {
         return { ...item, image_url: '/ghee-podi-masala-dosa.jpg' };
+      }
+      if (String(item.id) === '8' || (item.name && item.name.includes('Ghee Mysore'))) {
+        return { ...item, image_url: '/ghee-mysore-masala-dosa.jpg' };
       }
       return item;
     });
