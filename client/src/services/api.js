@@ -305,8 +305,8 @@ export const apiCall = async (endpoint, method = 'GET', data = null, customToken
 const getDynamicMenu = () => {
   try {
     const currentVer = localStorage.getItem('dakshin_menu_ver');
-    if (currentVer !== 'v20_schezwan_butter_podi_dosa_photos') {
-      localStorage.setItem('dakshin_menu_ver', 'v20_schezwan_butter_podi_dosa_photos');
+    if (currentVer !== 'v21_paper_dosa_pizza_dosa_photos') {
+      localStorage.setItem('dakshin_menu_ver', 'v21_paper_dosa_pizza_dosa_photos');
       localStorage.setItem('dakshin_custom_menu', JSON.stringify(FALLBACK_MENU_ITEMS));
       return FALLBACK_MENU_ITEMS;
     }
@@ -344,6 +344,15 @@ const getDynamicMenu = () => {
           }
           if (String(item.id) === '22' || (item.name && item.name.includes('Butter Podi Masala'))) {
             return { ...item, image_url: '/butter-podi-masala-dosa.jpg' };
+          }
+          if (String(item.id) === '24' || (item.name && item.name.includes('Paper Plain'))) {
+            return { ...item, image_url: '/paper-plain-dosa.jpg' };
+          }
+          if (String(item.id) === '25' || (item.name && item.name.includes('Paper Masala'))) {
+            return { ...item, image_url: '/paper-masala-dosa.jpg' };
+          }
+          if (String(item.id) === '26' || (item.name && item.name.includes('Pizza Dosa'))) {
+            return { ...item, image_url: '/pizza-dosa.jpg' };
           }
           return item;
         });
@@ -433,6 +442,15 @@ export const apiService = {
       }
       if (String(item.id) === '22' || (item.name && item.name.includes('Butter Podi Masala'))) {
         return { ...item, image_url: '/butter-podi-masala-dosa.jpg' };
+      }
+      if (String(item.id) === '24' || (item.name && item.name.includes('Paper Plain'))) {
+        return { ...item, image_url: '/paper-plain-dosa.jpg' };
+      }
+      if (String(item.id) === '25' || (item.name && item.name.includes('Paper Masala'))) {
+        return { ...item, image_url: '/paper-masala-dosa.jpg' };
+      }
+      if (String(item.id) === '26' || (item.name && item.name.includes('Pizza Dosa'))) {
+        return { ...item, image_url: '/pizza-dosa.jpg' };
       }
       return item;
     });

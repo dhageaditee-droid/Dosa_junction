@@ -48,9 +48,9 @@ INSERT INTO menu_items (id, category_id, name, description, price, image_url, is
 (21, 2, 'Schezwan Masala Dosa', 'Indo-Chinese Schezwan sauce spiced masala dosa', 95.00, '/schezwan-masala-dosa.jpg', TRUE, 'spicy', '12 mins', TRUE, TRUE, FALSE, 4.6),
 (22, 2, 'Butter Podi Masala Dosa', 'Pure Amul butter & South Indian podi powder spiced dosa', 95.00, '/butter-podi-masala-dosa.jpg', TRUE, 'medium', '12 mins', TRUE, TRUE, TRUE, 4.8),
 (23, 2, 'Open Dosa', 'Open face crispy dosa served with potato bhaji & butter top', 80.00, 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80', TRUE, 'medium', '12 mins', TRUE, FALSE, FALSE, 4.5),
-(24, 2, 'Paper Plain Dosa', 'Extra long, paper-thin ultra-crispy plain dosa', 110.00, 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '15 mins', TRUE, TRUE, TRUE, 4.8),
-(25, 2, 'Paper Masala Dosa', 'Giant paper-thin crispy dosa served with spiced potato masala', 130.00, 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=600&q=80', TRUE, 'medium', '15 mins', TRUE, TRUE, TRUE, 4.9),
-(26, 2, 'Pizza Dosa', 'Fusion Dosa loaded with cheese, capsicum, corn, tomatoes & pizza herbs', 130.00, 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '15 mins', TRUE, TRUE, TRUE, 4.9),
+(24, 2, 'Paper Plain Dosa', 'Extra long, paper-thin ultra-crispy plain dosa', 110.00, '/paper-plain-dosa.jpg', TRUE, 'mild', '15 mins', TRUE, TRUE, TRUE, 4.8),
+(25, 2, 'Paper Masala Dosa', 'Giant paper-thin crispy dosa served with spiced potato masala', 130.00, '/paper-masala-dosa.jpg', TRUE, 'medium', '15 mins', TRUE, TRUE, TRUE, 4.9),
+(26, 2, 'Pizza Dosa', 'Fusion Dosa loaded with cheese, capsicum, corn, tomatoes & pizza herbs', 130.00, '/pizza-dosa.jpg', TRUE, 'mild', '15 mins', TRUE, TRUE, TRUE, 4.9),
 
 -- 4. Uttapam / उत्तापा
 (27, 4, 'Plain Uttapam', 'Soft thick rice pancake served with sambar & chutney', 75.00, 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '12 mins', TRUE, FALSE, FALSE, 4.4),
