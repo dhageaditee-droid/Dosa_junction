@@ -305,8 +305,8 @@ export const apiCall = async (endpoint, method = 'GET', data = null, customToken
 const getDynamicMenu = () => {
   try {
     const currentVer = localStorage.getItem('dakshin_menu_ver');
-    if (currentVer !== 'v33_black_tea_milk_garlic_dosa_photos') {
-      localStorage.setItem('dakshin_menu_ver', 'v33_black_tea_milk_garlic_dosa_photos');
+    if (currentVer !== 'v34_pudina_and_plain_dosa_photos') {
+      localStorage.setItem('dakshin_menu_ver', 'v34_pudina_and_plain_dosa_photos');
       localStorage.setItem('dakshin_custom_menu', JSON.stringify(FALLBACK_MENU_ITEMS));
       return FALLBACK_MENU_ITEMS;
     }
@@ -336,11 +336,17 @@ const getDynamicMenu = () => {
           if (String(item.id) === '9' || (item.name && item.name.includes('Ghee Garlic'))) {
             return { ...item, image_url: '/ghee-garlic-masala-dosa.jpg' };
           }
+          if (String(item.id) === '10' || String(item.id) === '18' || (item.name && item.name.includes('Pudina Masala'))) {
+            return { ...item, image_url: '/ghee-pudina-masala-dosa.jpg' };
+          }
           if (String(item.id) === '12' || (item.name && item.name.includes('Loni Sponge Dosa 3 Pcs'))) {
             return { ...item, image_url: '/loni-sponge-dosa-3-pcs.jpg' };
           }
           if (String(item.id) === '11' || (item.name && item.name.includes('Loni Sponge'))) {
             return { ...item, image_url: '/loni-sponge-dosa.jpg' };
+          }
+          if (String(item.id) === '13' || (item.name && item.name === 'Plain Dosa')) {
+            return { ...item, image_url: '/plain-dosa.jpg' };
           }
           if (String(item.id) === '14' || (item.name && item.name === 'Masala Dosa')) {
             return { ...item, image_url: '/masala-dosa.jpg' };
@@ -494,11 +500,17 @@ export const apiService = {
       if (String(item.id) === '9' || (item.name && item.name.includes('Ghee Garlic'))) {
         return { ...item, image_url: '/ghee-garlic-masala-dosa.jpg' };
       }
+      if (String(item.id) === '10' || String(item.id) === '18' || (item.name && item.name.includes('Pudina Masala'))) {
+        return { ...item, image_url: '/ghee-pudina-masala-dosa.jpg' };
+      }
       if (String(item.id) === '12' || (item.name && item.name.includes('Loni Sponge Dosa 3 Pcs'))) {
         return { ...item, image_url: '/loni-sponge-dosa-3-pcs.jpg' };
       }
       if (String(item.id) === '11' || (item.name && item.name.includes('Loni Sponge'))) {
         return { ...item, image_url: '/loni-sponge-dosa.jpg' };
+      }
+      if (String(item.id) === '13' || (item.name && item.name === 'Plain Dosa')) {
+        return { ...item, image_url: '/plain-dosa.jpg' };
       }
       if (String(item.id) === '14' || (item.name && item.name === 'Masala Dosa')) {
         return { ...item, image_url: '/masala-dosa.jpg' };
