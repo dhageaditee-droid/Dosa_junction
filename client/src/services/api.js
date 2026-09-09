@@ -305,8 +305,8 @@ export const apiCall = async (endpoint, method = 'GET', data = null, customToken
 const getDynamicMenu = () => {
   try {
     const currentVer = localStorage.getItem('dakshin_menu_ver');
-    if (currentVer !== 'v35_clean_studio_pudina_plain_dosa') {
-      localStorage.setItem('dakshin_menu_ver', 'v35_clean_studio_pudina_plain_dosa');
+    if (currentVer !== 'v36_garlic_and_palak_dosa_photos') {
+      localStorage.setItem('dakshin_menu_ver', 'v36_garlic_and_palak_dosa_photos');
       localStorage.setItem('dakshin_custom_menu', JSON.stringify(FALLBACK_MENU_ITEMS));
       return FALLBACK_MENU_ITEMS;
     }
@@ -356,6 +356,12 @@ const getDynamicMenu = () => {
           }
           if (String(item.id) === '16' || (item.name && item.name.includes('Mysore Masala'))) {
             return { ...item, image_url: '/mysore-masala-dosa.jpg' };
+          }
+          if (String(item.id) === '17' || (item.name && item.name === 'Garlic Masala Dosa')) {
+            return { ...item, image_url: '/garlic-masala-dosa.jpg' };
+          }
+          if (String(item.id) === '19' || (item.name && item.name.includes('Palak Masala'))) {
+            return { ...item, image_url: '/palak-masala-dosa.jpg' };
           }
           if (String(item.id) === '20' || (item.name && item.name.includes('Cut Masala'))) {
             return { ...item, image_url: '/cut-masala-dosa.jpg' };
@@ -520,6 +526,12 @@ export const apiService = {
       }
       if (String(item.id) === '16' || (item.name && item.name.includes('Mysore Masala'))) {
         return { ...item, image_url: '/mysore-masala-dosa.jpg' };
+      }
+      if (String(item.id) === '17' || (item.name && item.name === 'Garlic Masala Dosa')) {
+        return { ...item, image_url: '/garlic-masala-dosa.jpg' };
+      }
+      if (String(item.id) === '19' || (item.name && item.name.includes('Palak Masala'))) {
+        return { ...item, image_url: '/palak-masala-dosa.jpg' };
       }
       if (String(item.id) === '20' || (item.name && item.name.includes('Cut Masala'))) {
         return { ...item, image_url: '/cut-masala-dosa.jpg' };
