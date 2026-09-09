@@ -45,67 +45,107 @@ const Home = () => {
   const popularRef = useRef(null);
   const testimonialRef = useRef(null);
 
-  // Sample Featured Popular Dishes (matching image mockup)
+  // Featured Popular Dishes (matching image mockup)
   const popularDishesData = [
     {
-      id: 10,
-      name: 'Masala Dosa',
-      description: 'Crispy dosa with spicy potato masala',
-      price: 129,
-      rating: 4.8,
-      is_veg: true,
-      is_bestseller: true,
-      image_url: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=600&q=80'
-    },
-    {
-      id: 11,
-      name: 'Mysore Masala Dosa',
-      description: 'Spicy dosa with mysore masala',
+      id: 5,
+      name: 'South Indian Special Combo',
+      description: 'Masala Dosa + 1 Pc Idli + 1 Pc Medu Vada + Pineapple Sheera + Chaha',
       price: 149,
-      rating: 4.7,
+      rating: 5.0,
       is_veg: true,
       is_bestseller: true,
-      image_url: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80'
+      image_url: '/south-indian-special-combo.jpg'
     },
     {
-      id: 12,
-      name: 'Idli Sambar',
-      description: 'Soft idlis served with hot sambar & chutney',
-      price: 79,
-      rating: 4.9,
-      is_veg: true,
-      is_bestseller: false,
-      image_url: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80'
-    },
-    {
-      id: 13,
-      name: 'Medu Vada',
-      description: 'Crispy medu vada with sambar & chutney',
-      price: 79,
+      id: 1,
+      name: 'Chaha',
+      description: 'Traditional hot spiced Indian tea',
+      price: 20,
       rating: 4.8,
       is_veg: true,
-      is_bestseller: false,
-      image_url: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80'
-    },
-    {
-      id: 14,
-      name: 'Uttapam',
-      description: 'Soft & tasty uttapam with veggies',
-      price: 109,
-      rating: 4.6,
-      is_veg: true,
-      is_bestseller: false,
-      image_url: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80'
+      is_bestseller: true,
+      image_url: '/chaha.jpg'
     },
     {
       id: 2,
-      name: 'Filter Coffee',
-      description: 'South Indian filter coffee made fresh',
-      price: 49,
+      name: 'Black Tea',
+      description: 'Strong aromatic black tea',
+      price: 15,
+      rating: 4.5,
+      is_veg: true,
+      is_bestseller: false,
+      image_url: '/black-tea.jpg'
+    },
+    {
+      id: 3,
+      name: 'Coffee',
+      description: 'Authentic South Indian filter coffee',
+      price: 25,
       rating: 4.9,
       is_veg: true,
       is_bestseller: true,
-      image_url: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=600&q=80'
+      image_url: '/coffee.jpg'
+    },
+    {
+      id: 4,
+      name: 'Milk',
+      description: 'Fresh hot milk',
+      price: 20,
+      rating: 4.4,
+      is_veg: true,
+      is_bestseller: false,
+      image_url: '/milk.jpg'
+    },
+    {
+      id: 6,
+      name: 'Ghee Namma South Special Dosa',
+      description: 'Grand special dosa loaded with pure A2 Ghee & South Indian herbs',
+      price: 125,
+      rating: 4.9,
+      is_veg: true,
+      is_bestseller: true,
+      image_url: '/ghee-namma-south-special-dosa.jpg'
+    },
+    {
+      id: 14,
+      name: 'Masala Dosa',
+      description: 'Classic crispy Dosa stuffed with spiced potato masala',
+      price: 70,
+      rating: 4.8,
+      is_veg: true,
+      is_bestseller: true,
+      image_url: '/masala-dosa.jpg'
+    },
+    {
+      id: 13,
+      name: 'Plain Dosa',
+      description: 'Golden crisp plain fermented crepe served with chutneys & sambar',
+      price: 60,
+      rating: 4.6,
+      is_veg: true,
+      is_bestseller: false,
+      image_url: '/plain-dosa.jpg'
+    },
+    {
+      id: 40,
+      name: 'Medu Vada 2 Pcs',
+      description: 'Crispy golden fried lentil donuts served with coconut chutney & sambar',
+      price: 60,
+      rating: 4.8,
+      is_veg: true,
+      is_bestseller: true,
+      image_url: '/medu-vada-2-pcs.jpg'
+    },
+    {
+      id: 41,
+      name: 'Idli Medu Vada Combo 2 Pcs',
+      description: 'Combo of 1 steamed Idli and 1 Medu Vada served with hot sambar',
+      price: 40,
+      rating: 4.9,
+      is_veg: true,
+      is_bestseller: true,
+      image_url: '/idli-medu-vada-combo.jpg'
     }
   ];
 
@@ -190,7 +230,10 @@ const Home = () => {
     }, 1000);
   };
 
-  const displayDishes = menuItems.length > 0 ? menuItems.slice(0, 6) : popularDishesData;
+  const displayDishes = popularDishesData.map(p => {
+    const found = menuItems.find(m => String(m.id) === String(p.id) || (m.name && m.name.toLowerCase() === p.name.toLowerCase()));
+    return found ? { ...p, ...found, image_url: p.image_url || found.image_url } : p;
+  });
 
   return (
     <div style={{ backgroundColor: '#FAF7F0', color: '#1E293B', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
@@ -407,135 +450,226 @@ const Home = () => {
       </section>
 
       {/* ================= POPULAR SOUTH INDIAN DISHES ================= */}
-      <section style={{ padding: '4rem 0', backgroundColor: '#FFFFFF' }}>
+      <section style={{ padding: '4.5rem 0 3.5rem 0', backgroundColor: '#FFFFFF' }}>
         <div className="container">
           
-          {/* Section Header with Slider Navigation Controls */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
-            <div style={{ flexGrow: 1, textAlign: 'center' }}>
-              <span style={{ color: '#94A3B8', fontSize: '0.9rem', letterSpacing: '2px', fontWeight: 700 }}>
-                — POPULAR SOUTH INDIAN DISHES —
-              </span>
+          {/* Section Header: Leaf Icon + Overline + Script Heading + Subtitle */}
+          <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+            <div style={{ marginBottom: '6px' }}>
+              <span style={{ fontSize: '1.4rem' }}>🍃</span>
             </div>
-
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button
-                onClick={() => handleScrollPopular('left')}
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '50%',
-                  border: '1px solid #CBD5E1',
-                  backgroundColor: '#FFFFFF',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.06)'
-                }}
-              >
-                <ChevronLeft size={20} color="#475569" />
-              </button>
-              <button
-                onClick={() => handleScrollPopular('right')}
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '50%',
-                  border: '1px solid #CBD5E1',
-                  backgroundColor: '#FFFFFF',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.06)'
-                }}
-              >
-                <ChevronRight size={20} color="#475569" />
-              </button>
+            <div style={{ color: '#064E3B', fontSize: '0.9rem', letterSpacing: '2px', fontWeight: 800, textTransform: 'uppercase' }}>
+              — POPULAR SOUTH INDIAN DISHES —
             </div>
+            <h2
+              style={{
+                fontFamily: "'Caveat', cursive, 'Playfair Display', serif",
+                fontSize: 'clamp(2.4rem, 4.5vw, 3.4rem)',
+                fontWeight: 700,
+                color: '#064E3B',
+                margin: '0.4rem 0 0.5rem 0'
+              }}
+            >
+              Authentic <span style={{ color: '#D97706' }}>Flavours</span>, Loved by All
+            </h2>
+            <p style={{ color: '#64748B', fontSize: '0.96rem', maxWidth: '680px', margin: '0 auto', lineHeight: 1.5 }}>
+              Explore our most loved South Indian dishes, made with fresh ingredients and traditional recipes.
+            </p>
           </div>
 
-          {/* Horizontally Scrollable Carousel Grid */}
-          <div
-            ref={popularRef}
-            style={{
-              display: 'flex',
-              gap: '1.25rem',
-              overflowX: 'auto',
-              scrollBehavior: 'smooth',
-              paddingBottom: '1rem',
-              scrollbarWidth: 'none'
-            }}
-            className="no-scrollbar"
-          >
-            {displayDishes.map((dish) => {
-              const translatedName = translateDish(dish.name);
-              return (
-                <div
-                  key={dish.id}
-                  style={{
-                    flexShrink: 0,
-                    width: '240px',
-                    backgroundColor: '#FFFFFF',
-                    borderRadius: '16px',
-                    border: '1px solid #E2E8F0',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-                    padding: '12px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    transition: 'transform 0.2s, boxShadow 0.2s'
-                  }}
-                  className="pop-dish-card"
-                >
-                  <div>
-                    <div style={{ width: '100%', height: '140px', borderRadius: '12px', overflow: 'hidden', marginBottom: '10px' }}>
-                      <img
-                        src={dish.image_url || 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=500&q=80'}
-                        alt={translatedName}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
+          {/* Horizontally Scrollable Carousel Grid with Floating Side Arrows */}
+          <div style={{ position: 'relative' }}>
+            
+            {/* Left Circular Slider Button */}
+            <button
+              onClick={() => handleScrollPopular('left')}
+              className="carousel-nav-btn carousel-left-btn"
+              style={{
+                position: 'absolute',
+                left: '-18px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                zIndex: 10,
+                width: '42px',
+                height: '42px',
+                borderRadius: '50%',
+                border: '1px solid #E2E8F0',
+                backgroundColor: '#FFFFFF',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 14px rgba(0,0,0,0.12)',
+                transition: 'all 0.2s'
+              }}
+              title="Scroll Left"
+            >
+              <ChevronLeft size={22} color="#064E3B" />
+            </button>
+
+            {/* Right Circular Slider Button */}
+            <button
+              onClick={() => handleScrollPopular('right')}
+              className="carousel-nav-btn carousel-right-btn"
+              style={{
+                position: 'absolute',
+                right: '-18px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                zIndex: 10,
+                width: '42px',
+                height: '42px',
+                borderRadius: '50%',
+                border: '1px solid #E2E8F0',
+                backgroundColor: '#FFFFFF',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 14px rgba(0,0,0,0.12)',
+                transition: 'all 0.2s'
+              }}
+              title="Scroll Right"
+            >
+              <ChevronRight size={22} color="#064E3B" />
+            </button>
+
+            {/* Scrollable Container */}
+            <div
+              ref={popularRef}
+              style={{
+                display: 'flex',
+                gap: '1.25rem',
+                overflowX: 'auto',
+                scrollBehavior: 'smooth',
+                padding: '0.5rem 0.2rem 1.5rem 0.2rem',
+                scrollbarWidth: 'none'
+              }}
+              className="no-scrollbar"
+            >
+              {displayDishes.map((dish) => {
+                const translatedName = translateDish(dish.name);
+                return (
+                  <div
+                    key={dish.id}
+                    style={{
+                      flexShrink: 0,
+                      width: '245px',
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '18px',
+                      border: '1px solid #E8E5DC',
+                      boxShadow: '0 4px 18px rgba(0,0,0,0.06)',
+                      padding: '13px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      transition: 'transform 0.2s, boxShadow 0.2s'
+                    }}
+                    className="pop-dish-card"
+                  >
+                    <div>
+                      {/* Image Box with Veg Badge */}
+                      <div
+                        style={{
+                          position: 'relative',
+                          width: '100%',
+                          height: '150px',
+                          borderRadius: '14px',
+                          overflow: 'hidden',
+                          marginBottom: '10px'
+                        }}
+                      >
+                        <img
+                          src={dish.image_url || '/south-indian-special-combo.jpg'}
+                          alt={translatedName}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                        <div
+                          style={{
+                            position: 'absolute',
+                            top: '8px',
+                            right: '8px',
+                            backgroundColor: 'rgba(6, 78, 59, 0.88)',
+                            backdropFilter: 'blur(4px)',
+                            color: '#FFFFFF',
+                            padding: '3px 8px',
+                            borderRadius: '12px',
+                            fontSize: '0.72rem',
+                            fontWeight: 700,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '3px'
+                          }}
+                        >
+                          <Leaf size={11} color="#4ADE80" />
+                          <span>Veg</span>
+                        </div>
+                      </div>
+
+                      {/* Title & Description */}
+                      <h4
+                        style={{
+                          fontSize: '1.05rem',
+                          fontWeight: 800,
+                          color: '#064E3B',
+                          margin: '0 0 4px 0',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}
+                        title={translatedName}
+                      >
+                        {translatedName}
+                      </h4>
+                      <p
+                        style={{
+                          fontSize: '0.79rem',
+                          color: '#64748B',
+                          margin: '0 0 10px 0',
+                          lineHeight: 1.4,
+                          height: '36px',
+                          overflow: 'hidden'
+                        }}
+                      >
+                        {dish.description}
+                      </p>
                     </div>
-                    <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#064E3B', margin: '0 0 4px 0' }}>
-                      {translatedName}
-                    </h4>
-                    <p style={{ fontSize: '0.78rem', color: '#64748B', margin: '0 0 10px 0', lineHeight: 1.4, height: '34px', overflow: 'hidden' }}>
-                      {dish.description}
-                    </p>
-                  </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '8px', borderTop: '1px solid #F1F5F9' }}>
-                    <span style={{ fontSize: '1.05rem', fontWeight: 800, color: '#064E3B' }}>
-                      ₹{dish.price}
-                    </span>
+                    {/* Bottom Price and Add to Cart Button */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '10px', borderTop: '1px solid #F1F5F9' }}>
+                      <span style={{ fontSize: '1.2rem', fontWeight: 800, color: '#064E3B' }}>
+                        ₹{dish.price}
+                      </span>
 
-                    <button
-                      onClick={() => {
-                        addToCart(dish, 1);
-                        addToast(`${translatedName} added to cart!`, 'success');
-                      }}
-                      style={{
-                        padding: '6px 14px',
-                        borderRadius: '20px',
-                        border: '1.5px solid #D97706',
-                        backgroundColor: '#FFF9ED',
-                        color: '#D97706',
-                        fontSize: '0.8rem',
-                        fontWeight: 800,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px'
-                      }}
-                    >
-                      <ShoppingCart size={13} />
-                      <span>Add to Cart</span>
-                    </button>
+                      <button
+                        onClick={() => {
+                          addToCart(dish, 1);
+                          addToast(`${translatedName} added to cart!`, 'success');
+                        }}
+                        style={{
+                          padding: '7px 14px',
+                          borderRadius: '24px',
+                          border: '1.5px solid #D97706',
+                          backgroundColor: '#FFFFFF',
+                          color: '#D97706',
+                          fontSize: '0.82rem',
+                          fontWeight: 800,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                          transition: 'all 0.2s ease',
+                          boxShadow: '0 2px 8px rgba(217, 119, 6, 0.12)'
+                        }}
+                      >
+                        <ShoppingCart size={14} color="#D97706" />
+                        <span>Add to Cart</span>
+                      </button>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
 
         </div>
@@ -544,41 +678,49 @@ const Home = () => {
 
 
       {/* ================= WHY CHOOSE DOSA JUNCTION? ================= */}
-      <section style={{ padding: '3rem 0 4rem 0', backgroundColor: '#FFFFFF' }}>
+      <section style={{ padding: '3.5rem 0 4.5rem 0', backgroundColor: '#FAF7F0', borderTop: '1px solid #EAE7DC' }}>
         <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-            <span style={{ color: '#94A3B8', fontSize: '0.9rem', letterSpacing: '2px', fontWeight: 700 }}>
+          
+          {/* Header */}
+          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+            <div style={{ marginBottom: '6px' }}>
+              <span style={{ fontSize: '1.4rem' }}>🍃</span>
+            </div>
+            <div style={{ color: '#064E3B', fontSize: '0.9rem', letterSpacing: '2px', fontWeight: 800, textTransform: 'uppercase' }}>
               — WHY CHOOSE DOSA JUNCTION? —
-            </span>
+            </div>
           </div>
 
+          {/* 4 Features Horizontal Grid with Dividers */}
           <div
+            className="why-choose-features-grid"
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-              gap: '1.5rem'
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: '1rem',
+              alignItems: 'flex-start'
             }}
           >
             {[
               {
-                icon: UtensilsCrossed,
-                title: '100% Authentic',
-                desc: 'Traditional recipes passed down through generations.'
-              },
-              {
                 icon: Leaf,
-                title: 'Fresh Ingredients',
-                desc: 'We use only the freshest and finest ingredients.'
+                title: 'Pure Veg',
+                desc: 'Made with 100% fresh & natural ingredients'
               },
               {
-                icon: CheckCircle2,
-                title: 'Pure Veg Restaurant',
-                desc: '100% vegetarian with hygienic preparation.'
+                icon: Sparkles,
+                title: 'Fresh Ingredients',
+                desc: 'Quality ingredients for better taste'
+              },
+              {
+                icon: Award,
+                title: 'Authentic Taste',
+                desc: 'Traditional recipes, original flavours'
               },
               {
                 icon: Truck,
                 title: 'Fast Delivery',
-                desc: 'Hot & fresh food delivered to your doorstep.'
+                desc: 'Hot & fresh, right to your door'
               }
             ].map((feature, idx) => {
               const IconComp = feature.icon;
@@ -586,41 +728,65 @@ const Home = () => {
                 <div
                   key={idx}
                   style={{
-                    backgroundColor: '#FAF7F0',
-                    borderRadius: '16px',
-                    padding: '1.8rem 1.2rem',
                     textAlign: 'center',
-                    border: '1px solid #E5E7EB',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
+                    padding: '0 1rem',
+                    borderRight: idx < 3 ? '1px solid #E2E8F0' : 'none'
                   }}
+                  className="why-choose-col"
                 >
                   <div
                     style={{
-                      width: '54px',
-                      height: '54px',
+                      width: '64px',
+                      height: '64px',
                       borderRadius: '50%',
-                      backgroundColor: '#064E3B',
-                      color: '#FFFFFF',
+                      backgroundColor: '#DCFCE7',
+                      color: '#16A34A',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      margin: '0 auto 1.2rem auto',
-                      boxShadow: '0 4px 10px rgba(6, 78, 59, 0.25)'
+                      margin: '0 auto 14px auto',
+                      boxShadow: '0 4px 14px rgba(22, 163, 74, 0.15)'
                     }}
                   >
-                    <IconComp size={26} />
+                    <IconComp size={28} color="#16A34A" />
                   </div>
-                  <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#064E3B', marginBottom: '0.5rem' }}>
+                  <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#064E3B', marginBottom: '6px' }}>
                     {feature.title}
-                  </h3>
-                  <p style={{ fontSize: '0.85rem', color: '#64748B', lineHeight: 1.5, margin: 0 }}>
+                  </h4>
+                  <p style={{ fontSize: '0.85rem', color: '#64748B', lineHeight: 1.5, margin: '0 auto', maxWidth: '200px' }}>
                     {feature.desc}
                   </p>
                 </div>
               );
             })}
           </div>
+
         </div>
+
+        {/* Responsive CSS for Why Choose Grid and Carousel Buttons */}
+        <style>{`
+          @media (max-width: 900px) {
+            .why-choose-features-grid {
+              grid-template-columns: repeat(2, 1fr) !important;
+              gap: 2rem !important;
+            }
+            .why-choose-col {
+              border-right: none !important;
+            }
+            .carousel-left-btn {
+              left: 0px !important;
+            }
+            .carousel-right-btn {
+              right: 0px !important;
+            }
+          }
+          @media (max-width: 600px) {
+            .why-choose-features-grid {
+              grid-template-columns: 1fr !important;
+              gap: 2rem !important;
+            }
+          }
+        `}</style>
       </section>
 
       {/* ================= OUR STORY & GALLERY ================= */}
