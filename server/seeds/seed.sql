@@ -21,9 +21,9 @@ SELECT setval('categories_id_seq', 9, true);
 INSERT INTO menu_items (id, category_id, name, description, price, image_url, is_veg, spice_level, preparation_time, is_available, is_bestseller, is_featured, rating) VALUES
 
 -- 1. Beverages / चहा
-(1, 1, 'Chaha', 'Traditional hot spiced Indian tea', 10.00, 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '5 mins', TRUE, TRUE, TRUE, 4.8),
+(1, 1, 'Chaha', 'Traditional hot spiced Indian tea', 10.00, '/chaha.jpg', TRUE, 'mild', '5 mins', TRUE, TRUE, TRUE, 4.8),
 (2, 1, 'Black Tea', 'Strong aromatic black tea', 15.00, '/black-tea.jpg', TRUE, 'mild', '5 mins', TRUE, FALSE, FALSE, 4.5),
-(3, 1, 'Coffee', 'Authentic South Indian hot coffee', 25.00, 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '5 mins', TRUE, TRUE, TRUE, 4.9),
+(3, 1, 'Coffee', 'Authentic South Indian hot coffee', 25.00, '/coffee.jpg', TRUE, 'mild', '5 mins', TRUE, TRUE, TRUE, 4.9),
 (4, 1, 'Milk', 'Fresh hot milk', 20.00, '/milk.jpg', TRUE, 'mild', '5 mins', TRUE, FALSE, FALSE, 4.4),
 
 -- 2. Special Dosa / स्पेशल डोसा

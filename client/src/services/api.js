@@ -305,8 +305,8 @@ export const apiCall = async (endpoint, method = 'GET', data = null, customToken
 const getDynamicMenu = () => {
   try {
     const currentVer = localStorage.getItem('dakshin_menu_ver');
-    if (currentVer !== 'v39_remove_duplicate_rice_extras') {
-      localStorage.setItem('dakshin_menu_ver', 'v39_remove_duplicate_rice_extras');
+    if (currentVer !== 'v40_chaha_and_coffee_clean_photos') {
+      localStorage.setItem('dakshin_menu_ver', 'v40_chaha_and_coffee_clean_photos');
       localStorage.setItem('dakshin_custom_menu', JSON.stringify(FALLBACK_MENU_ITEMS));
       return FALLBACK_MENU_ITEMS;
     }
@@ -323,8 +323,14 @@ const getDynamicMenu = () => {
           return true;
         });
         const sanitized = filteredParsed.map(item => {
+          if (String(item.id) === '1' || (item.name && item.name === 'Chaha')) {
+            return { ...item, image_url: '/chaha.jpg' };
+          }
           if (String(item.id) === '2' || (item.name && item.name === 'Black Tea')) {
             return { ...item, image_url: '/black-tea.jpg' };
+          }
+          if (String(item.id) === '3' || (item.name && item.name === 'Coffee')) {
+            return { ...item, image_url: '/coffee.jpg' };
           }
           if (String(item.id) === '4' || (item.name && item.name === 'Milk')) {
             return { ...item, image_url: '/milk.jpg' };
@@ -502,8 +508,14 @@ export const apiService = {
 
     // Always enforce latest local image for Special Dosas & Masala Dosa variants
     itemsList = itemsList.map(item => {
+      if (String(item.id) === '1' || (item.name && item.name === 'Chaha')) {
+        return { ...item, image_url: '/chaha.jpg' };
+      }
       if (String(item.id) === '2' || (item.name && item.name === 'Black Tea')) {
         return { ...item, image_url: '/black-tea.jpg' };
+      }
+      if (String(item.id) === '3' || (item.name && item.name === 'Coffee')) {
+        return { ...item, image_url: '/coffee.jpg' };
       }
       if (String(item.id) === '4' || (item.name && item.name === 'Milk')) {
         return { ...item, image_url: '/milk.jpg' };

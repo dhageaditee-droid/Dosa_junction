@@ -16,9 +16,9 @@ export const FALLBACK_MENU_ITEMS = [
   { id: 99, category_id: 10, category_slug: 'combo', name: 'South Indian Special Combo', description: 'Masala Dosa + 1 Pc Idli + 1 Pc Medu Vada + Pineapple Sheera + Chaha', price: 149.00, image_url: '/south-indian-special-combo.jpg', is_veg: true, spice_level: 'medium', preparation_time: '15 mins', is_available: true, is_bestseller: true, rating: 5.0 },
 
   // 1. Beverages
-  { id: 1, category_id: 1, category_slug: 'beverages', name: 'Chaha', description: 'Traditional hot spiced Indian tea', price: 20.00, image_url: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=600&q=80', is_veg: true, spice_level: 'mild', preparation_time: '5 mins', is_available: true, is_bestseller: true, rating: 4.8 },
+  { id: 1, category_id: 1, category_slug: 'beverages', name: 'Chaha', description: 'Traditional hot spiced Indian tea', price: 20.00, image_url: '/chaha.jpg', is_veg: true, spice_level: 'mild', preparation_time: '5 mins', is_available: true, is_bestseller: true, rating: 4.8 },
   { id: 2, category_id: 1, category_slug: 'beverages', name: 'Black Tea', description: 'Strong aromatic black tea', price: 15.00, image_url: '/black-tea.jpg', is_veg: true, spice_level: 'mild', preparation_time: '5 mins', is_available: true, is_bestseller: false, rating: 4.5 },
-  { id: 3, category_id: 1, category_slug: 'beverages', name: 'Coffee', description: 'Authentic South Indian filter coffee', price: 25.00, image_url: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=600&q=80', is_veg: true, spice_level: 'mild', preparation_time: '5 mins', is_available: true, is_bestseller: true, rating: 4.9 },
+  { id: 3, category_id: 1, category_slug: 'beverages', name: 'Coffee', description: 'Authentic South Indian filter coffee', price: 25.00, image_url: '/coffee.jpg', is_veg: true, spice_level: 'mild', preparation_time: '5 mins', is_available: true, is_bestseller: true, rating: 4.9 },
   { id: 4, category_id: 1, category_slug: 'beverages', name: 'Milk', description: 'Fresh hot milk', price: 20.00, image_url: '/milk.jpg', is_veg: true, spice_level: 'mild', preparation_time: '5 mins', is_available: true, is_bestseller: false, rating: 4.4 },
 
   // 2. Special Dosa
