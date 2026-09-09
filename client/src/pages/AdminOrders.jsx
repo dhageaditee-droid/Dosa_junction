@@ -217,7 +217,7 @@ const AdminOrders = () => {
         {/* Header Bar */}
         <div className="admin-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
           <div>
-            <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem', color: 'var(--color-emerald)', margin: 0 }}>
+            <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem', color: '#0F172A', margin: 0 }}>
               Admin Payment Verification & Order Management
             </h1>
             <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
@@ -256,8 +256,8 @@ const AdminOrders = () => {
               padding: '0.8rem 1.5rem',
               borderRadius: '14px',
               border: 'none',
-              backgroundColor: activeTab === 'sessions' ? 'var(--color-emerald)' : '#FFFFFF',
-              color: activeTab === 'sessions' ? '#FFFFFF' : 'var(--color-emerald)',
+              backgroundColor: activeTab === 'sessions' ? '#0F172A' : '#FFFFFF',
+              color: activeTab === 'sessions' ? '#FFFFFF' : '#0F172A',
               fontWeight: 800,
               fontSize: '0.95rem',
               cursor: 'pointer',
@@ -271,7 +271,7 @@ const AdminOrders = () => {
             ⚡ Pending Payment Verifications
             <span style={{
               backgroundColor: activeTab === 'sessions' ? '#FFC83B' : '#FEF3C7',
-              color: activeTab === 'sessions' ? '#0F3825' : '#B45309',
+              color: activeTab === 'sessions' ? '#0F172A' : '#B45309',
               padding: '2px 8px',
               borderRadius: '10px',
               fontSize: '0.8rem',
@@ -287,8 +287,8 @@ const AdminOrders = () => {
               padding: '0.8rem 1.5rem',
               borderRadius: '14px',
               border: 'none',
-              backgroundColor: activeTab === 'orders' ? 'var(--color-emerald)' : '#FFFFFF',
-              color: activeTab === 'orders' ? '#FFFFFF' : 'var(--color-emerald)',
+              backgroundColor: activeTab === 'orders' ? '#0F172A' : '#FFFFFF',
+              color: activeTab === 'orders' ? '#FFFFFF' : '#0F172A',
               fontWeight: 800,
               fontSize: '0.95rem',
               cursor: 'pointer',
@@ -335,7 +335,7 @@ const AdminOrders = () => {
           </div>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '1rem' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-emerald)', cursor: 'pointer' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', fontWeight: 700, color: '#0F172A', cursor: 'pointer' }}>
               <input
                 type="checkbox"
                 checked={todayOnly}
@@ -371,7 +371,7 @@ const AdminOrders = () => {
             ) : paymentSessions.length === 0 ? (
               <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '3rem', textAlign: 'center', boxShadow: '0 4px 14px rgba(0,0,0,0.04)' }}>
                 <CheckCircle size={48} color="#16A34A" style={{ marginBottom: '0.8rem' }} />
-                <h3 style={{ color: 'var(--color-emerald)', margin: 0 }}>No Pending Payment Sessions</h3>
+                <h3 style={{ color: '#0F172A', margin: 0 }}>No Pending Payment Sessions</h3>
                 <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', marginTop: '4px' }}>
                   All customer payment proofs have been verified or no active payment sessions are waiting.
                 </p>
@@ -406,7 +406,7 @@ const AdminOrders = () => {
                         return (
                           <tr key={sess.id}>
                             <td style={{ whiteSpace: 'nowrap' }}>
-                              <div style={{ fontWeight: 900, color: 'var(--color-emerald)', fontSize: '1.2rem' }}>
+                              <div style={{ fontWeight: 900, color: '#0F172A', fontSize: '1.2rem' }}>
                                 {index + 1}
                               </div>
                               <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '3px', marginTop: '2px' }}>
@@ -416,7 +416,7 @@ const AdminOrders = () => {
                             </td>
 
                             <td>
-                              <div style={{ fontWeight: 800, color: 'var(--color-emerald)' }}>{sess.customer_name}</div>
+                              <div style={{ fontWeight: 800, color: '#0F172A' }}>{sess.customer_name}</div>
                               <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>{sess.customer_phone}</div>
                             </td>
 
@@ -427,7 +427,7 @@ const AdminOrders = () => {
                                   <span style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>No items</span>
                                 ) : cartItems.length === 1 ? (
                                   <div style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: '#F8FAFC', padding: '4px 8px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '0.82rem' }}>
-                                    <span style={{ fontWeight: 700, color: 'var(--color-emerald)' }}>
+                                    <span style={{ fontWeight: 700, color: '#0F172A' }}>
                                       {cartItems[0].quantity}x {cleanDishName(cartItems[0].item_name || cartItems[0].name)}
                                     </span>
                                     <span style={{ fontWeight: 700, color: 'var(--color-gold)' }}>₹{parseFloat(cartItems[0].subtotal || cartItems[0].price * cartItems[0].quantity).toFixed(2)}</span>
@@ -435,7 +435,7 @@ const AdminOrders = () => {
                                 ) : (
                                   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: '#F8FAFC', padding: '4px 8px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '0.82rem' }}>
-                                      <span style={{ fontWeight: 700, color: 'var(--color-emerald)' }}>
+                                      <span style={{ fontWeight: 700, color: '#0F172A' }}>
                                         {cartItems[0].quantity}x {cleanDishName(cartItems[0].item_name || cartItems[0].name)}
                                       </span>
                                       <span style={{ fontWeight: 700, color: 'var(--color-gold)' }}>₹{parseFloat(cartItems[0].subtotal || cartItems[0].price * cartItems[0].quantity).toFixed(2)}</span>
@@ -465,8 +465,8 @@ const AdminOrders = () => {
                                     {isExpanded && (
                                       <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', marginTop: '2px' }}>
                                         {cartItems.slice(1).map((it, idx) => (
-                                          <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: '#ECFDF5', padding: '4px 8px', borderRadius: '6px', border: '1px solid #A7F3D0', fontSize: '0.8rem' }}>
-                                            <span style={{ fontWeight: 700, color: '#065F46' }}>
+                                          <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: '#F1F5F9', padding: '4px 8px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.8rem' }}>
+                                            <span style={{ fontWeight: 700, color: '#0F172A' }}>
                                               {it.quantity}x {cleanDishName(it.item_name || it.name)}
                                             </span>
                                             <span style={{ fontWeight: 700, color: 'var(--color-gold)' }}>₹{parseFloat(it.subtotal || it.price * it.quantity).toFixed(2)}</span>
@@ -493,7 +493,7 @@ const AdminOrders = () => {
                             <td>
                               {sess.utr_number ? (
                                 <div style={{ fontSize: '0.82rem' }}>
-                                  <div style={{ fontFamily: 'monospace', fontWeight: 800, color: 'var(--color-emerald)' }}>
+                                  <div style={{ fontFamily: 'monospace', fontWeight: 800, color: '#0F172A' }}>
                                     UTR: {sess.utr_number}
                                   </div>
                                   {sess.payment_screenshot && (
@@ -534,7 +534,7 @@ const AdminOrders = () => {
                                       <div style={{ display: 'flex', alignItems: 'flex-start', gap: '5px' }}>
                                         <MapPin size={14} color="var(--color-gold)" style={{ flexShrink: 0, marginTop: '2px' }} />
                                         <div>
-                                          <div style={{ fontWeight: 700, color: 'var(--color-emerald)', wordBreak: 'break-word' }}>
+                                          <div style={{ fontWeight: 700, color: '#0F172A', wordBreak: 'break-word' }}>
                                             {fullAddr}
                                           </div>
                                         </div>
@@ -626,7 +626,7 @@ const AdminOrders = () => {
             ) : orders.length === 0 ? (
               <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '3rem', textAlign: 'center', boxShadow: '0 4px 14px rgba(0,0,0,0.04)' }}>
                 <Package size={48} color="var(--color-gold)" style={{ marginBottom: '0.8rem' }} />
-                <h3 style={{ color: 'var(--color-emerald)', margin: 0 }}>No Confirmed Orders Yet</h3>
+                <h3 style={{ color: '#0F172A', margin: 0 }}>No Confirmed Orders Yet</h3>
                 <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', marginTop: '4px' }}>
                   Approved payment sessions will appear here as confirmed orders.
                 </p>
@@ -662,7 +662,7 @@ const AdminOrders = () => {
                         return (
                           <tr key={ord.id}>
                             <td style={{ whiteSpace: 'nowrap' }}>
-                              <div style={{ fontWeight: 900, color: 'var(--color-emerald)', fontSize: '1.2rem' }}>
+                              <div style={{ fontWeight: 900, color: '#0F172A', fontSize: '1.2rem' }}>
                                 {index + 1}
                               </div>
                               <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '3px', marginTop: '2px' }}>
@@ -672,7 +672,7 @@ const AdminOrders = () => {
                             </td>
 
                             <td>
-                              <div style={{ fontWeight: 800, color: 'var(--color-emerald)' }}>{ord.customer_name}</div>
+                              <div style={{ fontWeight: 800, color: '#0F172A' }}>{ord.customer_name}</div>
                               <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{ord.customer_phone}</div>
                             </td>
 
@@ -683,7 +683,7 @@ const AdminOrders = () => {
                                   <span style={{ color: 'var(--color-text-muted)', fontStyle: 'italic', fontSize: '0.8rem' }}>No items</span>
                                 ) : itemCount === 1 ? (
                                   <div style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: '#F8FAFC', padding: '4px 8px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '0.82rem' }}>
-                                    <span style={{ fontWeight: 700, color: 'var(--color-emerald)' }}>
+                                    <span style={{ fontWeight: 700, color: '#0F172A' }}>
                                       {itemsList[0].quantity}x {cleanDishName(itemsList[0].item_name)}
                                     </span>
                                     <span style={{ fontWeight: 700, color: 'var(--color-gold)' }}>₹{parseFloat(itemsList[0].subtotal).toFixed(2)}</span>
@@ -691,7 +691,7 @@ const AdminOrders = () => {
                                 ) : (
                                   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: '#F8FAFC', padding: '4px 8px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '0.82rem' }}>
-                                      <span style={{ fontWeight: 700, color: 'var(--color-emerald)' }}>
+                                      <span style={{ fontWeight: 700, color: '#0F172A' }}>
                                         {itemsList[0].quantity}x {cleanDishName(itemsList[0].item_name)}
                                       </span>
                                       <span style={{ fontWeight: 700, color: 'var(--color-gold)' }}>₹{parseFloat(itemsList[0].subtotal).toFixed(2)}</span>
@@ -721,8 +721,8 @@ const AdminOrders = () => {
                                     {isExpanded && (
                                       <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', marginTop: '2px' }}>
                                         {itemsList.slice(1).map((it, idx) => (
-                                          <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: '#ECFDF5', padding: '4px 8px', borderRadius: '6px', border: '1px solid #A7F3D0', fontSize: '0.8rem' }}>
-                                            <span style={{ fontWeight: 700, color: '#065F46' }}>
+                                          <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: '#F1F5F9', padding: '4px 8px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.8rem' }}>
+                                            <span style={{ fontWeight: 700, color: '#0F172A' }}>
                                               {it.quantity}x {cleanDishName(it.item_name)}
                                             </span>
                                             <span style={{ fontWeight: 700, color: 'var(--color-gold)' }}>₹{parseFloat(it.subtotal).toFixed(2)}</span>
@@ -746,7 +746,7 @@ const AdminOrders = () => {
                             <td>
                               {ord.utr_number ? (
                                 <div style={{ fontSize: '0.8rem' }}>
-                                  <div style={{ fontFamily: 'monospace', fontWeight: 700, color: 'var(--color-emerald)' }}>
+                                  <div style={{ fontFamily: 'monospace', fontWeight: 700, color: '#0F172A' }}>
                                     UTR: {ord.utr_number}
                                   </div>
                                   {ord.payment_screenshot && (
@@ -802,7 +802,7 @@ const AdminOrders = () => {
                                       <div style={{ display: 'flex', alignItems: 'flex-start', gap: '5px' }}>
                                         <MapPin size={14} color="var(--color-gold)" style={{ flexShrink: 0, marginTop: '2px' }} />
                                         <div>
-                                          <div style={{ fontWeight: 700, color: 'var(--color-emerald)', wordBreak: 'break-word' }}>
+                                          <div style={{ fontWeight: 700, color: '#0F172A', wordBreak: 'break-word' }}>
                                             {fullAddr || extraDetails}
                                           </div>
                                           {fullAddr && extraDetails && (!ord.city || !fullAddr.includes(ord.city)) && (

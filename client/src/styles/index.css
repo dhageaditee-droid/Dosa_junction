@@ -410,7 +410,7 @@ h1, h2, h3, h4, .font-heading {
 }
 
 .admin-table th {
-  background-color: var(--color-deep-green);
+  background-color: #0F172A;
   color: #fff;
   font-size: 0.85rem;
   text-transform: uppercase;
