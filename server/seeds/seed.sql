@@ -62,7 +62,7 @@ INSERT INTO menu_items (id, category_id, name, description, price, image_url, is
 (33, 4, 'Masala Uttapam', 'Uttapam topped with potato bhaji & spices', 85.00, '/masala-uttapam.jpg', TRUE, 'medium', '12 mins', TRUE, FALSE, FALSE, 4.6),
 (34, 4, 'Schezwan Uttapam', 'Spicy Schezwan sauce layered Uttapam', 95.00, '/schezwan-uttapam.jpg', TRUE, 'spicy', '12 mins', TRUE, FALSE, FALSE, 4.5),
 (35, 4, 'Cheese Onion Uttapam', 'Onion Uttapam loaded with melted cheese', 95.00, '/cheese-onion-uttapam.jpg', TRUE, 'mild', '12 mins', TRUE, TRUE, FALSE, 4.7),
-(36, 4, 'Cheese Chilli Uttapam', 'Spicy green chillies & melted cheese Uttapam', 95.00, 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80', TRUE, 'spicy', '12 mins', TRUE, FALSE, FALSE, 4.6),
+(36, 4, 'Cheese Chilli Uttapam', 'Spicy green chillies & melted cheese Uttapam', 95.00, '/cheese-chilli-uttapam.jpg', TRUE, 'spicy', '12 mins', TRUE, FALSE, FALSE, 4.6),
 (37, 4, 'Cheese Masala Uttapam', 'Potato masala & cheese topped savory Uttapam', 100.00, '/cheese-masala-uttapam.jpg', TRUE, 'medium', '15 mins', TRUE, TRUE, TRUE, 4.8),
 (38, 4, 'Cheese Corn Uttapam', 'Sweet corn & melted cheese Uttapam', 100.00, '/cheese-corn-uttapam.jpg', TRUE, 'mild', '15 mins', TRUE, TRUE, FALSE, 4.8),
 
@@ -74,15 +74,15 @@ INSERT INTO menu_items (id, category_id, name, description, price, image_url, is
 (41, 6, 'Idli Medu Vada Combo 2 Pcs', 'Combo of 1 steamed Idli and 1 Medu Vada served with hot sambar', 40.00, '/idli-medu-vada-combo.jpg', TRUE, 'mild', '5 mins', TRUE, TRUE, TRUE, 4.9),
 
 -- 7. Idli / इटली
-(42, 5, 'Idli 1 Pc', 'Single soft steamed rice idli with sambar & chutney', 15.00, 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '5 mins', TRUE, TRUE, FALSE, 4.7),
+(42, 5, 'Idli 1 Pc', 'Single soft steamed rice idli with sambar & chutney', 15.00, '/idli-1-pc.jpg', TRUE, 'mild', '5 mins', TRUE, TRUE, FALSE, 4.7),
 (43, 5, 'Masala Idli', 'Tossed idli pieces tempered with podi masala, curry leaves & ghee', 80.00, '/masala-idli.jpg', TRUE, 'medium', '8 mins', TRUE, TRUE, TRUE, 4.8),
 (44, 5, 'Thatte Idli', 'Traditional large plate-sized flat Karnataka soft Thatte Idli', 70.00, '/thatte-idli.jpg', TRUE, 'mild', '8 mins', TRUE, TRUE, TRUE, 4.9),
-(45, 5, 'Button Idli', 'Mini bite-sized idlis dipped in hot sambar bowl', 60.00, 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '8 mins', TRUE, TRUE, FALSE, 4.7),
+(45, 5, 'Button Idli', 'Mini bite-sized idlis dipped in hot sambar bowl', 60.00, '/button-idli.jpg', TRUE, 'mild', '8 mins', TRUE, TRUE, FALSE, 4.7),
 
 -- 8. Rice / राईस
 (46, 8, 'Masala Rice', 'Spiced South Indian rice tempered with mustard, chillies & spices', 90.00, '/masala-rice.jpg', TRUE, 'medium', '10 mins', TRUE, TRUE, FALSE, 4.6),
 (47, 8, 'Curd Rice', 'Soothing rice mixed with fresh curd, mustard & pomegranate', 90.00, '/curd-rice.jpg', TRUE, 'mild', '8 mins', TRUE, TRUE, TRUE, 4.9),
-(48, 8, 'Lemon Rice', 'Tangy steamed rice tempered with lemon juice, peanuts & curry leaves', 85.00, 'https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '10 mins', TRUE, TRUE, FALSE, 4.7),
+(48, 8, 'Lemon Rice', 'Tangy steamed rice tempered with lemon juice, peanuts & curry leaves', 85.00, '/lemon-rice.jpg', TRUE, 'mild', '10 mins', TRUE, TRUE, FALSE, 4.7),
 
 -- 9. Extras / एक्स्ट्रा
 (49, 9, 'Extra Cheese', 'Add-on extra shredded Amul Cheese', 25.00, 'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '2 mins', TRUE, FALSE, FALSE, 4.5),

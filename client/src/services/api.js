@@ -305,8 +305,8 @@ export const apiCall = async (endpoint, method = 'GET', data = null, customToken
 const getDynamicMenu = () => {
   try {
     const currentVer = localStorage.getItem('dakshin_menu_ver');
-    if (currentVer !== 'v41_garlic_masala_schezwan_uttapam_photos') {
-      localStorage.setItem('dakshin_menu_ver', 'v41_garlic_masala_schezwan_uttapam_photos');
+    if (currentVer !== 'v42_cheese_chilli_idli_button_lemon_photos') {
+      localStorage.setItem('dakshin_menu_ver', 'v42_cheese_chilli_idli_button_lemon_photos');
       localStorage.setItem('dakshin_custom_menu', JSON.stringify(FALLBACK_MENU_ITEMS));
       return FALLBACK_MENU_ITEMS;
     }
@@ -418,6 +418,48 @@ const getDynamicMenu = () => {
           }
           if (String(item.id) === '34' || (item.name && item.name === 'Schezwan Uttapam')) {
             return { ...item, image_url: '/schezwan-uttapam.jpg' };
+          }
+          if (String(item.id) === '35' || (item.name && item.name === 'Cheese Onion Uttapam')) {
+            return { ...item, image_url: '/cheese-onion-uttapam.jpg' };
+          }
+          if (String(item.id) === '36' || (item.name && item.name === 'Cheese Chilli Uttapam')) {
+            return { ...item, image_url: '/cheese-chilli-uttapam.jpg' };
+          }
+          if (String(item.id) === '37' || (item.name && item.name === 'Cheese Masala Uttapam')) {
+            return { ...item, image_url: '/cheese-masala-uttapam.jpg' };
+          }
+          if (String(item.id) === '38' || (item.name && item.name === 'Cheese Corn Uttapam')) {
+            return { ...item, image_url: '/cheese-corn-uttapam.jpg' };
+          }
+          if (String(item.id) === '39' || (item.name && item.name === 'Pineapple Sheera')) {
+            return { ...item, image_url: '/pineapple-sheera.jpg' };
+          }
+          if (String(item.id) === '40' || (item.name && item.name === 'Medu Vada 2 Pcs')) {
+            return { ...item, image_url: '/medu-vada-2-pcs.jpg' };
+          }
+          if (String(item.id) === '41' || (item.name && item.name.includes('Idli, Medu Vada') || item.name.includes('Idli Medu Vada'))) {
+            return { ...item, image_url: '/idli-medu-vada-combo.jpg' };
+          }
+          if (String(item.id) === '42' || (item.name && (item.name === 'Idli (1 Pc)' || item.name === 'Idli 1 Pc'))) {
+            return { ...item, image_url: '/idli-1-pc.jpg' };
+          }
+          if (String(item.id) === '43' || (item.name && item.name === 'Masala Idli')) {
+            return { ...item, image_url: '/masala-idli.jpg' };
+          }
+          if (String(item.id) === '44' || (item.name && item.name === 'Thatte Idli')) {
+            return { ...item, image_url: '/thatte-idli.jpg' };
+          }
+          if (String(item.id) === '45' || (item.name && item.name === 'Button Idli')) {
+            return { ...item, image_url: '/button-idli.jpg' };
+          }
+          if (String(item.id) === '46' || String(item.id) === '52' || (item.name && item.name === 'Masala Rice')) {
+            return { ...item, image_url: '/masala-rice.jpg' };
+          }
+          if (String(item.id) === '47' || (item.name && item.name === 'Curd Rice')) {
+            return { ...item, image_url: '/curd-rice.jpg' };
+          }
+          if (String(item.id) === '48' || (item.name && item.name === 'Lemon Rice')) {
+            return { ...item, image_url: '/lemon-rice.jpg' };
           }
           if (String(item.id) === '35' || (item.name && item.name === 'Cheese Onion Uttapam')) {
             return { ...item, image_url: '/cheese-onion-uttapam.jpg' };
@@ -616,6 +658,9 @@ export const apiService = {
       if (String(item.id) === '35' || (item.name && item.name === 'Cheese Onion Uttapam')) {
         return { ...item, image_url: '/cheese-onion-uttapam.jpg' };
       }
+      if (String(item.id) === '36' || (item.name && item.name === 'Cheese Chilli Uttapam')) {
+        return { ...item, image_url: '/cheese-chilli-uttapam.jpg' };
+      }
       if (String(item.id) === '37' || (item.name && item.name === 'Cheese Masala Uttapam')) {
         return { ...item, image_url: '/cheese-masala-uttapam.jpg' };
       }
@@ -631,17 +676,26 @@ export const apiService = {
       if (String(item.id) === '41' || (item.name && item.name.includes('Idli, Medu Vada') || item.name.includes('Idli Medu Vada'))) {
         return { ...item, image_url: '/idli-medu-vada-combo.jpg' };
       }
+      if (String(item.id) === '42' || (item.name && (item.name === 'Idli (1 Pc)' || item.name === 'Idli 1 Pc'))) {
+        return { ...item, image_url: '/idli-1-pc.jpg' };
+      }
       if (String(item.id) === '43' || (item.name && item.name === 'Masala Idli')) {
         return { ...item, image_url: '/masala-idli.jpg' };
       }
       if (String(item.id) === '44' || (item.name && item.name === 'Thatte Idli')) {
         return { ...item, image_url: '/thatte-idli.jpg' };
       }
+      if (String(item.id) === '45' || (item.name && item.name === 'Button Idli')) {
+        return { ...item, image_url: '/button-idli.jpg' };
+      }
       if (String(item.id) === '46' || String(item.id) === '52' || (item.name && item.name === 'Masala Rice')) {
         return { ...item, image_url: '/masala-rice.jpg' };
       }
       if (String(item.id) === '47' || (item.name && item.name === 'Curd Rice')) {
         return { ...item, image_url: '/curd-rice.jpg' };
+      }
+      if (String(item.id) === '48' || (item.name && item.name === 'Lemon Rice')) {
+        return { ...item, image_url: '/lemon-rice.jpg' };
       }
       if (String(item.id) === '49' || String(item.id) === '53' || (item.name && item.name === 'Fried Rice')) {
         return { ...item, image_url: '/fried-rice.jpg' };
