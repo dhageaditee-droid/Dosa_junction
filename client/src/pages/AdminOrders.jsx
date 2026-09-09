@@ -10,7 +10,7 @@ import { useToast } from '../context/ToastContext';
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
   const [paymentSessions, setPaymentSessions] = useState([]);
-  const [activeTab, setActiveTab] = useState('sessions'); // 'sessions' or 'orders'
+  const [activeTab, setActiveTab] = useState('orders'); // 'orders' or 'sessions'
 
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -382,33 +382,37 @@ const AdminOrders = () => {
                   <table className="admin-table">
                     <thead>
                       <tr>
-                        <th>Temp Payment ID</th>
-                        <th>Customer Details</th>
+                        <th>Order No.</th>
+                        <th>Customer</th>
                         <th>Cart Items</th>
                         <th>Type</th>
                         <th>Expected Amount</th>
                         <th>UTR / Screenshot</th>
                         <th>Payment Status</th>
-                        <th>Submitted At</th>
+                        <th>Customer Address</th>
                         <th>Verification Actions</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {paymentSessions.map((sess) => {
+                      {paymentSessions.map((sess, index) => {
                         const cartItems = typeof sess.cart_items === 'string' ? JSON.parse(sess.cart_items) : (sess.cart_items || []);
                         const isExpanded = expandedOrders[`sess_${sess.id}`];
+
+                        const rawTimestamp = sess.payment_proof_submitted_at || sess.created_at || (sess.id && !isNaN(Number(sess.id)) ? new Date(Number(sess.id)).toISOString() : null);
+                        const validTimestamp = rawTimestamp && !isNaN(new Date(rawTimestamp).getTime()) ? rawTimestamp : null;
+                        const sessionDateObj = validTimestamp ? new Date(validTimestamp) : new Date();
+                        const sessionTimeStr = sessionDateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
 
                         return (
                           <tr key={sess.id}>
                             <td style={{ whiteSpace: 'nowrap' }}>
-                              <div style={{ fontWeight: 900, color: 'var(--color-emerald)', fontSize: '1.05rem', fontFamily: 'monospace' }}>
-                                {sess.payment_ref}
+                              <div style={{ fontWeight: 900, color: 'var(--color-emerald)', fontSize: '1.2rem' }}>
+                                {index + 1}
                               </div>
-                              {sess.order_number && (
-                                <div style={{ fontSize: '0.74rem', color: '#16A34A', fontWeight: 800, marginTop: '2px' }}>
-                                  Order: #{sess.order_number}
-                                </div>
-                              )}
+                              <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '3px', marginTop: '2px' }}>
+                                <Clock size={12} color="var(--color-gold)" />
+                                <span>{sessionTimeStr}</span>
+                              </div>
                             </td>
 
                             <td>
@@ -521,8 +525,29 @@ const AdminOrders = () => {
 
                             <td>{renderSessionBadge(sess.status)}</td>
 
-                            <td style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>
-                              {sess.payment_proof_submitted_at ? new Date(sess.payment_proof_submitted_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }) : new Date(sess.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
+                            <td>
+                              {(() => {
+                                const fullAddr = sess.delivery_address || sess.deliveryAddress || sess.address || '';
+                                if (fullAddr) {
+                                  return (
+                                    <div style={{ minWidth: '170px', maxWidth: '250px', fontSize: '0.82rem', lineHeight: '1.35' }}>
+                                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '5px' }}>
+                                        <MapPin size={14} color="var(--color-gold)" style={{ flexShrink: 0, marginTop: '2px' }} />
+                                        <div>
+                                          <div style={{ fontWeight: 700, color: 'var(--color-emerald)', wordBreak: 'break-word' }}>
+                                            {fullAddr}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  );
+                                }
+                                return (
+                                  <span style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', fontStyle: 'italic' }}>
+                                    {sess.order_type === 'Dine In' ? 'Dine In' : sess.order_type === 'Takeaway' ? 'Takeaway' : 'No Address'}
+                                  </span>
+                                );
+                              })()}
                             </td>
 
                             {/* Action Buttons: Approve (Creates Order) / Reject */}
