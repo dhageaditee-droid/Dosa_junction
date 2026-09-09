@@ -612,7 +612,7 @@ const AdminOrders = () => {
                   <table className="admin-table">
                     <thead>
                       <tr>
-                        <th>Order #</th>
+                        <th>Order No.</th>
                         <th>Customer</th>
                         <th>Ordered Dishes</th>
                         <th>Type</th>
@@ -624,7 +624,7 @@ const AdminOrders = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {orders.map((ord) => {
+                      {orders.map((ord, index) => {
                         const isExpanded = expandedOrders[ord.id];
                         const itemsList = ord.items || [];
                         const itemCount = itemsList.length;
@@ -637,8 +637,8 @@ const AdminOrders = () => {
                         return (
                           <tr key={ord.id}>
                             <td style={{ whiteSpace: 'nowrap' }}>
-                              <div style={{ fontWeight: 900, color: 'var(--color-emerald)', fontSize: '1.05rem', fontFamily: 'monospace' }}>
-                                {ord.order_number}
+                              <div style={{ fontWeight: 900, color: 'var(--color-emerald)', fontSize: '1.2rem' }}>
+                                {index + 1}
                               </div>
                               <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '3px', marginTop: '2px' }}>
                                 <Clock size={12} color="var(--color-gold)" />
