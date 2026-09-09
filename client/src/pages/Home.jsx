@@ -200,129 +200,168 @@ const Home = () => {
       <section
         style={{
           position: 'relative',
-          padding: '3rem 0 4rem 0',
-          background: 'linear-gradient(180deg, #FBF8F1 0%, #F5EFE3 100%)',
+          padding: '3.5rem 0 4.5rem 0',
+          background: 'radial-gradient(ellipse at 70% 35%, #2B1A0E 0%, #180F08 55%, #0F0905 100%)',
+          color: '#FFFFFF',
           overflow: 'hidden'
         }}
       >
-        <div className="container">
+        {/* Subtle ambient lighting effect */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '-20%',
+            right: '-10%',
+            width: '600px',
+            height: '600px',
+            background: 'radial-gradient(circle, rgba(251, 191, 36, 0.12) 0%, rgba(0,0,0,0) 70%)',
+            pointerEvents: 'none',
+            zIndex: 1
+          }}
+        />
+
+        <div className="container" style={{ position: 'relative', zIndex: 2 }}>
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '2.5rem',
+              gridTemplateColumns: '1.05fr 1fr',
+              gap: '3rem',
               alignItems: 'center'
             }}
             className="hero-grid"
           >
             {/* Left Content Column */}
             <div>
-              {/* Top Traditional Badge */}
+              {/* Top Traditional Golden Ribbon Badge */}
               <div
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '8px',
-                  backgroundColor: '#EFF6E0',
-                  border: '1px solid #A3E635',
-                  color: '#15803D',
-                  padding: '6px 16px',
+                  backgroundColor: '#FBBF24',
+                  color: '#1C1917',
+                  padding: '7px 18px',
                   borderRadius: '30px',
-                  fontSize: '0.82rem',
-                  fontWeight: 700,
-                  marginBottom: '1.5rem',
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
+                  fontSize: '0.85rem',
+                  fontWeight: 800,
+                  marginBottom: '1.6rem',
+                  boxShadow: '0 4px 16px rgba(251, 191, 36, 0.35)',
+                  letterSpacing: '0.2px'
                 }}
               >
-                <Leaf size={15} color="#16A34A" />
+                <Leaf size={16} color="#1C1917" />
                 <span>100% Traditional South Indian Recipes</span>
               </div>
 
-              {/* Main Headline */}
+              {/* Main Headline: Script Top Line + Bold Gold Second Line */}
               <h1
                 style={{
-                  fontSize: '3.2rem',
-                  fontFamily: 'var(--font-heading)',
-                  fontWeight: 800,
                   lineHeight: 1.15,
-                  color: '#064E3B',
                   marginBottom: '1.2rem'
                 }}
               >
-                Taste the Tradition <br />
-                of <span style={{ color: '#D97706' }}>South India</span>
+                <span
+                  style={{
+                    display: 'block',
+                    fontFamily: "'Caveat', cursive, 'Playfair Display', serif",
+                    fontSize: 'clamp(3rem, 5vw, 4.2rem)',
+                    fontWeight: 700,
+                    color: '#FFFFFF',
+                    letterSpacing: '1px',
+                    textShadow: '0 3px 12px rgba(0,0,0,0.6)'
+                  }}
+                >
+                  Taste the Tradition
+                </span>
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    fontFamily: "var(--font-heading)",
+                    fontSize: 'clamp(2.4rem, 4vw, 3.4rem)',
+                    fontWeight: 800,
+                    color: '#FBBF24',
+                    textShadow: '0 3px 12px rgba(0,0,0,0.6)'
+                  }}
+                >
+                  of South India <span style={{ fontSize: '1.8rem' }}>🍃</span>
+                </span>
               </h1>
 
               {/* Subheadline */}
               <p
                 style={{
-                  fontSize: '1.05rem',
-                  color: '#475569',
+                  fontSize: '1.08rem',
+                  color: '#CBD5E1',
                   lineHeight: 1.6,
-                  marginBottom: '2rem',
-                  maxWidth: '500px'
+                  marginBottom: '2.2rem',
+                  maxWidth: '480px',
+                  fontWeight: 400
                 }}
               >
                 Crispy Dosas, Soft Idlis & Authentic Flavours Made Fresh Every Day.
               </p>
 
               {/* Primary Action Buttons */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '2.5rem' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.2rem', marginBottom: '2.6rem' }}>
                 <Link
                   to="/menu"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '8px',
-                    backgroundColor: '#D97706',
-                    color: '#FFFFFF',
-                    padding: '12px 26px',
+                    backgroundColor: '#FBBF24',
+                    color: '#1C1917',
+                    padding: '13px 28px',
                     borderRadius: '30px',
                     fontWeight: 800,
                     fontSize: '0.98rem',
                     textDecoration: 'none',
-                    boxShadow: '0 6px 18px rgba(217, 119, 6, 0.35)',
-                    transition: 'transform 0.2s'
+                    boxShadow: '0 6px 20px rgba(251, 191, 36, 0.4)',
+                    transition: 'all 0.2s ease'
                   }}
                 >
+                  <UtensilsCrossed size={18} color="#1C1917" />
                   <span>Explore Menu</span>
-                  <ArrowRight size={18} />
+                  <ArrowRight size={18} color="#1C1917" />
                 </Link>
 
                 <Link
-                  to="/menu"
+                  to="/cart"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '8px',
-                    backgroundColor: '#064E3B',
+                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    border: '1.5px solid rgba(255, 255, 255, 0.6)',
                     color: '#FFFFFF',
-                    padding: '12px 26px',
+                    padding: '13px 28px',
                     borderRadius: '30px',
-                    fontWeight: 800,
+                    fontWeight: 700,
                     fontSize: '0.98rem',
                     textDecoration: 'none',
-                    boxShadow: '0 6px 18px rgba(6, 78, 59, 0.3)',
-                    transition: 'transform 0.2s'
+                    backdropFilter: 'blur(6px)',
+                    transition: 'all 0.2s ease'
                   }}
                 >
-                  <ShoppingCart size={18} />
+                  <ShoppingCart size={18} color="#FFFFFF" />
                   <span>Order Now</span>
                 </Link>
               </div>
 
               {/* Feature Pills Row */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.2rem', fontSize: '0.85rem', fontWeight: 700, color: '#166534' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Leaf size={16} color="#16A34A" />
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', fontSize: '0.92rem', fontWeight: 700, color: '#F1F5F9' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Leaf size={18} color="#FBBF24" />
                   <span>Pure Veg</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Sparkles size={16} color="#D97706" />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Sparkles size={18} color="#FBBF24" />
                   <span>Fresh Ingredients</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Truck size={16} color="#0284C7" />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Truck size={18} color="#FBBF24" />
                   <span>Fast Delivery</span>
                 </div>
               </div>
@@ -335,14 +374,15 @@ const Home = () => {
                   position: 'relative',
                   borderRadius: '24px',
                   overflow: 'hidden',
-                  boxShadow: '0 20px 40px rgba(0,0,0,0.18)',
-                  border: '4px solid #FFFFFF'
+                  boxShadow: '0 25px 50px rgba(0, 0, 0, 0.6)',
+                  border: '1px solid rgba(251, 191, 36, 0.25)',
+                  backgroundColor: '#1C120B'
                 }}
               >
                 <img
-                  src="https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=1000&q=80"
-                  alt="South Indian Dosa Platter"
-                  style={{ width: '100%', height: 'auto', display: 'block', transform: 'scale(1.02)' }}
+                  src="/hero-dosa-platter.jpg"
+                  alt="Authentic South Indian Dosa Platter"
+                  style={{ width: '100%', height: 'auto', display: 'block', transform: 'scale(1.01)' }}
                 />
               </div>
             </div>

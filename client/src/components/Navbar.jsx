@@ -30,13 +30,13 @@ const Navbar = ({ onOpenAuthModal }) => {
     <header style={{ position: 'sticky', top: 0, zIndex: 1000 }}>
 
 
-      {/* 2. Main Floating White Card Navbar Container */}
+      {/* 2. Main Floating Dark Elegant Navbar Container */}
       <div 
         className="main-navbar-wrapper"
         style={{
-          backgroundColor: 'rgba(255, 253, 249, 0.95)',
-          backdropFilter: 'blur(8px)',
-          borderBottom: '1px solid #EAE3D2',
+          backgroundColor: 'rgba(20, 14, 9, 0.95)',
+          backdropFilter: 'blur(12px)',
+          borderBottom: '1px solid rgba(251, 191, 36, 0.2)',
           padding: '0.4rem 0'
         }}
       >
@@ -60,8 +60,8 @@ const Navbar = ({ onOpenAuthModal }) => {
                 height: '46px',
                 borderRadius: '50%',
                 objectFit: 'cover',
-                border: '2px solid var(--color-gold)',
-                boxShadow: '0 4px 10px rgba(0,0,0,0.12)',
+                border: '2px solid #FBBF24',
+                boxShadow: '0 4px 12px rgba(251, 191, 36, 0.25)',
                 flexShrink: 0
               }}
             />
@@ -72,18 +72,18 @@ const Navbar = ({ onOpenAuthModal }) => {
                   fontFamily: 'var(--font-heading)',
                   fontSize: '1.35rem',
                   fontWeight: 800,
-                  color: '#0F3825',
+                  color: '#FFFFFF',
                   letterSpacing: '-0.5px',
                   display: 'block',
                   lineHeight: 1.1,
                   whiteSpace: 'nowrap'
                 }}
               >
-                Dosa <span style={{ color: '#EA580C' }}>Junction</span>
+                Dosa <span style={{ color: '#FBBF24' }}>Junction</span>
               </span>
               <span 
                 className="brand-text-sub"
-                style={{ fontSize: '0.6rem', color: '#D97706', letterSpacing: '0.8px', textTransform: 'uppercase', fontWeight: 700, whiteSpace: 'nowrap', display: 'block' }}
+                style={{ fontSize: '0.6rem', color: '#FBBF24', letterSpacing: '0.8px', textTransform: 'uppercase', fontWeight: 700, whiteSpace: 'nowrap', display: 'block' }}
               >
                 ✦ TASTE OF SOUTH ✦
               </span>
@@ -102,17 +102,17 @@ const Navbar = ({ onOpenAuthModal }) => {
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '5px',
+                    gap: '6px',
                     fontSize: '0.92rem',
                     fontWeight: active ? 800 : 600,
-                    color: active ? '#EA580C' : '#0F3825',
+                    color: active ? '#FBBF24' : '#E2E8F0',
                     position: 'relative',
                     transition: 'all 0.2s ease',
                     padding: '6px 0',
                     textDecoration: 'none'
                   }}
                 >
-                  <IconComp size={15} color={active ? '#EA580C' : '#0F3825'} />
+                  <IconComp size={15} color={active ? '#FBBF24' : '#94A3B8'} />
                   <span>{link.name}</span>
                   {active && (
                     <span
@@ -122,7 +122,7 @@ const Navbar = ({ onOpenAuthModal }) => {
                         left: 0,
                         right: 0,
                         height: '2.5px',
-                        backgroundColor: '#EA580C',
+                        backgroundColor: '#FBBF24',
                         borderRadius: '2px'
                       }}
                     />
@@ -137,7 +137,7 @@ const Navbar = ({ onOpenAuthModal }) => {
             
             {/* Language Selection Selector Pill */}
             <div className="nav-lang-desktop" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-              <Globe size={15} color="#D97706" style={{ position: 'absolute', left: '10px', pointerEvents: 'none', zIndex: 1 }} />
+              <Globe size={15} color="#FBBF24" style={{ position: 'absolute', left: '10px', pointerEvents: 'none', zIndex: 1 }} />
               <select
                 value={language}
                 onChange={(e) => changeLanguage(e.target.value)}
@@ -147,27 +147,27 @@ const Navbar = ({ onOpenAuthModal }) => {
                   paddingTop: '6px',
                   paddingBottom: '6px',
                   borderRadius: '30px',
-                  border: '1.5px solid #EAE3D2',
-                  backgroundColor: '#FFFDF9',
-                  color: '#0F3825',
+                  border: '1.5px solid rgba(251, 191, 36, 0.4)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                  color: '#FFFFFF',
                   fontWeight: 700,
                   fontSize: '0.82rem',
                   cursor: 'pointer',
                   outline: 'none',
                   appearance: 'none',
                   WebkitAppearance: 'none',
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
                 }}
                 title="Select Language / भाषा चुनें"
               >
-                <option value="en">English</option>
-                <option value="mr">मराठी</option>
-                <option value="hi">हिंदी</option>
+                <option value="en" style={{ background: '#1C1917', color: '#FFF' }}>English</option>
+                <option value="mr" style={{ background: '#1C1917', color: '#FFF' }}>मराठी</option>
+                <option value="hi" style={{ background: '#1C1917', color: '#FFF' }}>हिंदी</option>
               </select>
-              <ChevronDown size={14} color="#0F3825" style={{ position: 'absolute', right: '8px', pointerEvents: 'none' }} />
+              <ChevronDown size={14} color="#FBBF24" style={{ position: 'absolute', right: '8px', pointerEvents: 'none' }} />
             </div>
 
-            {/* Bright Orange Order Now Pill Button with Cart Count */}
+            {/* Bright Golden Order Now Pill Button with Cart Count */}
             <Link
               to="/cart"
               className="order-now-btn"
@@ -175,25 +175,25 @@ const Navbar = ({ onOpenAuthModal }) => {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '6px',
-                background: 'linear-gradient(135deg, #EA580C 0%, #D97706 100%)',
-                color: '#FFFFFF',
+                background: 'linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)',
+                color: '#1C1917',
                 padding: '0.55rem 1.25rem',
                 borderRadius: '30px',
                 fontWeight: 800,
                 fontSize: '0.88rem',
                 textDecoration: 'none',
-                boxShadow: '0 4px 14px rgba(234, 88, 12, 0.35)',
+                boxShadow: '0 4px 16px rgba(245, 158, 11, 0.45)',
                 transition: 'all 0.2s ease',
                 whiteSpace: 'nowrap'
               }}
             >
-              <ShoppingBag size={17} />
+              <ShoppingBag size={17} color="#1C1917" />
               <span className="order-now-text">Order Now</span>
               {cartCount > 0 && (
                 <span
                   style={{
-                    backgroundColor: '#FFFFFF',
-                    color: '#EA580C',
+                    backgroundColor: '#1C1917',
+                    color: '#FBBF24',
                     fontSize: '0.75rem',
                     fontWeight: 900,
                     padding: '1px 7px',
@@ -217,18 +217,18 @@ const Navbar = ({ onOpenAuthModal }) => {
               transform: 'translateX(-50%)',
               width: '28px',
               height: '14px',
-              backgroundColor: '#FFFDF9',
+              backgroundColor: '#140E09',
               borderRadius: '0 0 14px 14px',
-              borderBottom: '1px solid #EAE3D2',
-              borderLeft: '1px solid #EAE3D2',
-              borderRight: '1px solid #EAE3D2',
+              borderBottom: '1px solid rgba(251, 191, 36, 0.2)',
+              borderLeft: '1px solid rgba(251, 191, 36, 0.2)',
+              borderRight: '1px solid rgba(251, 191, 36, 0.2)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               zIndex: 2
             }}
           >
-            <span style={{ color: '#0F3825', fontSize: '0.7rem', lineHeight: 1 }}>🌿</span>
+            <span style={{ color: '#FBBF24', fontSize: '0.7rem', lineHeight: 1 }}>🌿</span>
           </div>
 
         </div>
@@ -238,8 +238,8 @@ const Navbar = ({ onOpenAuthModal }) => {
       <div 
         className="mobile-sub-navbar"
         style={{
-          backgroundColor: '#FFFDF9',
-          borderBottom: '1px solid #EAE3D2',
+          backgroundColor: '#140E09',
+          borderBottom: '1px solid rgba(251, 191, 36, 0.2)',
           padding: '8px 12px',
           overflowX: 'auto',
           WebkitOverflowScrolling: 'touch',
@@ -248,7 +248,7 @@ const Navbar = ({ onOpenAuthModal }) => {
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+          boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
         }}
       >
         {navLinks.map((link) => {
@@ -266,17 +266,17 @@ const Navbar = ({ onOpenAuthModal }) => {
                 borderRadius: '20px',
                 fontSize: '0.82rem',
                 fontWeight: active ? 800 : 600,
-                color: active ? '#FFFFFF' : '#0F3825',
-                backgroundColor: active ? '#EA580C' : 'rgba(15, 56, 37, 0.06)',
-                border: active ? '1px solid #EA580C' : '1px solid #EAE3D2',
+                color: active ? '#1C1917' : '#E2E8F0',
+                backgroundColor: active ? '#FBBF24' : 'rgba(255, 255, 255, 0.08)',
+                border: active ? '1px solid #FBBF24' : '1px solid rgba(255, 255, 255, 0.15)',
                 textDecoration: 'none',
                 whiteSpace: 'nowrap',
                 flexShrink: 0,
-                boxShadow: active ? '0 2px 8px rgba(234, 88, 12, 0.25)' : 'none',
+                boxShadow: active ? '0 2px 8px rgba(251, 191, 36, 0.3)' : 'none',
                 transition: 'all 0.2s ease'
               }}
             >
-              <IconComp size={14} color={active ? '#FFFFFF' : '#0F3825'} />
+              <IconComp size={14} color={active ? '#1C1917' : '#94A3B8'} />
               <span>{link.name}</span>
             </Link>
           );
