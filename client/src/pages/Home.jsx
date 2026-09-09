@@ -202,7 +202,7 @@ const Home = () => {
         style={{
           position: 'relative',
           minHeight: '640px',
-          backgroundImage: "linear-gradient(to right, rgba(15, 10, 6, 0.88) 0%, rgba(15, 10, 6, 0.5) 45%, rgba(15, 10, 6, 0.05) 100%), url('/hero-full-banner-bg.jpg')",
+          backgroundImage: "linear-gradient(to right, rgba(28, 16, 8, 0.48) 0%, rgba(28, 16, 8, 0.22) 45%, rgba(0, 0, 0, 0) 100%), url('/hero-full-banner-bg.jpg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center right',
           backgroundRepeat: 'no-repeat',

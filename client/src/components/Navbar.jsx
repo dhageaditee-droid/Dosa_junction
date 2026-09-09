@@ -30,13 +30,13 @@ const Navbar = ({ onOpenAuthModal }) => {
     <header style={{ position: 'sticky', top: 0, zIndex: 1000 }}>
 
 
-      {/* 2. Main Floating Dark Elegant Navbar Container */}
+      {/* 2. Main Floating Elegant Navbar Container */}
       <div 
         className="main-navbar-wrapper"
         style={{
-          backgroundColor: 'rgba(20, 14, 9, 0.95)',
-          backdropFilter: 'blur(12px)',
-          borderBottom: '1px solid rgba(251, 191, 36, 0.2)',
+          backgroundColor: 'rgba(38, 24, 14, 0.78)',
+          backdropFilter: 'blur(10px)',
+          borderBottom: '1px solid rgba(251, 191, 36, 0.18)',
           padding: '0.4rem 0'
         }}
       >
@@ -217,7 +217,7 @@ const Navbar = ({ onOpenAuthModal }) => {
               transform: 'translateX(-50%)',
               width: '28px',
               height: '14px',
-              backgroundColor: '#140E09',
+              backgroundColor: '#26180E',
               borderRadius: '0 0 14px 14px',
               borderBottom: '1px solid rgba(251, 191, 36, 0.2)',
               borderLeft: '1px solid rgba(251, 191, 36, 0.2)',
@@ -238,7 +238,7 @@ const Navbar = ({ onOpenAuthModal }) => {
       <div 
         className="mobile-sub-navbar"
         style={{
-          backgroundColor: '#140E09',
+          backgroundColor: '#26180E',
           borderBottom: '1px solid rgba(251, 191, 36, 0.2)',
           padding: '8px 12px',
           overflowX: 'auto',
