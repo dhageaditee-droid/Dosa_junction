@@ -196,196 +196,161 @@ const Home = () => {
     <div style={{ backgroundColor: '#FAF7F0', color: '#1E293B', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       <SEOHead title="Dosa Junction | Authentic Taste of South India" />
 
-      {/* ================= HERO SECTION ================= */}
+      {/* ================= HERO SECTION (FULL PANORAMIC BANNER) ================= */}
       <section
+        className="hero-panoramic-section"
         style={{
           position: 'relative',
-          padding: '3.5rem 0 4.5rem 0',
-          background: 'radial-gradient(ellipse at 70% 35%, #2B1A0E 0%, #180F08 55%, #0F0905 100%)',
+          minHeight: '640px',
+          backgroundImage: "linear-gradient(to right, rgba(15, 10, 6, 0.88) 0%, rgba(15, 10, 6, 0.5) 45%, rgba(15, 10, 6, 0.05) 100%), url('/hero-full-banner-bg.jpg')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center right',
+          backgroundRepeat: 'no-repeat',
+          display: 'flex',
+          alignItems: 'center',
+          padding: '4.5rem 0',
           color: '#FFFFFF',
           overflow: 'hidden'
         }}
       >
-        {/* Subtle ambient lighting effect */}
-        <div
-          style={{
-            position: 'absolute',
-            top: '-20%',
-            right: '-10%',
-            width: '600px',
-            height: '600px',
-            background: 'radial-gradient(circle, rgba(251, 191, 36, 0.12) 0%, rgba(0,0,0,0) 70%)',
-            pointerEvents: 'none',
-            zIndex: 1
-          }}
-        />
-
         <div className="container" style={{ position: 'relative', zIndex: 2 }}>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1.05fr 1fr',
-              gap: '3rem',
-              alignItems: 'center'
-            }}
-            className="hero-grid"
-          >
-            {/* Left Content Column */}
-            <div>
-              {/* Top Traditional Golden Ribbon Badge */}
-              <div
+          <div style={{ maxWidth: '580px' }} className="hero-content-wrapper">
+            
+            {/* Top Traditional Golden Ribbon Badge */}
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                backgroundColor: '#FBBF24',
+                color: '#1C1917',
+                padding: '7px 18px',
+                borderRadius: '30px',
+                fontSize: '0.85rem',
+                fontWeight: 800,
+                marginBottom: '1.6rem',
+                boxShadow: '0 4px 16px rgba(251, 191, 36, 0.35)',
+                letterSpacing: '0.2px'
+              }}
+            >
+              <Leaf size={16} color="#1C1917" />
+              <span>100% Traditional South Indian Recipes</span>
+            </div>
+
+            {/* Main Headline: Script Top Line + Bold Gold Second Line */}
+            <h1
+              style={{
+                lineHeight: 1.15,
+                marginBottom: '1.2rem'
+              }}
+            >
+              <span
+                style={{
+                  display: 'block',
+                  fontFamily: "'Caveat', cursive, 'Playfair Display', serif",
+                  fontSize: 'clamp(3.2rem, 5.5vw, 4.6rem)',
+                  fontWeight: 700,
+                  color: '#FFFFFF',
+                  letterSpacing: '1px',
+                  textShadow: '0 3px 14px rgba(0,0,0,0.7)'
+                }}
+              >
+                Taste the Tradition
+              </span>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  fontFamily: "var(--font-heading)",
+                  fontSize: 'clamp(2.4rem, 4.2vw, 3.5rem)',
+                  fontWeight: 800,
+                  color: '#FBBF24',
+                  textShadow: '0 3px 14px rgba(0,0,0,0.7)'
+                }}
+              >
+                of South India <span style={{ fontSize: '1.8rem' }}>🍃</span>
+              </span>
+            </h1>
+
+            {/* Subheadline */}
+            <p
+              style={{
+                fontSize: '1.08rem',
+                color: '#E2E8F0',
+                lineHeight: 1.6,
+                marginBottom: '2.4rem',
+                maxWidth: '480px',
+                fontWeight: 400,
+                textShadow: '0 2px 8px rgba(0,0,0,0.6)'
+              }}
+            >
+              Crispy Dosas, Soft Idlis & Authentic Flavours Made Fresh Every Day.
+            </p>
+
+            {/* Primary Action Buttons */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.2rem', marginBottom: '2.8rem' }}>
+              <Link
+                to="/menu"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '8px',
                   backgroundColor: '#FBBF24',
                   color: '#1C1917',
-                  padding: '7px 18px',
+                  padding: '13px 28px',
                   borderRadius: '30px',
-                  fontSize: '0.85rem',
                   fontWeight: 800,
-                  marginBottom: '1.6rem',
-                  boxShadow: '0 4px 16px rgba(251, 191, 36, 0.35)',
-                  letterSpacing: '0.2px'
+                  fontSize: '0.98rem',
+                  textDecoration: 'none',
+                  boxShadow: '0 6px 20px rgba(251, 191, 36, 0.45)',
+                  transition: 'all 0.2s ease'
                 }}
               >
-                <Leaf size={16} color="#1C1917" />
-                <span>100% Traditional South Indian Recipes</span>
-              </div>
+                <UtensilsCrossed size={18} color="#1C1917" />
+                <span>Explore Menu</span>
+                <ArrowRight size={18} color="#1C1917" />
+              </Link>
 
-              {/* Main Headline: Script Top Line + Bold Gold Second Line */}
-              <h1
+              <Link
+                to="/cart"
                 style={{
-                  lineHeight: 1.15,
-                  marginBottom: '1.2rem'
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                  border: '1.5px solid rgba(255, 255, 255, 0.65)',
+                  color: '#FFFFFF',
+                  padding: '13px 28px',
+                  borderRadius: '30px',
+                  fontWeight: 700,
+                  fontSize: '0.98rem',
+                  textDecoration: 'none',
+                  backdropFilter: 'blur(8px)',
+                  transition: 'all 0.2s ease'
                 }}
               >
-                <span
-                  style={{
-                    display: 'block',
-                    fontFamily: "'Caveat', cursive, 'Playfair Display', serif",
-                    fontSize: 'clamp(3rem, 5vw, 4.2rem)',
-                    fontWeight: 700,
-                    color: '#FFFFFF',
-                    letterSpacing: '1px',
-                    textShadow: '0 3px 12px rgba(0,0,0,0.6)'
-                  }}
-                >
-                  Taste the Tradition
-                </span>
-                <span
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    fontFamily: "var(--font-heading)",
-                    fontSize: 'clamp(2.4rem, 4vw, 3.4rem)',
-                    fontWeight: 800,
-                    color: '#FBBF24',
-                    textShadow: '0 3px 12px rgba(0,0,0,0.6)'
-                  }}
-                >
-                  of South India <span style={{ fontSize: '1.8rem' }}>🍃</span>
-                </span>
-              </h1>
+                <ShoppingCart size={18} color="#FFFFFF" />
+                <span>Order Now</span>
+              </Link>
+            </div>
 
-              {/* Subheadline */}
-              <p
-                style={{
-                  fontSize: '1.08rem',
-                  color: '#CBD5E1',
-                  lineHeight: 1.6,
-                  marginBottom: '2.2rem',
-                  maxWidth: '480px',
-                  fontWeight: 400
-                }}
-              >
-                Crispy Dosas, Soft Idlis & Authentic Flavours Made Fresh Every Day.
-              </p>
-
-              {/* Primary Action Buttons */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.2rem', marginBottom: '2.6rem' }}>
-                <Link
-                  to="/menu"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    backgroundColor: '#FBBF24',
-                    color: '#1C1917',
-                    padding: '13px 28px',
-                    borderRadius: '30px',
-                    fontWeight: 800,
-                    fontSize: '0.98rem',
-                    textDecoration: 'none',
-                    boxShadow: '0 6px 20px rgba(251, 191, 36, 0.4)',
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  <UtensilsCrossed size={18} color="#1C1917" />
-                  <span>Explore Menu</span>
-                  <ArrowRight size={18} color="#1C1917" />
-                </Link>
-
-                <Link
-                  to="/cart"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                    border: '1.5px solid rgba(255, 255, 255, 0.6)',
-                    color: '#FFFFFF',
-                    padding: '13px 28px',
-                    borderRadius: '30px',
-                    fontWeight: 700,
-                    fontSize: '0.98rem',
-                    textDecoration: 'none',
-                    backdropFilter: 'blur(6px)',
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  <ShoppingCart size={18} color="#FFFFFF" />
-                  <span>Order Now</span>
-                </Link>
+            {/* Feature Pills Row */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', fontSize: '0.92rem', fontWeight: 700, color: '#F1F5F9', textShadow: '0 2px 6px rgba(0,0,0,0.7)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Leaf size={18} color="#FBBF24" />
+                <span>Pure Veg</span>
               </div>
-
-              {/* Feature Pills Row */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', fontSize: '0.92rem', fontWeight: 700, color: '#F1F5F9' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Leaf size={18} color="#FBBF24" />
-                  <span>Pure Veg</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Sparkles size={18} color="#FBBF24" />
-                  <span>Fresh Ingredients</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Truck size={18} color="#FBBF24" />
-                  <span>Fast Delivery</span>
-                </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Sparkles size={18} color="#FBBF24" />
+                <span>Fresh Ingredients</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Truck size={18} color="#FBBF24" />
+                <span>Fast Delivery</span>
               </div>
             </div>
 
-            {/* Right Hero Image Column */}
-            <div style={{ position: 'relative', textAlign: 'center' }}>
-              <div
-                style={{
-                  position: 'relative',
-                  borderRadius: '24px',
-                  overflow: 'hidden',
-                  boxShadow: '0 25px 50px rgba(0, 0, 0, 0.6)',
-                  border: '1px solid rgba(251, 191, 36, 0.25)',
-                  backgroundColor: '#1C120B'
-                }}
-              >
-                <img
-                  src="/hero-dosa-platter.jpg"
-                  alt="Authentic South Indian Dosa Platter"
-                  style={{ width: '100%', height: 'auto', display: 'block', transform: 'scale(1.01)' }}
-                />
-              </div>
-            </div>
           </div>
         </div>
       </section>
