@@ -790,23 +790,43 @@ const Home = () => {
       </section>
 
       {/* ================= OUR STORY & GALLERY ================= */}
-      <section style={{ padding: '4rem 0', backgroundColor: '#FAF7F0' }}>
+      <section style={{ padding: '4.5rem 0', backgroundColor: '#FAF7F0', borderTop: '1px solid #EAE7DC' }}>
         <div className="container">
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '1fr 1.3fr',
+              gridTemplateColumns: '1fr 1.35fr',
               gap: '3rem',
               alignItems: 'center'
             }}
             className="story-grid"
           >
-            {/* Left Story Text */}
+            {/* Left Story Content */}
             <div>
-              <h2 style={{ fontSize: '2.4rem', fontWeight: 800, fontFamily: 'var(--font-heading)', color: '#064E3B', marginBottom: '1rem' }}>
-                Our Story
+              <div style={{ color: '#064E3B', fontSize: '0.88rem', letterSpacing: '2px', fontWeight: 800, textTransform: 'uppercase', marginBottom: '0.8rem' }}>
+                — OUR STORY 🍃 —
+              </div>
+              
+              <h2
+                style={{
+                  fontSize: 'clamp(2.4rem, 4vw, 3.2rem)',
+                  fontWeight: 800,
+                  fontFamily: 'var(--font-heading)',
+                  color: '#064E3B',
+                  lineHeight: 1.15,
+                  marginBottom: '1.2rem'
+                }}
+              >
+                From the Heart of <br />
+                <span style={{ color: '#D97706', position: 'relative', display: 'inline-block' }}>
+                  South India
+                  <svg style={{ position: 'absolute', bottom: '-8px', left: 0, width: '100%', height: '10px' }} viewBox="0 0 100 10" preserveAspectRatio="none">
+                    <path d="M0,5 Q50,10 100,5" stroke="#F59E0B" strokeWidth="3" fill="none" />
+                  </svg>
+                </span>
               </h2>
-              <p style={{ fontSize: '1rem', color: '#475569', lineHeight: 1.7, marginBottom: '1.8rem' }}>
+
+              <p style={{ fontSize: '1.02rem', color: '#475569', lineHeight: 1.7, marginBottom: '2.2rem', maxWidth: '480px' }}>
                 Dosa Junction is born out of a passion for authentic South Indian food. We bring you the true taste of tradition with love and quality in every dish.
               </p>
 
@@ -818,12 +838,13 @@ const Home = () => {
                   gap: '8px',
                   backgroundColor: '#064E3B',
                   color: '#FFFFFF',
-                  padding: '10px 22px',
+                  padding: '12px 28px',
                   borderRadius: '30px',
                   fontWeight: 800,
-                  fontSize: '0.9rem',
+                  fontSize: '0.92rem',
                   textDecoration: 'none',
-                  boxShadow: '0 4px 12px rgba(6, 78, 59, 0.3)'
+                  boxShadow: '0 4px 14px rgba(6, 78, 59, 0.3)',
+                  transition: 'all 0.2s ease'
                 }}
               >
                 <span>Read More</span>
@@ -831,124 +852,334 @@ const Home = () => {
               </Link>
             </div>
 
-            {/* Right Photo Gallery Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px' }}>
-              {[
-                'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=400&q=80',
-                'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=400&q=80',
-                'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=400&q=80',
-                'https://images.unsplash.com/photo-1610192244261-3f33de3f55e4?auto=format&fit=crop&w=400&q=80',
-                'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=400&q=80'
-              ].map((imgUrl, i) => (
-                <div key={i} style={{ height: '140px', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}>
-                  <img src={imgUrl} alt={`Gallery item ${i}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ================= WHAT OUR CUSTOMERS SAY ================= */}
-      <section style={{ padding: '4rem 0', backgroundColor: '#FFFFFF' }}>
-        <div className="container">
-          
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
-            <div style={{ flexGrow: 1, textAlign: 'center' }}>
-              <span style={{ color: '#94A3B8', fontSize: '0.9rem', letterSpacing: '2px', fontWeight: 700 }}>
-                — WHAT OUR CUSTOMERS SAY —
-              </span>
-            </div>
-
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button
-                onClick={() => handleScrollTestimonials('left')}
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '50%',
-                  border: '1px solid #CBD5E1',
-                  backgroundColor: '#FFFFFF',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                <ChevronLeft size={20} color="#475569" />
-              </button>
-              <button
-                onClick={() => handleScrollTestimonials('right')}
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '50%',
-                  border: '1px solid #CBD5E1',
-                  backgroundColor: '#FFFFFF',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                <ChevronRight size={20} color="#475569" />
-              </button>
-            </div>
-          </div>
-
-          <div
-            ref={testimonialRef}
-            style={{
-              display: 'flex',
-              gap: '1.5rem',
-              overflowX: 'auto',
-              scrollBehavior: 'smooth',
-              paddingBottom: '1rem',
-              scrollbarWidth: 'none'
-            }}
-            className="no-scrollbar"
-          >
-            {testimonials.map((test, idx) => (
+            {/* Right Photo Collage Layout */}
+            <div
+              className="story-collage-container"
+              style={{
+                display: 'flex',
+                gap: '14px',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              {/* Main Organic Dosa Card */}
               <div
-                key={idx}
                 style={{
-                  flexShrink: 0,
-                  width: '320px',
-                  backgroundColor: '#FAF7F0',
-                  borderRadius: '16px',
-                  padding: '1.5rem',
-                  border: '1px solid #E5E7EB',
-                  display: 'flex',
-                  gap: '1rem',
-                  alignItems: 'flex-start'
+                  position: 'relative',
+                  width: '240px',
+                  height: '310px',
+                  borderRadius: '24px 60px 24px 24px',
+                  overflow: 'hidden',
+                  border: '2.5px solid #F59E0B',
+                  boxShadow: '0 12px 30px rgba(0,0,0,0.12)',
+                  flexShrink: 0
                 }}
               >
                 <img
-                  src={test.avatar}
-                  alt={test.name}
-                  style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover' }}
+                  src="/hero-dosa-platter.jpg"
+                  alt="Authentic Dosa"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
-
-                <div>
-                  <div style={{ display: 'flex', gap: '2px', color: '#F59E0B', marginBottom: '6px' }}>
-                    {Array.from({ length: test.rating }).map((_, i) => (
-                      <Star key={i} size={14} fill="#F59E0B" />
-                    ))}
-                  </div>
-
-                  <p style={{ fontSize: '0.85rem', color: '#334155', fontStyle: 'italic', marginBottom: '8px', lineHeight: 1.5 }}>
-                    "{test.comment}"
-                  </p>
-
-                  <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#064E3B' }}>
-                    — {test.name}
-                  </span>
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '10px',
+                    right: '10px',
+                    backgroundColor: '#064E3B',
+                    color: '#FBBF24',
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '0.9rem',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+                  }}
+                >
+                  ✨
                 </div>
               </div>
-            ))}
+
+              {/* Middle 2 Stacked Images (Coffee & Idli Vada) */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', width: '135px', flexShrink: 0 }}>
+                <div style={{ height: '148px', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 6px 16px rgba(0,0,0,0.08)' }}>
+                  <img
+                    src="/coffee.jpg"
+                    alt="Filter Coffee"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                </div>
+                <div style={{ height: '148px', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 6px 16px rgba(0,0,0,0.08)' }}>
+                  <img
+                    src="/idli-medu-vada-combo.jpg"
+                    alt="Idli Vada Combo"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                </div>
+              </div>
+
+              {/* Right Tall Image (Restaurant Interior) */}
+              <div style={{ width: '140px', height: '310px', borderRadius: '18px', overflow: 'hidden', boxShadow: '0 6px 18px rgba(0,0,0,0.08)', flexShrink: 0 }}>
+                <img
+                  src="/restaurant-interior.jpg"
+                  alt="Restaurant Dining Ambiance"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              </div>
+
+              {/* Far Right Calligraphy Quote */}
+              <div
+                className="story-quote-tag"
+                style={{
+                  fontFamily: "'Caveat', cursive",
+                  fontSize: '1.45rem',
+                  color: '#064E3B',
+                  lineHeight: 1.25,
+                  fontWeight: 700,
+                  paddingLeft: '6px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  textAlign: 'center',
+                  flexShrink: 0
+                }}
+              >
+                <span>Good</span>
+                <span>Food</span>
+                <span>Brings</span>
+                <span>People</span>
+                <span>Together</span>
+                <span style={{ fontSize: '1.8rem', color: '#16A34A', marginTop: '4px' }}>♡</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* Responsive Story Collage Style */}
+        <style>{`
+          @media (max-width: 900px) {
+            .story-grid {
+              grid-template-columns: 1fr !important;
+              text-align: center !important;
+            }
+            .story-grid > div {
+              margin: 0 auto !important;
+            }
+            .story-collage-container {
+              flex-wrap: wrap !important;
+              justify-content: center !important;
+            }
+          }
+        `}</style>
+      </section>
+
+      {/* ================= WHAT OUR CUSTOMERS SAY ================= */}
+      <section style={{ padding: '4.5rem 0', backgroundColor: '#FFFFFF' }}>
+        <div className="container">
+          
+          {/* Section Header */}
+          <div style={{ textAlign: 'center', marginBottom: '2.8rem' }}>
+            <div style={{ marginBottom: '6px' }}>
+              <span style={{ fontSize: '1.4rem' }}>🍃</span>
+            </div>
+            <div style={{ color: '#064E3B', fontSize: '0.9rem', letterSpacing: '2px', fontWeight: 800, textTransform: 'uppercase' }}>
+              — WHAT OUR CUSTOMERS SAY —
+            </div>
+            <p style={{ color: '#64748B', fontSize: '0.96rem', margin: '0.4rem 0 0 0' }}>
+              Real people. Real taste. Real happiness.
+            </p>
           </div>
 
+          {/* Testimonial Cards Slider Container */}
+          <div style={{ position: 'relative' }}>
+            
+            {/* Left Button */}
+            <button
+              onClick={() => handleScrollTestimonials('left')}
+              className="carousel-nav-btn carousel-left-btn"
+              style={{
+                position: 'absolute',
+                left: '-18px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                zIndex: 10,
+                width: '42px',
+                height: '42px',
+                borderRadius: '50%',
+                border: '1px solid #E2E8F0',
+                backgroundColor: '#FFFFFF',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 14px rgba(0,0,0,0.12)',
+                transition: 'all 0.2s'
+              }}
+              title="Scroll Left"
+            >
+              <ChevronLeft size={22} color="#064E3B" />
+            </button>
+
+            {/* Right Button */}
+            <button
+              onClick={() => handleScrollTestimonials('right')}
+              className="carousel-nav-btn carousel-right-btn"
+              style={{
+                position: 'absolute',
+                right: '-18px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                zIndex: 10,
+                width: '42px',
+                height: '42px',
+                borderRadius: '50%',
+                border: '1px solid #E2E8F0',
+                backgroundColor: '#FFFFFF',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 14px rgba(0,0,0,0.12)',
+                transition: 'all 0.2s'
+              }}
+              title="Scroll Right"
+            >
+              <ChevronRight size={22} color="#064E3B" />
+            </button>
+
+            {/* Cards Grid / Row */}
+            <div
+              ref={testimonialRef}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: '1.5rem',
+                overflowX: 'auto',
+                scrollBehavior: 'smooth',
+                padding: '0.4rem 0.2rem'
+              }}
+              className="testimonials-grid"
+            >
+              {[
+                {
+                  name: 'Priya S.',
+                  location: 'Nashik',
+                  avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+                  comment: 'Best dosa I ever had! Authentic taste and super fresh.',
+                  rating: 5
+                },
+                {
+                  name: 'Rahul K.',
+                  location: 'Nashik',
+                  avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80',
+                  comment: 'Filter coffee is just wow! Feels like South India.',
+                  rating: 5
+                },
+                {
+                  name: 'Neha M.',
+                  location: 'Nashik',
+                  avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80',
+                  comment: 'Quick delivery and amazing food. Highly recommended!',
+                  rating: 5
+                }
+              ].map((test, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '20px',
+                    padding: '24px 20px',
+                    border: '1px solid #EAE7DC',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+                    display: 'flex',
+                    gap: '16px',
+                    alignItems: 'flex-start',
+                    position: 'relative',
+                    overflow: 'hidden'
+                  }}
+                  className="testimonial-card"
+                >
+                  {/* Avatar */}
+                  <img
+                    src={test.avatar}
+                    alt={test.name}
+                    style={{
+                      width: '56px',
+                      height: '56px',
+                      borderRadius: '50%',
+                      objectFit: 'cover',
+                      border: '2px solid #F59E0B',
+                      flexShrink: 0
+                    }}
+                  />
+
+                  {/* Content */}
+                  <div style={{ position: 'relative', zIndex: 2 }}>
+                    {/* 5 Stars */}
+                    <div style={{ display: 'flex', gap: '3px', color: '#F59E0B', marginBottom: '8px' }}>
+                      {Array.from({ length: test.rating }).map((_, i) => (
+                        <Star key={i} size={15} fill="#F59E0B" color="#F59E0B" />
+                      ))}
+                    </div>
+
+                    {/* Review text */}
+                    <p style={{ fontSize: '0.9rem', color: '#334155', fontStyle: 'italic', marginBottom: '12px', lineHeight: 1.5, minHeight: '44px' }}>
+                      "{test.comment}"
+                    </p>
+
+                    {/* Author and Location */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '0.95rem', fontWeight: 800, color: '#064E3B' }}>
+                        — {test.name}
+                      </span>
+                      <span style={{ fontSize: '0.8rem', color: '#94A3B8', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                        📍 {test.location}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Watermark Quote */}
+                  <span
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      bottom: '-6px',
+                      fontSize: '3.6rem',
+                      color: '#DCFCE7',
+                      fontFamily: 'serif',
+                      lineHeight: 1,
+                      pointerEvents: 'none',
+                      userSelect: 'none',
+                      zIndex: 1
+                    }}
+                  >
+                    ”
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Bottom 3 Dots Slider Indicators */}
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '2.5rem' }}>
+              <span style={{ width: '24px', height: '6px', backgroundColor: '#064E3B', borderRadius: '4px' }}></span>
+              <span style={{ width: '6px', height: '6px', backgroundColor: '#CBD5E1', borderRadius: '50%' }}></span>
+              <span style={{ width: '6px', height: '6px', backgroundColor: '#CBD5E1', borderRadius: '50%' }}></span>
+            </div>
+
+          </div>
         </div>
+
+        {/* Responsive Testimonials CSS */}
+        <style>{`
+          @media (max-width: 900px) {
+            .testimonials-grid {
+              grid-template-columns: 1fr !important;
+              gap: 1.2rem !important;
+            }
+          }
+        `}</style>
       </section>
 
       {/* ================= VISIT US & CONTACT US ================= */}
