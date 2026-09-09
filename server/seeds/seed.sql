@@ -47,13 +47,13 @@ INSERT INTO menu_items (id, category_id, name, description, price, image_url, is
 (20, 2, 'Cut Masala Dosa', 'Crispy dosa sliced into bite-sized roll cuts with potato masala', 85.00, '/cut-masala-dosa.jpg', TRUE, 'medium', '12 mins', TRUE, TRUE, FALSE, 4.7),
 (21, 2, 'Schezwan Masala Dosa', 'Indo-Chinese Schezwan sauce spiced masala dosa', 95.00, '/schezwan-masala-dosa.jpg', TRUE, 'spicy', '12 mins', TRUE, TRUE, FALSE, 4.6),
 (22, 2, 'Butter Podi Masala Dosa', 'Pure Amul butter & South Indian podi powder spiced dosa', 95.00, '/butter-podi-masala-dosa.jpg', TRUE, 'medium', '12 mins', TRUE, TRUE, TRUE, 4.8),
-(23, 2, 'Open Dosa', 'Open face crispy dosa served with potato bhaji & butter top', 80.00, 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80', TRUE, 'medium', '12 mins', TRUE, FALSE, FALSE, 4.5),
+(23, 2, 'Open Dosa', 'Open face crispy dosa served with potato bhaji & butter top', 80.00, '/open-dosa.jpg', TRUE, 'medium', '12 mins', TRUE, FALSE, FALSE, 4.5),
 (24, 2, 'Paper Plain Dosa', 'Extra long, paper-thin ultra-crispy plain dosa', 110.00, '/paper-plain-dosa.jpg', TRUE, 'mild', '15 mins', TRUE, TRUE, TRUE, 4.8),
 (25, 2, 'Paper Masala Dosa', 'Giant paper-thin crispy dosa served with spiced potato masala', 130.00, '/paper-masala-dosa.jpg', TRUE, 'medium', '15 mins', TRUE, TRUE, TRUE, 4.9),
 (26, 2, 'Pizza Dosa', 'Fusion Dosa loaded with cheese, capsicum, corn, tomatoes & pizza herbs', 130.00, '/pizza-dosa.jpg', TRUE, 'mild', '15 mins', TRUE, TRUE, TRUE, 4.9),
 
 -- 4. Uttapam / उत्तापा
-(27, 4, 'Plain Uttapam', 'Soft thick rice pancake served with sambar & chutney', 75.00, 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '12 mins', TRUE, FALSE, FALSE, 4.4),
+(27, 4, 'Plain Uttapam', 'Soft thick rice pancake served with sambar & chutney', 75.00, '/plain-uttapam.jpg', TRUE, 'mild', '12 mins', TRUE, FALSE, FALSE, 4.4),
 (28, 4, 'Onion Uttapam', 'Thick Uttapam topped with chopped onions & coriander', 85.00, '/onion-uttapam.jpg', TRUE, 'mild', '12 mins', TRUE, TRUE, TRUE, 4.7),
 (29, 4, 'Tomato Uttapam', 'Juicy fresh tomato slice topped soft Uttapam', 85.00, 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '12 mins', TRUE, FALSE, FALSE, 4.5),
 (30, 4, 'Onion Tomato Uttapam', 'Classic onion & tomato combination topped Uttapam', 90.00, '/onion-tomato-uttapam.jpg', TRUE, 'mild', '12 mins', TRUE, TRUE, TRUE, 4.8),

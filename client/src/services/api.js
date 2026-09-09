@@ -305,8 +305,8 @@ export const apiCall = async (endpoint, method = 'GET', data = null, customToken
 const getDynamicMenu = () => {
   try {
     const currentVer = localStorage.getItem('dakshin_menu_ver');
-    if (currentVer !== 'v36_garlic_and_palak_dosa_photos') {
-      localStorage.setItem('dakshin_menu_ver', 'v36_garlic_and_palak_dosa_photos');
+    if (currentVer !== 'v37_open_dosa_and_plain_uttapam_photos') {
+      localStorage.setItem('dakshin_menu_ver', 'v37_open_dosa_and_plain_uttapam_photos');
       localStorage.setItem('dakshin_custom_menu', JSON.stringify(FALLBACK_MENU_ITEMS));
       return FALLBACK_MENU_ITEMS;
     }
@@ -372,6 +372,9 @@ const getDynamicMenu = () => {
           if (String(item.id) === '22' || (item.name && item.name.includes('Butter Podi Masala'))) {
             return { ...item, image_url: '/butter-podi-masala-dosa.jpg' };
           }
+          if (String(item.id) === '23' || (item.name && item.name.includes('Open Dosa'))) {
+            return { ...item, image_url: '/open-dosa.jpg' };
+          }
           if (String(item.id) === '24' || (item.name && item.name.includes('Paper Plain'))) {
             return { ...item, image_url: '/paper-plain-dosa.jpg' };
           }
@@ -380,6 +383,9 @@ const getDynamicMenu = () => {
           }
           if (String(item.id) === '26' || (item.name && item.name.includes('Pizza Dosa'))) {
             return { ...item, image_url: '/pizza-dosa.jpg' };
+          }
+          if (String(item.id) === '27' || (item.name && item.name === 'Plain Uttapam')) {
+            return { ...item, image_url: '/plain-uttapam.jpg' };
           }
           if (String(item.id) === '28' || (item.name && item.name === 'Onion Uttapam')) {
             return { ...item, image_url: '/onion-uttapam.jpg' };
@@ -542,6 +548,9 @@ export const apiService = {
       if (String(item.id) === '22' || (item.name && item.name.includes('Butter Podi Masala'))) {
         return { ...item, image_url: '/butter-podi-masala-dosa.jpg' };
       }
+      if (String(item.id) === '23' || (item.name && item.name.includes('Open Dosa'))) {
+        return { ...item, image_url: '/open-dosa.jpg' };
+      }
       if (String(item.id) === '24' || (item.name && item.name.includes('Paper Plain'))) {
         return { ...item, image_url: '/paper-plain-dosa.jpg' };
       }
@@ -550,6 +559,9 @@ export const apiService = {
       }
       if (String(item.id) === '26' || (item.name && item.name.includes('Pizza Dosa'))) {
         return { ...item, image_url: '/pizza-dosa.jpg' };
+      }
+      if (String(item.id) === '27' || (item.name && item.name === 'Plain Uttapam')) {
+        return { ...item, image_url: '/plain-uttapam.jpg' };
       }
       if (String(item.id) === '28' || (item.name && item.name === 'Onion Uttapam')) {
         return { ...item, image_url: '/onion-uttapam.jpg' };
