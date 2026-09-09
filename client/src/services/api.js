@@ -305,8 +305,8 @@ export const apiCall = async (endpoint, method = 'GET', data = null, customToken
 const getDynamicMenu = () => {
   try {
     const currentVer = localStorage.getItem('dakshin_menu_ver');
-    if (currentVer !== 'v40_chaha_and_coffee_clean_photos') {
-      localStorage.setItem('dakshin_menu_ver', 'v40_chaha_and_coffee_clean_photos');
+    if (currentVer !== 'v41_garlic_masala_schezwan_uttapam_photos') {
+      localStorage.setItem('dakshin_menu_ver', 'v41_garlic_masala_schezwan_uttapam_photos');
       localStorage.setItem('dakshin_custom_menu', JSON.stringify(FALLBACK_MENU_ITEMS));
       return FALLBACK_MENU_ITEMS;
     }
@@ -409,6 +409,15 @@ const getDynamicMenu = () => {
           }
           if (String(item.id) === '30' || (item.name && item.name === 'Onion Tomato Uttapam')) {
             return { ...item, image_url: '/onion-tomato-uttapam.jpg' };
+          }
+          if (String(item.id) === '32' || (item.name && item.name === 'Garlic Uttapam')) {
+            return { ...item, image_url: '/garlic-uttapam.jpg' };
+          }
+          if (String(item.id) === '33' || (item.name && item.name === 'Masala Uttapam')) {
+            return { ...item, image_url: '/masala-uttapam.jpg' };
+          }
+          if (String(item.id) === '34' || (item.name && item.name === 'Schezwan Uttapam')) {
+            return { ...item, image_url: '/schezwan-uttapam.jpg' };
           }
           if (String(item.id) === '35' || (item.name && item.name === 'Cheese Onion Uttapam')) {
             return { ...item, image_url: '/cheese-onion-uttapam.jpg' };
@@ -594,6 +603,15 @@ export const apiService = {
       }
       if (String(item.id) === '30' || (item.name && item.name === 'Onion Tomato Uttapam')) {
         return { ...item, image_url: '/onion-tomato-uttapam.jpg' };
+      }
+      if (String(item.id) === '32' || (item.name && item.name === 'Garlic Uttapam')) {
+        return { ...item, image_url: '/garlic-uttapam.jpg' };
+      }
+      if (String(item.id) === '33' || (item.name && item.name === 'Masala Uttapam')) {
+        return { ...item, image_url: '/masala-uttapam.jpg' };
+      }
+      if (String(item.id) === '34' || (item.name && item.name === 'Schezwan Uttapam')) {
+        return { ...item, image_url: '/schezwan-uttapam.jpg' };
       }
       if (String(item.id) === '35' || (item.name && item.name === 'Cheese Onion Uttapam')) {
         return { ...item, image_url: '/cheese-onion-uttapam.jpg' };
