@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingBag, Search, Filter, RefreshCw, Eye, X, Printer, CheckCircle, Ban, DollarSign, ChevronDown, ChevronUp, Package, Clock, Trash2, CheckCircle2, XCircle, FileCheck, ExternalLink, Image as ImageIcon, ShieldCheck } from 'lucide-react';
+import { ShoppingBag, Search, Filter, RefreshCw, Eye, X, Printer, CheckCircle, Ban, DollarSign, ChevronDown, ChevronUp, Package, Clock, Trash2, CheckCircle2, XCircle, FileCheck, ExternalLink, Image as ImageIcon, ShieldCheck, MapPin } from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
 import StatusBadge from '../components/StatusBadge';
 import SkeletonLoader from '../components/SkeletonLoader';
@@ -620,7 +620,7 @@ const AdminOrders = () => {
                         <th>UTR / Proof</th>
                         <th>Order Status</th>
                         <th>Change Kitchen Status</th>
-                        <th>Actions</th>
+                        <th>Customer Address</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -767,13 +767,27 @@ const AdminOrders = () => {
                             </td>
 
                             <td>
-                              <button
-                                onClick={() => handlePrintReceipt(ord)}
-                                title="Print KOT / Receipt"
-                                style={{ padding: '5px 10px', backgroundColor: '#FFFFFF', borderRadius: '8px', color: '#1F2937', border: '1px solid var(--color-border)', cursor: 'pointer', fontWeight: 700, fontSize: '0.78rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
-                              >
-                                <Printer size={15} /> Receipt
-                              </button>
+                              {ord.delivery_address || ord.address ? (
+                                <div style={{ minWidth: '170px', maxWidth: '250px', fontSize: '0.82rem', lineHeight: '1.35' }}>
+                                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '5px' }}>
+                                    <MapPin size={14} color="var(--color-gold)" style={{ flexShrink: 0, marginTop: '2px' }} />
+                                    <div>
+                                      <div style={{ fontWeight: 700, color: 'var(--color-emerald)', wordBreak: 'break-word' }}>
+                                        {ord.delivery_address || ord.address}
+                                      </div>
+                                      {(ord.landmark || ord.city || ord.pincode) && (
+                                        <div style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+                                          {[ord.landmark, ord.city, ord.pincode].filter(Boolean).join(', ')}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : (
+                                <span style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', fontStyle: 'italic' }}>
+                                  {ord.order_type === 'Dine In' ? 'Dine In' : ord.order_type === 'Takeaway' ? 'Takeaway' : 'No Address'}
+                                </span>
+                              )}
                             </td>
 
                           </tr>
