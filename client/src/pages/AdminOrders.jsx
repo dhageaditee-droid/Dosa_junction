@@ -210,6 +210,15 @@ const AdminOrders = () => {
   return (
     <div className="admin-page-layout" style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--color-cream-alt)' }}>
       <SEOHead title="Admin Order & Payment Verification Portal | Dosa Junction" />
+      <style>{`
+        .admin-table th {
+          background-color: #0F172A !important;
+          color: #FFFFFF !important;
+        }
+        .admin-table thead, .admin-table thead tr {
+          background-color: #0F172A !important;
+        }
+      `}</style>
       <AdminSidebar />
 
       <main className="admin-main-content" style={{ flexGrow: 1, padding: '2rem', overflowY: 'auto' }}>
@@ -380,17 +389,17 @@ const AdminOrders = () => {
               <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 14px rgba(0,0,0,0.04)' }}>
                 <div style={{ overflowX: 'auto' }}>
                   <table className="admin-table">
-                    <thead>
-                      <tr>
-                        <th>Order No.</th>
-                        <th>Customer</th>
-                        <th>Cart Items</th>
-                        <th>Type</th>
-                        <th>Expected Amount</th>
-                        <th>UTR / Screenshot</th>
-                        <th>Payment Status</th>
-                        <th>Customer Address</th>
-                        <th>Verification Actions</th>
+                    <thead style={{ backgroundColor: '#0F172A' }}>
+                      <tr style={{ backgroundColor: '#0F172A' }}>
+                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Order No.</th>
+                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Customer</th>
+                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Cart Items</th>
+                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Type</th>
+                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Expected Amount</th>
+                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>UTR / Screenshot</th>
+                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Payment Status</th>
+                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Customer Address</th>
+                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Verification Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -635,17 +644,17 @@ const AdminOrders = () => {
               <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 14px rgba(0,0,0,0.04)' }}>
                 <div style={{ overflowX: 'auto' }}>
                   <table className="admin-table">
-                    <thead>
-                      <tr>
-                        <th>Order No.</th>
-                        <th>Customer</th>
-                        <th>Ordered Dishes</th>
-                        <th>Type</th>
-                        <th>Total</th>
-                        <th>UTR / Proof</th>
-                        <th>Order Status</th>
-                        <th>Change Kitchen Status</th>
-                        <th>Customer Address</th>
+                    <thead style={{ backgroundColor: '#0F172A' }}>
+                      <tr style={{ backgroundColor: '#0F172A' }}>
+                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Order No.</th>
+                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Customer</th>
+                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Ordered Dishes</th>
+                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Type</th>
+                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Total</th>
+                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>UTR / Proof</th>
+                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Order Status</th>
+                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Change Kitchen Status</th>
+                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Customer Address</th>
                       </tr>
                     </thead>
                     <tbody>
