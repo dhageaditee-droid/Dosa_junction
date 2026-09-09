@@ -336,7 +336,7 @@ const Home = () => {
             </div>
 
             {/* Feature Pills Row */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', fontSize: '0.92rem', fontWeight: 700, color: '#F1F5F9', textShadow: '0 2px 6px rgba(0,0,0,0.7)' }}>
+            <div className="hero-features-row" style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', fontSize: '0.92rem', fontWeight: 700, color: '#F1F5F9', textShadow: '0 2px 6px rgba(0,0,0,0.7)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Leaf size={18} color="#FBBF24" />
                 <span>Pure Veg</span>
@@ -351,8 +351,59 @@ const Home = () => {
               </div>
             </div>
 
+            {/* Dedicated High-Quality Food Platter Photo for Mobile View Only */}
+            <div className="hero-mobile-image-container">
+              <img
+                src="/hero-dosa-platter.jpg"
+                alt="Authentic South Indian Dosa Platter"
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                  display: 'block'
+                }}
+              />
+            </div>
+
           </div>
         </div>
+
+        {/* Responsive Mobile Stylesheet */}
+        <style>{`
+          .hero-mobile-image-container {
+            display: none;
+          }
+          @media (max-width: 768px) {
+            .hero-panoramic-section {
+              background: radial-gradient(ellipse at 50% 15%, #352114 0%, #20130B 60%, #120A05 100%) !important;
+              padding: 2.2rem 0 2.5rem 0 !important;
+              min-height: auto !important;
+            }
+            .hero-content-wrapper {
+              max-width: 100% !important;
+              text-align: center !important;
+            }
+            .hero-content-wrapper div[style*="inline-flex"] {
+              justify-content: center !important;
+            }
+            .hero-features-row {
+              justify-content: center !important;
+              gap: 1.2rem !important;
+              font-size: 0.85rem !important;
+            }
+            .hero-content-wrapper > div[style*="flexWrap"] {
+              justify-content: center !important;
+            }
+            .hero-mobile-image-container {
+              display: block !important;
+              margin-top: 2rem !important;
+              border-radius: 20px !important;
+              overflow: hidden !important;
+              border: 1.5px solid rgba(251, 191, 36, 0.35) !important;
+              box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6) !important;
+              background-color: #1A1009 !important;
+            }
+          }
+        `}</style>
       </section>
 
       {/* ================= POPULAR SOUTH INDIAN DISHES ================= */}
