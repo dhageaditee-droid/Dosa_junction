@@ -305,8 +305,8 @@ export const apiCall = async (endpoint, method = 'GET', data = null, customToken
 const getDynamicMenu = () => {
   try {
     const currentVer = localStorage.getItem('dakshin_menu_ver');
-    if (currentVer !== 'v42_cheese_chilli_idli_button_lemon_photos') {
-      localStorage.setItem('dakshin_menu_ver', 'v42_cheese_chilli_idli_button_lemon_photos');
+    if (currentVer !== 'v43_button_idli_v2_photos') {
+      localStorage.setItem('dakshin_menu_ver', 'v43_button_idli_v2_photos');
       localStorage.setItem('dakshin_custom_menu', JSON.stringify(FALLBACK_MENU_ITEMS));
       return FALLBACK_MENU_ITEMS;
     }
