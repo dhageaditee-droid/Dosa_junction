@@ -8,7 +8,7 @@ export const FALLBACK_CATEGORIES = [
   { id: 6, name: 'Vada', slug: 'vada', description: 'Crispy lentil donuts & Combos', display_order: 7 },
   { id: 7, name: 'Sheera & Desserts', slug: 'desserts', description: 'Authentic South Indian Sweets', display_order: 8 },
   { id: 8, name: 'Rice', slug: 'rice', description: 'Seasoned aromatic rice dishes', display_order: 9 },
-  { id: 9, name: 'Extras', slug: 'extras', description: 'Sides & Extras: Pav Bhaji, Masala Rice, Fried Rice & Schezwan Rice', display_order: 10 }
+  { id: 9, name: 'Extras', slug: 'extras', description: 'Sides & Extras: Pav Bhaji', display_order: 10 }
 ];
 
 export const FALLBACK_MENU_ITEMS = [
@@ -82,8 +82,5 @@ export const FALLBACK_MENU_ITEMS = [
   { id: 50, category_id: 8, category_slug: 'rice', name: 'Schezwan Rice', description: 'Spicy Indo-Chinese Schezwan tossed fried rice', price: 120.00, image_url: '/schezwan-rice.jpg', is_veg: true, spice_level: 'spicy', preparation_time: '12 mins', is_available: true, is_bestseller: true, rating: 4.8 },
 
   // 9. Extras
-  { id: 51, category_id: 9, category_slug: 'extras', name: 'Pav Bhaji', description: 'Delicious Mumbai style buttery Pav Bhaji', price: 70.00, image_url: '/pav-bhaji.jpg', is_veg: true, spice_level: 'medium', preparation_time: '10 mins', is_available: true, is_bestseller: true, rating: 4.9 },
-  { id: 52, category_id: 9, category_slug: 'extras', name: 'Masala Rice', description: 'Spiced South Indian rice tempered with spices', price: 110.00, image_url: '/masala-rice.jpg', is_veg: true, spice_level: 'medium', preparation_time: '10 mins', is_available: true, is_bestseller: true, rating: 4.8 },
-  { id: 53, category_id: 9, category_slug: 'extras', name: 'Fried Rice', description: 'Delicious vegetable fried rice tossed with herbs', price: 110.00, image_url: '/fried-rice.jpg', is_veg: true, spice_level: 'medium', preparation_time: '12 mins', is_available: true, is_bestseller: true, rating: 4.8 },
-  { id: 54, category_id: 9, category_slug: 'extras', name: 'Schezwan Rice', description: 'Spicy Indo-Chinese Schezwan tossed fried rice', price: 120.00, image_url: '/schezwan-rice.jpg', is_veg: true, spice_level: 'spicy', preparation_time: '12 mins', is_available: true, is_bestseller: true, rating: 4.8 },
+  { id: 51, category_id: 9, category_slug: 'extras', name: 'Pav Bhaji', description: 'Delicious Mumbai style buttery Pav Bhaji', price: 70.00, image_url: '/pav-bhaji.jpg', is_veg: true, spice_level: 'medium', preparation_time: '10 mins', is_available: true, is_bestseller: true, rating: 4.9 }
 ];

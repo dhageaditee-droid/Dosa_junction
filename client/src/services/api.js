@@ -305,8 +305,8 @@ export const apiCall = async (endpoint, method = 'GET', data = null, customToken
 const getDynamicMenu = () => {
   try {
     const currentVer = localStorage.getItem('dakshin_menu_ver');
-    if (currentVer !== 'v38_tomato_uttapam_clean_photo') {
-      localStorage.setItem('dakshin_menu_ver', 'v38_tomato_uttapam_clean_photo');
+    if (currentVer !== 'v39_remove_duplicate_rice_extras') {
+      localStorage.setItem('dakshin_menu_ver', 'v39_remove_duplicate_rice_extras');
       localStorage.setItem('dakshin_custom_menu', JSON.stringify(FALLBACK_MENU_ITEMS));
       return FALLBACK_MENU_ITEMS;
     }
@@ -314,7 +314,15 @@ const getDynamicMenu = () => {
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        const sanitized = parsed.map(item => {
+        const filteredParsed = parsed.filter(item => {
+          if ((item.category_slug === 'extras' || item.category_id === 9 || String(item.category_id) === '9') &&
+              (item.name === 'Masala Rice' || item.name === 'Fried Rice' || item.name === 'Schezwan Rice' ||
+               String(item.id) === '52' || String(item.id) === '53' || String(item.id) === '54')) {
+            return false;
+          }
+          return true;
+        });
+        const sanitized = filteredParsed.map(item => {
           if (String(item.id) === '2' || (item.name && item.name === 'Black Tea')) {
             return { ...item, image_url: '/black-tea.jpg' };
           }
@@ -617,13 +625,15 @@ export const apiService = {
       return item;
     });
 
-    // Filter out plain Cheese, Butter, Masala from extras if present
+    // Filter out plain Cheese, Butter, Masala or duplicate rice from extras if present
     itemsList = itemsList.filter(i => {
-      if (i.category_slug === 'extras' || i.category_id === 9) {
+      if (i.category_slug === 'extras' || i.category_id === 9 || String(i.category_id) === '9') {
         const n = cleanDishName(i.name).toLowerCase().trim();
         if (n === 'cheese' || n === 'cheese (चीज)' || n === 'extra cheese' ||
             n === 'butter' || n === 'butter (बटर)' || n === 'extra butter' ||
-            n === 'masala' || n === 'masala (मसाला)' || n === 'extra masala') {
+            n === 'masala' || n === 'masala (मसाला)' || n === 'extra masala' ||
+            n === 'masala rice' || n === 'fried rice' || n === 'schezwan rice' ||
+            String(i.id) === '52' || String(i.id) === '53' || String(i.id) === '54') {
           return false;
         }
       }
