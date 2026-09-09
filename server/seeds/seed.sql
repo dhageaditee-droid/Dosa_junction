@@ -22,19 +22,19 @@ INSERT INTO menu_items (id, category_id, name, description, price, image_url, is
 
 -- 1. Beverages / चहा
 (1, 1, 'Chaha', 'Traditional hot spiced Indian tea', 10.00, 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '5 mins', TRUE, TRUE, TRUE, 4.8),
-(2, 1, 'Black Tea', 'Strong aromatic black tea', 15.00, 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '5 mins', TRUE, FALSE, FALSE, 4.5),
+(2, 1, 'Black Tea', 'Strong aromatic black tea', 15.00, '/black-tea.jpg', TRUE, 'mild', '5 mins', TRUE, FALSE, FALSE, 4.5),
 (3, 1, 'Coffee', 'Authentic South Indian hot coffee', 25.00, 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '5 mins', TRUE, TRUE, TRUE, 4.9),
-(4, 1, 'Milk', 'Fresh hot milk', 20.00, 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '5 mins', TRUE, FALSE, FALSE, 4.4),
+(4, 1, 'Milk', 'Fresh hot milk', 20.00, '/milk.jpg', TRUE, 'mild', '5 mins', TRUE, FALSE, FALSE, 4.4),
 
 -- 2. Special Dosa / स्पेशल डोसा
 (5, 3, 'South Indian Special Combo', 'Masala Dosa + 1 Pc Idli + 1 Pc Medu Vada + Pineapple Sheera + Chaha', 149.00, '/south-indian-special-combo.jpg', TRUE, 'medium', '15 mins', TRUE, TRUE, TRUE, 5.0),
 (6, 3, 'Ghee Namma South Special Dosa', 'Grand special dosa loaded with pure A2 Ghee & South Indian herbs', 125.00, '/ghee-namma-south-special-dosa.jpg', TRUE, 'medium', '15 mins', TRUE, TRUE, TRUE, 4.9),
 (7, 3, 'Ghee Podi Masala Dosa', 'Crispy Dosa layered with pure Ghee, spicy gun-powder podi & potato masala', 115.00, '/ghee-podi-masala-dosa.jpg', TRUE, 'spicy', '12 mins', TRUE, TRUE, TRUE, 4.8),
 (8, 3, 'Ghee Mysore Masala Dosa', 'Rich Ghee roasted Dosa smeared with red garlic chutney & potato filling', 115.00, '/ghee-mysore-masala-dosa.jpg', TRUE, 'spicy', '12 mins', TRUE, TRUE, FALSE, 4.8),
-(9, 3, 'Ghee Garlic Masala Dosa', 'Fragrant roasted Ghee & Garlic paste stuffed Masala Dosa', 115.00, 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=600&q=80', TRUE, 'medium', '12 mins', TRUE, FALSE, FALSE, 4.6),
+(9, 3, 'Ghee Garlic Masala Dosa', 'Fragrant roasted Ghee & Garlic paste stuffed Masala Dosa', 115.00, '/ghee-garlic-masala-dosa.jpg', TRUE, 'medium', '12 mins', TRUE, FALSE, FALSE, 4.6),
 (10, 3, 'Ghee Pudina Masala Dosa', 'Fresh mint (pudina) chutney spread Dosa roasted in pure Ghee', 115.00, 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80', TRUE, 'medium', '12 mins', TRUE, FALSE, FALSE, 4.6),
 (11, 3, 'Loni Sponge Dosa 2 Pcs', 'Soft fluffy sponge dosas smeared with homemade white butter (Loni)', 50.00, '/loni-sponge-dosa.jpg', TRUE, 'mild', '10 mins', TRUE, TRUE, TRUE, 4.9),
-(12, 3, 'Loni Sponge Dosa 3 Pcs', 'Triple set of soft butter sponge dosas', 70.00, '/loni-sponge-dosa.jpg', TRUE, 'mild', '10 mins', TRUE, TRUE, FALSE, 4.8),
+(12, 3, 'Loni Sponge Dosa 3 Pcs', 'Triple set of soft butter sponge dosas', 70.00, '/loni-sponge-dosa-3-pcs.jpg', TRUE, 'mild', '10 mins', TRUE, TRUE, FALSE, 4.8),
 
 -- 3. Dosa / डोसा
 (13, 2, 'Plain Dosa', 'Golden crisp plain fermented crepe served with chutneys & sambar', 60.00, 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '10 mins', TRUE, FALSE, TRUE, 4.6),
