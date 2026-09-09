@@ -176,13 +176,14 @@ module.exports = async function handler(req, res) {
 
       console.log('[UPI Deep Link Generated]:', upiUri);
 
+      const fullDeliveryAddr = [payload.deliveryAddress || payload.address || payload.delivery_address, payload.landmark, payload.city, payload.pincode].filter(Boolean).join(', ');
       const newSession = {
         id: Date.now(),
         payment_ref: paymentRef,
         customer_name: payload.customerName || payload.customer_name || 'Customer',
         customer_phone: payload.phone || payload.customerPhone || payload.customer_phone || '',
         customer_email: payload.email || payload.customerEmail || '',
-        delivery_address: payload.deliveryAddress || payload.address || '',
+        delivery_address: fullDeliveryAddr || payload.deliveryAddress || payload.address || '',
         order_type: payload.orderType || payload.order_type || 'Home Delivery',
         payment_method: 'Online UPI Payment',
         subtotal,

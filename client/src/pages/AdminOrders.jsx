@@ -767,27 +767,36 @@ const AdminOrders = () => {
                             </td>
 
                             <td>
-                              {ord.delivery_address || ord.address ? (
-                                <div style={{ minWidth: '170px', maxWidth: '250px', fontSize: '0.82rem', lineHeight: '1.35' }}>
-                                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '5px' }}>
-                                    <MapPin size={14} color="var(--color-gold)" style={{ flexShrink: 0, marginTop: '2px' }} />
-                                    <div>
-                                      <div style={{ fontWeight: 700, color: 'var(--color-emerald)', wordBreak: 'break-word' }}>
-                                        {ord.delivery_address || ord.address}
-                                      </div>
-                                      {(ord.landmark || ord.city || ord.pincode) && (
-                                        <div style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
-                                          {[ord.landmark, ord.city, ord.pincode].filter(Boolean).join(', ')}
+                              {(() => {
+                                const fullAddr = ord.delivery_address || ord.deliveryAddress || ord.address || ord.customer_address || ord.customerAddress || '';
+                                const extraDetails = [ord.landmark, ord.city, ord.pincode].filter(Boolean).join(', ');
+
+                                if (fullAddr || extraDetails) {
+                                  return (
+                                    <div style={{ minWidth: '170px', maxWidth: '250px', fontSize: '0.82rem', lineHeight: '1.35' }}>
+                                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '5px' }}>
+                                        <MapPin size={14} color="var(--color-gold)" style={{ flexShrink: 0, marginTop: '2px' }} />
+                                        <div>
+                                          <div style={{ fontWeight: 700, color: 'var(--color-emerald)', wordBreak: 'break-word' }}>
+                                            {fullAddr || extraDetails}
+                                          </div>
+                                          {fullAddr && extraDetails && (!ord.city || !fullAddr.includes(ord.city)) && (
+                                            <div style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+                                              {extraDetails}
+                                            </div>
+                                          )}
                                         </div>
-                                      )}
+                                      </div>
                                     </div>
-                                  </div>
-                                </div>
-                              ) : (
-                                <span style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', fontStyle: 'italic' }}>
-                                  {ord.order_type === 'Dine In' ? 'Dine In' : ord.order_type === 'Takeaway' ? 'Takeaway' : 'No Address'}
-                                </span>
-                              )}
+                                  );
+                                }
+
+                                return (
+                                  <span style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', fontStyle: 'italic' }}>
+                                    {ord.order_type === 'Dine In' ? 'Dine In' : ord.order_type === 'Takeaway' ? 'Takeaway' : 'No Address Provided'}
+                                  </span>
+                                );
+                              })()}
                             </td>
 
                           </tr>

@@ -739,13 +739,14 @@ export const apiService = {
 
     console.log('[UPI Deep Link Generated]:', upiUri);
 
+    const fullDeliveryAddr = [sessionData.deliveryAddress || sessionData.address || sessionData.delivery_address, sessionData.landmark, sessionData.city, sessionData.pincode].filter(Boolean).join(', ');
     const newSession = {
       id: Date.now(),
       payment_ref: ref,
       customer_name: sessionData.customerName || 'Customer',
       customer_phone: sessionData.customerPhone || '',
       customer_email: sessionData.customerEmail || '',
-      delivery_address: sessionData.deliveryAddress || '',
+      delivery_address: fullDeliveryAddr || sessionData.deliveryAddress || '',
       order_type: sessionData.orderType || 'Home Delivery',
       payment_method: 'Online UPI Payment',
       subtotal,
@@ -948,13 +949,14 @@ export const apiService = {
     const upiUri = `upi://pay?${upiParams.toString()}`;
     const isUpi = orderData.paymentMethod && (orderData.paymentMethod.includes('UPI') || orderData.paymentMethod.includes('QR'));
 
+    const fullDeliveryAddr = [orderData.deliveryAddress || orderData.address || orderData.delivery_address, orderData.landmark, orderData.city, orderData.pincode].filter(Boolean).join(', ');
     const newOrder = {
       id: Date.now(),
       order_number: orderNum,
       customer_name: orderData.customerName || orderData.customer_name || 'Customer',
       customer_phone: orderData.phone || orderData.customerPhone || orderData.customer_phone || '',
       customer_email: orderData.email || orderData.customerEmail || '',
-      delivery_address: orderData.deliveryAddress || orderData.address || '',
+      delivery_address: fullDeliveryAddr || orderData.deliveryAddress || orderData.address || '',
       order_type: orderData.orderType || orderData.order_type || 'Home Delivery',
       payment_method: orderData.paymentMethod || orderData.payment_method || 'Cash on Delivery',
       payment_status: isUpi ? 'Payment Verification Pending' : 'PENDING',
