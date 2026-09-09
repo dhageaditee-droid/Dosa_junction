@@ -305,8 +305,8 @@ export const apiCall = async (endpoint, method = 'GET', data = null, customToken
 const getDynamicMenu = () => {
   try {
     const currentVer = localStorage.getItem('dakshin_menu_ver');
-    if (currentVer !== 'v37_open_dosa_and_plain_uttapam_photos') {
-      localStorage.setItem('dakshin_menu_ver', 'v37_open_dosa_and_plain_uttapam_photos');
+    if (currentVer !== 'v38_tomato_uttapam_clean_photo') {
+      localStorage.setItem('dakshin_menu_ver', 'v38_tomato_uttapam_clean_photo');
       localStorage.setItem('dakshin_custom_menu', JSON.stringify(FALLBACK_MENU_ITEMS));
       return FALLBACK_MENU_ITEMS;
     }
@@ -389,6 +389,9 @@ const getDynamicMenu = () => {
           }
           if (String(item.id) === '28' || (item.name && item.name === 'Onion Uttapam')) {
             return { ...item, image_url: '/onion-uttapam.jpg' };
+          }
+          if (String(item.id) === '29' || (item.name && item.name === 'Tomato Uttapam')) {
+            return { ...item, image_url: '/tomato-uttapam.jpg' };
           }
           if (String(item.id) === '30' || (item.name && item.name === 'Onion Tomato Uttapam')) {
             return { ...item, image_url: '/onion-tomato-uttapam.jpg' };
@@ -565,6 +568,9 @@ export const apiService = {
       }
       if (String(item.id) === '28' || (item.name && item.name === 'Onion Uttapam')) {
         return { ...item, image_url: '/onion-uttapam.jpg' };
+      }
+      if (String(item.id) === '29' || (item.name && item.name === 'Tomato Uttapam')) {
+        return { ...item, image_url: '/tomato-uttapam.jpg' };
       }
       if (String(item.id) === '30' || (item.name && item.name === 'Onion Tomato Uttapam')) {
         return { ...item, image_url: '/onion-tomato-uttapam.jpg' };

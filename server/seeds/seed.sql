@@ -55,7 +55,7 @@ INSERT INTO menu_items (id, category_id, name, description, price, image_url, is
 -- 4. Uttapam / उत्तापा
 (27, 4, 'Plain Uttapam', 'Soft thick rice pancake served with sambar & chutney', 75.00, '/plain-uttapam.jpg', TRUE, 'mild', '12 mins', TRUE, FALSE, FALSE, 4.4),
 (28, 4, 'Onion Uttapam', 'Thick Uttapam topped with chopped onions & coriander', 85.00, '/onion-uttapam.jpg', TRUE, 'mild', '12 mins', TRUE, TRUE, TRUE, 4.7),
-(29, 4, 'Tomato Uttapam', 'Juicy fresh tomato slice topped soft Uttapam', 85.00, 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80', TRUE, 'mild', '12 mins', TRUE, FALSE, FALSE, 4.5),
+(29, 4, 'Tomato Uttapam', 'Juicy fresh tomato slice topped soft Uttapam', 85.00, '/tomato-uttapam.jpg', TRUE, 'mild', '12 mins', TRUE, FALSE, FALSE, 4.5),
 (30, 4, 'Onion Tomato Uttapam', 'Classic onion & tomato combination topped Uttapam', 90.00, '/onion-tomato-uttapam.jpg', TRUE, 'mild', '12 mins', TRUE, TRUE, TRUE, 4.8),
 (31, 4, 'Mysore Uttapam', 'Red garlic spicy chutney spread Uttapam', 95.00, 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80', TRUE, 'spicy', '12 mins', TRUE, FALSE, FALSE, 4.6),
 (32, 4, 'Garlic Uttapam', 'Roasted garlic & herb topped Uttapam', 85.00, 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80', TRUE, 'medium', '12 mins', TRUE, FALSE, FALSE, 4.5),
