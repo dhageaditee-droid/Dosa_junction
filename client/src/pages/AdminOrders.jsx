@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingBag, Search, Filter, RefreshCw, Eye, X, Printer, CheckCircle, Ban, DollarSign, ChevronDown, ChevronUp, Package, Clock, Trash2, CheckCircle2, XCircle, FileCheck, ExternalLink, Image as ImageIcon, ShieldCheck, MapPin } from 'lucide-react';
+import { ShoppingBag, Search, Filter, RefreshCw, Eye, X, Printer, Package, Clock, Trash2, Image as ImageIcon, MapPin, ChevronDown, ChevronUp } from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
 import StatusBadge from '../components/StatusBadge';
 import SkeletonLoader from '../components/SkeletonLoader';
@@ -9,20 +9,10 @@ import { useToast } from '../context/ToastContext';
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
-  const [paymentSessions, setPaymentSessions] = useState([]);
-  const [activeTab, setActiveTab] = useState('orders'); // 'orders' or 'sessions'
-
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [selectedSession, setSelectedSession] = useState(null);
-
   const [expandedOrders, setExpandedOrders] = useState({});
   const [previewImage, setPreviewImage] = useState(null);
-
-  // Rejection modal state
-  const [showRejectBox, setShowRejectBox] = useState(false);
-  const [rejectionReasonInput, setRejectionReasonInput] = useState('');
-  const [verifying, setVerifying] = useState(false);
 
   // Filters
   const [statusFilter, setStatusFilter] = useState('all');
@@ -35,12 +25,10 @@ const AdminOrders = () => {
 
   useEffect(() => {
     fetchOrders(true);
-    fetchPaymentSessions();
 
     const intervalId = setInterval(() => {
       fetchOrders(false);
-      fetchPaymentSessions();
-    }, 3000); // 3-second auto-sync for live payment sessions and orders
+    }, 4000); // 4-second auto-sync for live orders
 
     return () => clearInterval(intervalId);
   }, [statusFilter, typeFilter, paymentStatusFilter, todayOnly, search]);
@@ -56,22 +44,11 @@ const AdminOrders = () => {
       if (search.trim()) params.append('search', search.trim());
 
       const res = await apiService.getAdminOrders(params.toString());
-      if (res.orders) setOrders(res.orders);
+      if (res && res.orders) setOrders(res.orders);
     } catch (e) {
       if (showLoading && addToast) addToast('Failed to load admin orders list', 'error');
     } finally {
       if (showLoading) setLoading(false);
-    }
-  };
-
-  const fetchPaymentSessions = async () => {
-    try {
-      const res = await apiService.getAdminPaymentSessions();
-      if (res && res.sessions) {
-        setPaymentSessions(res.sessions);
-      }
-    } catch (e) {
-      console.error(e);
     }
   };
 
@@ -81,7 +58,6 @@ const AdminOrders = () => {
         setLoading(true);
         await apiService.clearAllOrders();
         setOrders([]);
-        setPaymentSessions([]);
         if (addToast) addToast('All orders cleared successfully!', 'success');
       } catch (err) {
         if (addToast) addToast('Failed to clear orders', 'error');
@@ -101,7 +77,7 @@ const AdminOrders = () => {
   const handleStatusUpdate = async (orderId, newStatus) => {
     try {
       const res = await apiService.updateOrderStatus(orderId, newStatus);
-      if (res.success) {
+      if (res && res.success) {
         if (addToast) addToast(`Order status updated to "${newStatus}"`, 'success');
         fetchOrders();
         if (selectedOrder && (selectedOrder.id === orderId || selectedOrder.order_number === orderId)) {
@@ -110,28 +86,6 @@ const AdminOrders = () => {
       }
     } catch (err) {
       if (addToast) addToast(err.message || 'Status update failed', 'error');
-    }
-  };
-
-  const handleVerifySession = async (sessionId, action, reason = '') => {
-    try {
-      setVerifying(true);
-      const res = await apiService.verifyPaymentSession(sessionId, { action, rejectionReason: reason });
-      if (res && res.success) {
-        if (addToast) addToast(res.message, 'success');
-        fetchOrders(true);
-        fetchPaymentSessions();
-        setSelectedSession(null);
-        if (res.order) {
-          setSelectedOrder(res.order);
-        }
-        setShowRejectBox(false);
-        setRejectionReasonInput('');
-      }
-    } catch (err) {
-      if (addToast) addToast(err.message || 'Payment verification failed', 'error');
-    } finally {
-      setVerifying(false);
     }
   };
 
@@ -171,45 +125,9 @@ const AdminOrders = () => {
     printWindow.document.close();
   };
 
-  const renderSessionBadge = (status) => {
-    let bg = '#EFF6FF';
-    let color = '#1E40AF';
-    let label = status || 'Created';
-
-    if (status === 'Verification Pending') {
-      bg = '#FEF3C7';
-      color = '#B45309';
-      label = 'Verification Pending';
-    } else if (status === 'Approved') {
-      bg = '#DCFCE7';
-      color = '#15803D';
-      label = 'Approved ✓';
-    } else if (status === 'Rejected') {
-      bg = '#FEE2E2';
-      color = '#B91C1C';
-      label = 'Rejected';
-    }
-
-    return (
-      <span style={{
-        padding: '4px 10px',
-        borderRadius: '12px',
-        fontSize: '0.75rem',
-        fontWeight: 800,
-        backgroundColor: bg,
-        color: color,
-        display: 'inline-block'
-      }}>
-        {label}
-      </span>
-    );
-  };
-
-  const pendingSessionsCount = paymentSessions.filter(s => s.status === 'Verification Pending' || s.status === 'Created').length;
-
   return (
     <div className="admin-page-layout" style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--color-cream-alt)' }}>
-      <SEOHead title="Admin Order & Payment Verification Portal | Dosa Junction" />
+      <SEOHead title="Admin Orders Management | Dosa Junction" />
       <style>{`
         .admin-table th {
           background-color: #0F172A !important;
@@ -227,16 +145,16 @@ const AdminOrders = () => {
         <div className="admin-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
           <div>
             <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem', color: '#0F172A', margin: 0 }}>
-              Admin Payment Verification & Order Management
+              Orders Management
             </h1>
             <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
-              Inspect customer payment screenshots and UTR numbers. Approve payments to confirm and create official orders.
+              Manage live customer orders, update kitchen preparation status, and track delivery.
             </p>
           </div>
 
           <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-            <button onClick={() => { fetchOrders(true); fetchPaymentSessions(); }} className="btn btn-outline btn-sm" style={{ backgroundColor: '#FFFFFF', flexShrink: 0 }}>
-              <RefreshCw size={16} /> Refresh Data
+            <button onClick={() => fetchOrders(true)} className="btn btn-outline btn-sm" style={{ backgroundColor: '#FFFFFF', flexShrink: 0 }}>
+              <RefreshCw size={16} /> Refresh Orders
             </button>
             <button
               onClick={handleClearAllOrders}
@@ -255,61 +173,6 @@ const AdminOrders = () => {
               <Trash2 size={16} /> Clear All
             </button>
           </div>
-        </div>
-
-        {/* Tab Navigation */}
-        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
-          <button
-            onClick={() => setActiveTab('sessions')}
-            style={{
-              padding: '0.8rem 1.5rem',
-              borderRadius: '14px',
-              border: 'none',
-              backgroundColor: activeTab === 'sessions' ? '#0F172A' : '#FFFFFF',
-              color: activeTab === 'sessions' ? '#FFFFFF' : '#0F172A',
-              fontWeight: 800,
-              fontSize: '0.95rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.04)',
-              transition: 'var(--transition-fast)'
-            }}
-          >
-            ⚡ Pending Payment Verifications
-            <span style={{
-              backgroundColor: activeTab === 'sessions' ? '#FFC83B' : '#FEF3C7',
-              color: activeTab === 'sessions' ? '#0F172A' : '#B45309',
-              padding: '2px 8px',
-              borderRadius: '10px',
-              fontSize: '0.8rem',
-              fontWeight: 900
-            }}>
-              {pendingSessionsCount}
-            </span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('orders')}
-            style={{
-              padding: '0.8rem 1.5rem',
-              borderRadius: '14px',
-              border: 'none',
-              backgroundColor: activeTab === 'orders' ? '#0F172A' : '#FFFFFF',
-              color: activeTab === 'orders' ? '#FFFFFF' : '#0F172A',
-              fontWeight: 800,
-              fontSize: '0.95rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.04)',
-              transition: 'var(--transition-fast)'
-            }}
-          >
-            📦 Confirmed Orders ({orders.length})
-          </button>
         </div>
 
         {/* Filters Box */}
@@ -331,7 +194,7 @@ const AdminOrders = () => {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by Payment Ref, Order #, Customer, UTR..."
+              placeholder="Search by Order #, Customer, Phone, UTR..."
               style={{
                 width: '100%',
                 padding: '0.6rem 1rem',
@@ -353,496 +216,249 @@ const AdminOrders = () => {
               /> Today Only
             </label>
 
-            {activeTab === 'orders' && (
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                style={{ padding: '0.5rem 0.8rem', borderRadius: '10px', border: '1px solid var(--color-border)', fontSize: '0.85rem', fontWeight: 600 }}
-              >
-                <option value="all">All Order Statuses</option>
-                <option value="Confirmed">Confirmed</option>
-                <option value="Preparing">Preparing</option>
-                <option value="Ready">Ready</option>
-                <option value="Out for Delivery">Out for Delivery</option>
-                <option value="Completed">Completed</option>
-                <option value="Cancelled">Cancelled</option>
-              </select>
-            )}
+            <select
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+              style={{ padding: '0.5rem 0.8rem', borderRadius: '10px', border: '1px solid var(--color-border)', fontSize: '0.85rem', fontWeight: 600 }}
+            >
+              <option value="all">All Order Types</option>
+              <option value="Dine In">Dine In</option>
+              <option value="Takeaway">Takeaway</option>
+              <option value="Home Delivery">Home Delivery</option>
+            </select>
+
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              style={{ padding: '0.5rem 0.8rem', borderRadius: '10px', border: '1px solid var(--color-border)', fontSize: '0.85rem', fontWeight: 600 }}
+            >
+              <option value="all">All Order Statuses</option>
+              <option value="Pending">Pending</option>
+              <option value="Confirmed">Confirmed</option>
+              <option value="Preparing">Preparing</option>
+              <option value="Ready">Ready</option>
+              <option value="Out for Delivery">Out for Delivery</option>
+              <option value="Completed">Completed</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
           </div>
 
         </div>
 
-        {/* TAB 1: PENDING PAYMENT SESSIONS (PAY-DJ-XXXX) */}
-        {activeTab === 'sessions' && (
-          <div>
-            {loading ? (
-              <SkeletonLoader count={4} type="table" />
-            ) : paymentSessions.length === 0 ? (
-              <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '3rem', textAlign: 'center', boxShadow: '0 4px 14px rgba(0,0,0,0.04)' }}>
-                <CheckCircle size={48} color="#16A34A" style={{ marginBottom: '0.8rem' }} />
-                <h3 style={{ color: '#0F172A', margin: 0 }}>No Pending Payment Sessions</h3>
-                <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', marginTop: '4px' }}>
-                  All customer payment proofs have been verified or no active payment sessions are waiting.
-                </p>
-              </div>
-            ) : (
-              <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 14px rgba(0,0,0,0.04)' }}>
-                <div style={{ overflowX: 'auto' }}>
-                  <table className="admin-table">
-                    <thead style={{ backgroundColor: '#0F172A' }}>
-                      <tr style={{ backgroundColor: '#0F172A' }}>
-                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Order No.</th>
-                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Customer</th>
-                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Cart Items</th>
-                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Type</th>
-                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Expected Amount</th>
-                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>UTR / Screenshot</th>
-                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Payment Status</th>
-                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Customer Address</th>
-                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Verification Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {paymentSessions.map((sess, index) => {
-                        const cartItems = typeof sess.cart_items === 'string' ? JSON.parse(sess.cart_items) : (sess.cart_items || []);
-                        const isExpanded = expandedOrders[`sess_${sess.id}`];
+        {/* ORDERS TABLE */}
+        <div>
+          {loading ? (
+            <SkeletonLoader count={6} type="table" />
+          ) : orders.length === 0 ? (
+            <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '3rem', textAlign: 'center', boxShadow: '0 4px 14px rgba(0,0,0,0.04)' }}>
+              <Package size={48} color="var(--color-gold)" style={{ marginBottom: '0.8rem' }} />
+              <h3 style={{ color: '#0F172A', margin: 0 }}>No Orders Found</h3>
+              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', marginTop: '4px' }}>
+                Customer orders will appear here once placed.
+              </p>
+            </div>
+          ) : (
+            <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 14px rgba(0,0,0,0.04)' }}>
+              <div style={{ overflowX: 'auto' }}>
+                <table className="admin-table">
+                  <thead style={{ backgroundColor: '#0F172A' }}>
+                    <tr style={{ backgroundColor: '#0F172A' }}>
+                      <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Order No.</th>
+                      <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Customer</th>
+                      <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Ordered Dishes</th>
+                      <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Type</th>
+                      <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Total</th>
+                      <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>UTR / Proof</th>
+                      <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Order Status</th>
+                      <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Change Kitchen Status</th>
+                      <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Customer Address</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {orders.map((ord, index) => {
+                      const isExpanded = expandedOrders[ord.id];
+                      const itemsList = ord.items || [];
+                      const itemCount = itemsList.length;
 
-                        const rawTimestamp = sess.payment_proof_submitted_at || sess.created_at || (sess.id && !isNaN(Number(sess.id)) ? new Date(Number(sess.id)).toISOString() : null);
-                        const validTimestamp = rawTimestamp && !isNaN(new Date(rawTimestamp).getTime()) ? rawTimestamp : null;
-                        const sessionDateObj = validTimestamp ? new Date(validTimestamp) : new Date();
-                        const sessionTimeStr = sessionDateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+                      const rawTimestamp = ord.created_at || (ord.id && !isNaN(Number(ord.id)) ? new Date(Number(ord.id)).toISOString() : null);
+                      const validTimestamp = rawTimestamp && !isNaN(new Date(rawTimestamp).getTime()) ? rawTimestamp : null;
+                      const orderDateObj = validTimestamp ? new Date(validTimestamp) : new Date();
+                      const orderTimeStr = orderDateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
 
-                        return (
-                          <tr key={sess.id}>
-                            <td style={{ whiteSpace: 'nowrap' }}>
-                              <div style={{ fontWeight: 900, color: '#0F172A', fontSize: '1.2rem' }}>
-                                {index + 1}
-                              </div>
-                              <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '3px', marginTop: '2px' }}>
-                                <Clock size={12} color="var(--color-gold)" />
-                                <span>{sessionTimeStr}</span>
-                              </div>
-                            </td>
+                      return (
+                        <tr key={ord.id}>
+                          <td style={{ whiteSpace: 'nowrap' }}>
+                            <div style={{ fontWeight: 900, color: '#0F172A', fontSize: '1.2rem' }}>
+                              {index + 1}
+                            </div>
+                            <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '3px', marginTop: '2px' }}>
+                              <Clock size={12} color="var(--color-gold)" />
+                              <span>{orderTimeStr}</span>
+                            </div>
+                          </td>
 
-                            <td>
-                              <div style={{ fontWeight: 800, color: '#0F172A' }}>{sess.customer_name}</div>
-                              <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>{sess.customer_phone}</div>
-                            </td>
+                          <td>
+                            <div style={{ fontWeight: 800, color: '#0F172A' }}>{ord.customer_name}</div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{ord.customer_phone}</div>
+                          </td>
 
-                            {/* Cart Items Column */}
-                            <td>
-                              <div style={{ minWidth: '220px', maxWidth: '280px' }}>
-                                {cartItems.length === 0 ? (
-                                  <span style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>No items</span>
-                                ) : cartItems.length === 1 ? (
-                                  <div style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: '#F8FAFC', padding: '4px 8px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '0.82rem' }}>
-                                    <span style={{ fontWeight: 700, color: '#0F172A' }}>
-                                      {cartItems[0].quantity}x {cleanDishName(cartItems[0].item_name || cartItems[0].name)}
-                                    </span>
-                                    <span style={{ fontWeight: 700, color: 'var(--color-gold)' }}>₹{parseFloat(cartItems[0].subtotal || cartItems[0].price * cartItems[0].quantity).toFixed(2)}</span>
-                                  </div>
-                                ) : (
-                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: '#F8FAFC', padding: '4px 8px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '0.82rem' }}>
-                                      <span style={{ fontWeight: 700, color: '#0F172A' }}>
-                                        {cartItems[0].quantity}x {cleanDishName(cartItems[0].item_name || cartItems[0].name)}
-                                      </span>
-                                      <span style={{ fontWeight: 700, color: 'var(--color-gold)' }}>₹{parseFloat(cartItems[0].subtotal || cartItems[0].price * cartItems[0].quantity).toFixed(2)}</span>
-                                    </div>
-
-                                    <button
-                                      type="button"
-                                      onClick={() => toggleOrderExpand(`sess_${sess.id}`)}
-                                      style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-between',
-                                        padding: '4px 8px',
-                                        borderRadius: '6px',
-                                        border: '1px solid var(--color-gold)',
-                                        backgroundColor: isExpanded ? '#FEF3C7' : '#FFFFFF',
-                                        color: 'var(--color-gold)',
-                                        fontWeight: 800,
-                                        fontSize: '0.76rem',
-                                        cursor: 'pointer'
-                                      }}
-                                    >
-                                      <span>{isExpanded ? '▲ Hide Dishes' : `▼ + ${cartItems.length - 1} More Dishes`}</span>
-                                      {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                                    </button>
-
-                                    {isExpanded && (
-                                      <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', marginTop: '2px' }}>
-                                        {cartItems.slice(1).map((it, idx) => (
-                                          <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: '#F1F5F9', padding: '4px 8px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.8rem' }}>
-                                            <span style={{ fontWeight: 700, color: '#0F172A' }}>
-                                              {it.quantity}x {cleanDishName(it.item_name || it.name)}
-                                            </span>
-                                            <span style={{ fontWeight: 700, color: 'var(--color-gold)' }}>₹{parseFloat(it.subtotal || it.price * it.quantity).toFixed(2)}</span>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    )}
-                                  </div>
-                                )}
-                              </div>
-                            </td>
-
-                            <td>
-                              <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-gold)' }}>
-                                {sess.order_type}
-                              </span>
-                            </td>
-
-                            <td style={{ fontWeight: 900, fontSize: '1.05rem', color: '#D97706', whiteSpace: 'nowrap' }}>
-                              ₹{parseFloat(sess.total_amount).toFixed(2)}
-                            </td>
-
-                            {/* UTR & Screenshot Column */}
-                            <td>
-                              {sess.utr_number ? (
-                                <div style={{ fontSize: '0.82rem' }}>
-                                  <div style={{ fontFamily: 'monospace', fontWeight: 800, color: '#0F172A' }}>
-                                    UTR: {sess.utr_number}
-                                  </div>
-                                  {sess.payment_screenshot && (
-                                    <button
-                                      type="button"
-                                      onClick={() => setPreviewImage(sess.payment_screenshot)}
-                                      style={{
-                                        border: 'none',
-                                        background: 'none',
-                                        color: '#2563EB',
-                                        fontSize: '0.78rem',
-                                        fontWeight: 800,
-                                        cursor: 'pointer',
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '3px',
-                                        marginTop: '3px',
-                                        padding: 0
-                                      }}
-                                    >
-                                      <ImageIcon size={14} /> View Screenshot
-                                    </button>
-                                  )}
-                                </div>
-                              ) : (
-                                <span style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', fontStyle: 'italic' }}>Pending Proof</span>
-                              )}
-                            </td>
-
-                            <td>{renderSessionBadge(sess.status)}</td>
-
-                            <td>
-                              {(() => {
-                                const fullAddr = sess.delivery_address || sess.deliveryAddress || sess.address || '';
-                                if (fullAddr) {
-                                  return (
-                                    <div style={{ minWidth: '170px', maxWidth: '250px', fontSize: '0.82rem', lineHeight: '1.35' }}>
-                                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '5px' }}>
-                                        <MapPin size={14} color="var(--color-gold)" style={{ flexShrink: 0, marginTop: '2px' }} />
-                                        <div>
-                                          <div style={{ fontWeight: 700, color: '#0F172A', wordBreak: 'break-word' }}>
-                                            {fullAddr}
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  );
-                                }
-                                return (
-                                  <span style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', fontStyle: 'italic' }}>
-                                    {sess.order_type === 'Dine In' ? 'Dine In' : sess.order_type === 'Takeaway' ? 'Takeaway' : 'No Address'}
+                          {/* Ordered Dishes Column */}
+                          <td>
+                            <div style={{ minWidth: '220px', maxWidth: '280px' }}>
+                              {itemCount === 0 ? (
+                                <span style={{ color: 'var(--color-text-muted)', fontStyle: 'italic', fontSize: '0.8rem' }}>No items</span>
+                              ) : itemCount === 1 ? (
+                                <div style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: '#F8FAFC', padding: '4px 8px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '0.82rem' }}>
+                                  <span style={{ fontWeight: 700, color: '#0F172A' }}>
+                                    {itemsList[0].quantity}x {cleanDishName(itemsList[0].item_name)}
                                   </span>
-                                );
-                              })()}
-                            </td>
-
-                            {/* Action Buttons: Approve (Creates Order) / Reject */}
-                            <td>
-                              {sess.status === 'Approved' ? (
-                                <span style={{ color: '#16A34A', fontWeight: 800, fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                  <CheckCircle2 size={16} /> Order #{sess.order_number} Created
-                                </span>
-                              ) : (
-                                <div style={{ display: 'flex', gap: '6px' }}>
-                                  <button
-                                    onClick={() => handleVerifySession(sess.id, 'approve')}
-                                    disabled={verifying}
-                                    style={{
-                                      padding: '6px 12px',
-                                      backgroundColor: '#16A34A',
-                                      color: '#FFFFFF',
-                                      borderRadius: '8px',
-                                      border: 'none',
-                                      cursor: 'pointer',
-                                      fontWeight: 800,
-                                      fontSize: '0.78rem',
-                                      display: 'inline-flex',
-                                      alignItems: 'center',
-                                      gap: '4px',
-                                      boxShadow: '0 2px 6px rgba(22, 163, 74, 0.3)'
-                                    }}
-                                  >
-                                    <CheckCircle size={14} /> Approve Payment
-                                  </button>
-
-                                  <button
-                                    onClick={() => {
-                                      const reason = window.prompt(`Enter rejection reason for session #${sess.payment_ref}:`, 'Payment proof screenshot or UTR invalid.');
-                                      if (reason !== null) {
-                                        handleVerifySession(sess.id, 'reject', reason);
-                                      }
-                                    }}
-                                    disabled={verifying}
-                                    style={{
-                                      padding: '6px 10px',
-                                      backgroundColor: '#FEE2E2',
-                                      color: '#DC2626',
-                                      borderRadius: '8px',
-                                      border: '1px solid #FCA5A5',
-                                      cursor: 'pointer',
-                                      fontWeight: 800,
-                                      fontSize: '0.78rem',
-                                      display: 'inline-flex',
-                                      alignItems: 'center',
-                                      gap: '4px'
-                                    }}
-                                  >
-                                    <XCircle size={14} /> Reject
-                                  </button>
+                                  <span style={{ fontWeight: 700, color: 'var(--color-gold)' }}>₹{parseFloat(itemsList[0].subtotal).toFixed(2)}</span>
                                 </div>
-                              )}
-                            </td>
-
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* TAB 2: CONFIRMED ORDERS (DJ-XXXX) */}
-        {activeTab === 'orders' && (
-          <div>
-            {loading ? (
-              <SkeletonLoader count={6} type="table" />
-            ) : orders.length === 0 ? (
-              <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '3rem', textAlign: 'center', boxShadow: '0 4px 14px rgba(0,0,0,0.04)' }}>
-                <Package size={48} color="var(--color-gold)" style={{ marginBottom: '0.8rem' }} />
-                <h3 style={{ color: '#0F172A', margin: 0 }}>No Confirmed Orders Yet</h3>
-                <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', marginTop: '4px' }}>
-                  Approved payment sessions will appear here as confirmed orders.
-                </p>
-              </div>
-            ) : (
-              <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 14px rgba(0,0,0,0.04)' }}>
-                <div style={{ overflowX: 'auto' }}>
-                  <table className="admin-table">
-                    <thead style={{ backgroundColor: '#0F172A' }}>
-                      <tr style={{ backgroundColor: '#0F172A' }}>
-                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Order No.</th>
-                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Customer</th>
-                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Ordered Dishes</th>
-                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Type</th>
-                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Total</th>
-                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>UTR / Proof</th>
-                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Order Status</th>
-                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Change Kitchen Status</th>
-                        <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Customer Address</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {orders.map((ord, index) => {
-                        const isExpanded = expandedOrders[ord.id];
-                        const itemsList = ord.items || [];
-                        const itemCount = itemsList.length;
-
-                        const rawTimestamp = ord.created_at || (ord.id && !isNaN(Number(ord.id)) ? new Date(Number(ord.id)).toISOString() : null);
-                        const validTimestamp = rawTimestamp && !isNaN(new Date(rawTimestamp).getTime()) ? rawTimestamp : null;
-                        const orderDateObj = validTimestamp ? new Date(validTimestamp) : new Date();
-                        const orderTimeStr = orderDateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-
-                        return (
-                          <tr key={ord.id}>
-                            <td style={{ whiteSpace: 'nowrap' }}>
-                              <div style={{ fontWeight: 900, color: '#0F172A', fontSize: '1.2rem' }}>
-                                {index + 1}
-                              </div>
-                              <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '3px', marginTop: '2px' }}>
-                                <Clock size={12} color="var(--color-gold)" />
-                                <span>{orderTimeStr}</span>
-                              </div>
-                            </td>
-
-                            <td>
-                              <div style={{ fontWeight: 800, color: '#0F172A' }}>{ord.customer_name}</div>
-                              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{ord.customer_phone}</div>
-                            </td>
-
-                            {/* Ordered Dishes Column */}
-                            <td>
-                              <div style={{ minWidth: '220px', maxWidth: '280px' }}>
-                                {itemCount === 0 ? (
-                                  <span style={{ color: 'var(--color-text-muted)', fontStyle: 'italic', fontSize: '0.8rem' }}>No items</span>
-                                ) : itemCount === 1 ? (
+                              ) : (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                                   <div style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: '#F8FAFC', padding: '4px 8px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '0.82rem' }}>
                                     <span style={{ fontWeight: 700, color: '#0F172A' }}>
                                       {itemsList[0].quantity}x {cleanDishName(itemsList[0].item_name)}
                                     </span>
                                     <span style={{ fontWeight: 700, color: 'var(--color-gold)' }}>₹{parseFloat(itemsList[0].subtotal).toFixed(2)}</span>
                                   </div>
-                                ) : (
-                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: '#F8FAFC', padding: '4px 8px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '0.82rem' }}>
-                                      <span style={{ fontWeight: 700, color: '#0F172A' }}>
-                                        {itemsList[0].quantity}x {cleanDishName(itemsList[0].item_name)}
-                                      </span>
-                                      <span style={{ fontWeight: 700, color: 'var(--color-gold)' }}>₹{parseFloat(itemsList[0].subtotal).toFixed(2)}</span>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleOrderExpand(ord.id)}
+                                    style={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'space-between',
+                                      padding: '4px 8px',
+                                      borderRadius: '6px',
+                                      border: '1px solid var(--color-gold)',
+                                      backgroundColor: isExpanded ? '#FEF3C7' : '#FFFFFF',
+                                      color: 'var(--color-gold)',
+                                      fontWeight: 800,
+                                      fontSize: '0.78rem',
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    <span>{isExpanded ? '▲ Hide Extra Dishes' : `▼ + ${itemCount - 1} More Dishes`}</span>
+                                    {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                                  </button>
+
+                                  {isExpanded && (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', marginTop: '2px' }}>
+                                      {itemsList.slice(1).map((it, idx) => (
+                                        <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: '#F1F5F9', padding: '4px 8px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.8rem' }}>
+                                          <span style={{ fontWeight: 700, color: '#0F172A' }}>
+                                            {it.quantity}x {cleanDishName(it.item_name)}
+                                          </span>
+                                          <span style={{ fontWeight: 700, color: 'var(--color-gold)' }}>₹{parseFloat(it.subtotal).toFixed(2)}</span>
+                                        </div>
+                                      ))}
                                     </div>
-
-                                    <button
-                                      type="button"
-                                      onClick={() => toggleOrderExpand(ord.id)}
-                                      style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-between',
-                                        padding: '4px 8px',
-                                        borderRadius: '6px',
-                                        border: '1px solid var(--color-gold)',
-                                        backgroundColor: isExpanded ? '#FEF3C7' : '#FFFFFF',
-                                        color: 'var(--color-gold)',
-                                        fontWeight: 800,
-                                        fontSize: '0.78rem',
-                                        cursor: 'pointer'
-                                      }}
-                                    >
-                                      <span>{isExpanded ? '▲ Hide Extra Dishes' : `▼ + ${itemCount - 1} More Dishes`}</span>
-                                      {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                                    </button>
-
-                                    {isExpanded && (
-                                      <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', marginTop: '2px' }}>
-                                        {itemsList.slice(1).map((it, idx) => (
-                                          <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: '#F1F5F9', padding: '4px 8px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.8rem' }}>
-                                            <span style={{ fontWeight: 700, color: '#0F172A' }}>
-                                              {it.quantity}x {cleanDishName(it.item_name)}
-                                            </span>
-                                            <span style={{ fontWeight: 700, color: 'var(--color-gold)' }}>₹{parseFloat(it.subtotal).toFixed(2)}</span>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    )}
-                                  </div>
-                                )}
-                              </div>
-                            </td>
-
-                            <td>
-                              <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-gold)' }}>
-                                {ord.order_type}
-                              </span>
-                            </td>
-
-                            <td style={{ fontWeight: 900, whiteSpace: 'nowrap' }}>₹{parseFloat(ord.total_amount).toFixed(2)}</td>
-
-                            <td>
-                              {ord.utr_number ? (
-                                <div style={{ fontSize: '0.8rem' }}>
-                                  <div style={{ fontFamily: 'monospace', fontWeight: 700, color: '#0F172A' }}>
-                                    UTR: {ord.utr_number}
-                                  </div>
-                                  {ord.payment_screenshot && (
-                                    <button
-                                      type="button"
-                                      onClick={() => setPreviewImage(ord.payment_screenshot)}
-                                      style={{ border: 'none', background: 'none', color: '#2563EB', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '3px', marginTop: '2px', padding: 0 }}
-                                    >
-                                      <ImageIcon size={13} /> View Proof
-                                    </button>
                                   )}
                                 </div>
-                              ) : (
-                                <span style={{ color: '#16A34A', fontWeight: 700, fontSize: '0.78rem' }}>Verified ✓</span>
                               )}
-                            </td>
+                            </div>
+                          </td>
 
-                            <td><StatusBadge status={ord.status} /></td>
+                          <td>
+                            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-gold)' }}>
+                              {ord.order_type}
+                            </span>
+                          </td>
 
-                            <td>
-                              <select
-                                value={ord.status}
-                                onChange={(e) => handleStatusUpdate(ord.id, e.target.value)}
-                                style={{
-                                  padding: '0.35rem 0.6rem',
-                                  borderRadius: '8px',
-                                  fontSize: '0.8rem',
-                                  fontWeight: 700,
-                                  outline: 'none',
-                                  border: '1px solid var(--color-border)',
-                                  backgroundColor: '#FFFFFF',
-                                  cursor: 'pointer'
-                                }}
-                              >
-                                <option value="Pending">Pending</option>
-                                <option value="Confirmed">Confirmed</option>
-                                <option value="Preparing">Preparing</option>
-                                <option value="Ready">Ready</option>
-                                {ord.order_type === 'Home Delivery' && <option value="Out for Delivery">Out for Delivery</option>}
-                                <option value="Completed">Completed</option>
-                                <option value="Cancelled">Cancelled</option>
-                              </select>
-                            </td>
+                          <td style={{ fontWeight: 900, whiteSpace: 'nowrap' }}>₹{parseFloat(ord.total_amount).toFixed(2)}</td>
 
-                            <td>
-                              {(() => {
-                                const fullAddr = ord.delivery_address || ord.deliveryAddress || ord.address || ord.customer_address || ord.customerAddress || '';
-                                const extraDetails = [ord.landmark, ord.city, ord.pincode].filter(Boolean).join(', ');
+                          <td>
+                            {ord.utr_number ? (
+                              <div style={{ fontSize: '0.8rem' }}>
+                                <div style={{ fontFamily: 'monospace', fontWeight: 700, color: '#0F172A' }}>
+                                  UTR: {ord.utr_number}
+                                </div>
+                                {ord.payment_screenshot && (
+                                  <button
+                                    type="button"
+                                    onClick={() => setPreviewImage(ord.payment_screenshot)}
+                                    style={{ border: 'none', background: 'none', color: '#2563EB', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '3px', marginTop: '2px', padding: 0 }}
+                                  >
+                                    <ImageIcon size={13} /> View Proof
+                                  </button>
+                                )}
+                              </div>
+                            ) : (
+                              <span style={{ color: '#16A34A', fontWeight: 700, fontSize: '0.78rem' }}>Verified ✓</span>
+                            )}
+                          </td>
 
-                                if (fullAddr || extraDetails) {
-                                  return (
-                                    <div style={{ minWidth: '170px', maxWidth: '250px', fontSize: '0.82rem', lineHeight: '1.35' }}>
-                                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '5px' }}>
-                                        <MapPin size={14} color="var(--color-gold)" style={{ flexShrink: 0, marginTop: '2px' }} />
-                                        <div>
-                                          <div style={{ fontWeight: 700, color: '#0F172A', wordBreak: 'break-word' }}>
-                                            {fullAddr || extraDetails}
-                                          </div>
-                                          {fullAddr && extraDetails && (!ord.city || !fullAddr.includes(ord.city)) && (
-                                            <div style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
-                                              {extraDetails}
-                                            </div>
-                                          )}
+                          <td><StatusBadge status={ord.status} /></td>
+
+                          <td>
+                            <select
+                              value={ord.status}
+                              onChange={(e) => handleStatusUpdate(ord.id, e.target.value)}
+                              style={{
+                                padding: '0.35rem 0.6rem',
+                                borderRadius: '8px',
+                                fontSize: '0.8rem',
+                                fontWeight: 700,
+                                outline: 'none',
+                                border: '1px solid var(--color-border)',
+                                backgroundColor: '#FFFFFF',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              <option value="Pending">Pending</option>
+                              <option value="Confirmed">Confirmed</option>
+                              <option value="Preparing">Preparing</option>
+                              <option value="Ready">Ready</option>
+                              {ord.order_type === 'Home Delivery' && <option value="Out for Delivery">Out for Delivery</option>}
+                              <option value="Completed">Completed</option>
+                              <option value="Cancelled">Cancelled</option>
+                            </select>
+                          </td>
+
+                          <td>
+                            {(() => {
+                              const fullAddr = ord.delivery_address || ord.deliveryAddress || ord.address || ord.customer_address || ord.customerAddress || '';
+                              const extraDetails = [ord.landmark, ord.city, ord.pincode].filter(Boolean).join(', ');
+
+                              if (fullAddr || extraDetails) {
+                                return (
+                                  <div style={{ minWidth: '170px', maxWidth: '250px', fontSize: '0.82rem', lineHeight: '1.35' }}>
+                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '5px' }}>
+                                      <MapPin size={14} color="var(--color-gold)" style={{ flexShrink: 0, marginTop: '2px' }} />
+                                      <div>
+                                        <div style={{ fontWeight: 700, color: '#0F172A', wordBreak: 'break-word' }}>
+                                          {fullAddr || extraDetails}
                                         </div>
+                                        {fullAddr && extraDetails && (!ord.city || !fullAddr.includes(ord.city)) && (
+                                          <div style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+                                            {extraDetails}
+                                          </div>
+                                        )}
                                       </div>
                                     </div>
-                                  );
-                                }
-
-                                return (
-                                  <span style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', fontStyle: 'italic' }}>
-                                    {ord.order_type === 'Dine In' ? 'Dine In' : ord.order_type === 'Takeaway' ? 'Takeaway' : 'No Address Provided'}
-                                  </span>
+                                  </div>
                                 );
-                              })()}
-                            </td>
+                              }
 
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
+                              return (
+                                <span style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', fontStyle: 'italic' }}>
+                                  {ord.order_type === 'Dine In' ? 'Dine In' : ord.order_type === 'Takeaway' ? 'Takeaway' : 'No Address Provided'}
+                                </span>
+                              );
+                            })()}
+                          </td>
+
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
-            )}
-          </div>
-        )}
+            </div>
+          )}
+        </div>
 
       </main>
 
