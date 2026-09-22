@@ -268,7 +268,7 @@ const AdminOrders = () => {
                       <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Ordered Dishes</th>
                       <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Type</th>
                       <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Total</th>
-                      <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>UTR / Proof</th>
+                      <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Payment Mode</th>
                       <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Order Status</th>
                       <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Change Kitchen Status</th>
                       <th style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}>Customer Address</th>
@@ -370,7 +370,15 @@ const AdminOrders = () => {
                           <td style={{ fontWeight: 900, whiteSpace: 'nowrap' }}>₹{parseFloat(ord.total_amount).toFixed(2)}</td>
 
                           <td>
-                            {ord.utr_number ? (
+                            {ord.payment_method === 'Cash on Delivery' || ord.payment_status === 'Cash on Delivery' ? (
+                              <span style={{ backgroundColor: '#DCFCE7', color: '#166534', padding: '4px 10px', borderRadius: '8px', fontWeight: 800, fontSize: '0.78rem', display: 'inline-block', border: '1px solid #86EFAC' }}>
+                                💵 Cash on Delivery
+                              </span>
+                            ) : ord.payment_method === 'Pay at Counter' || ord.payment_status === 'Pay at Counter' ? (
+                              <span style={{ backgroundColor: '#FEF3C7', color: '#B45309', padding: '4px 10px', borderRadius: '8px', fontWeight: 800, fontSize: '0.78rem', display: 'inline-block', border: '1px solid #FCD34D' }}>
+                                🏪 Pay at Counter
+                              </span>
+                            ) : ord.utr_number ? (
                               <div style={{ fontSize: '0.8rem' }}>
                                 <div style={{ fontFamily: 'monospace', fontWeight: 700, color: '#0F172A' }}>
                                   UTR: {ord.utr_number}
@@ -386,7 +394,9 @@ const AdminOrders = () => {
                                 )}
                               </div>
                             ) : (
-                              <span style={{ color: '#16A34A', fontWeight: 700, fontSize: '0.78rem' }}>Verified ✓</span>
+                              <span style={{ backgroundColor: '#EFF6FF', color: '#1D4ED8', padding: '4px 10px', borderRadius: '8px', fontWeight: 800, fontSize: '0.78rem', display: 'inline-block', border: '1px solid #BFDBFE' }}>
+                                Online UPI ✓
+                              </span>
                             )}
                           </td>
 

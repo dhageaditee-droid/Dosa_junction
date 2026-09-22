@@ -981,6 +981,68 @@ export const apiService = {
     };
   },
 
+  confirmSessionOrder: async (paymentRef, paymentMethod = 'Cash on Delivery') => {
+    try {
+      const res = await apiCall(`/payment-sessions/admin/payment-sessions/${paymentRef}/verify`, 'PATCH', {
+        action: 'approve',
+        paymentMethod,
+        paymentStatus: paymentMethod === 'Cash on Delivery' ? 'Cash on Delivery' : paymentMethod === 'Pay at Counter' ? 'Pay at Counter' : 'Online Paid'
+      });
+      if (res && res.success && res.order) {
+        await pushOrderToCloudSync(res.order);
+        return res;
+      }
+    } catch (err) {}
+
+    const savedSessions = JSON.parse(localStorage.getItem('dakshin_payment_sessions') || '[]');
+    const allOrders = JSON.parse(localStorage.getItem('dakshin_all_orders') || '[]');
+    let targetSession = savedSessions.find(s => String(s.payment_ref) === String(paymentRef) || String(s.id) === String(paymentRef));
+
+    const orderNum = `DJ-${Math.floor(1000 + Math.random() * 9000)}`;
+    const cartItems = targetSession ? (typeof targetSession.cart_items === 'string' ? JSON.parse(targetSession.cart_items) : (targetSession.cart_items || [])) : [];
+
+    const createdOrder = {
+      id: Date.now(),
+      order_number: orderNum,
+      customer_name: targetSession?.customer_name || 'Customer',
+      customer_phone: targetSession?.customer_phone || '',
+      customer_email: targetSession?.customer_email || '',
+      delivery_address: targetSession?.delivery_address || '',
+      order_type: targetSession?.order_type || 'Home Delivery',
+      payment_method: paymentMethod,
+      payment_status: paymentMethod === 'Cash on Delivery' ? 'Cash on Delivery' : paymentMethod === 'Pay at Counter' ? 'Pay at Counter' : 'Payment Verified',
+      status: 'Confirmed',
+      subtotal: targetSession?.subtotal || 0,
+      tax: targetSession?.tax || 0,
+      packing_charge: targetSession?.packing_charge || 0,
+      delivery_charge: targetSession?.delivery_charge || 0,
+      discount_amount: targetSession?.discount_amount || 0,
+      total_amount: targetSession?.total_amount || 0,
+      items: cartItems,
+      created_at: new Date().toISOString()
+    };
+
+    await pushOrderToCloudSync(createdOrder);
+
+    if (targetSession) {
+      targetSession = {
+        ...targetSession,
+        status: 'Approved',
+        order_number: createdOrder.order_number,
+        payment_method: paymentMethod
+      };
+      const updatedSessions = savedSessions.map(s => s.id === targetSession.id ? targetSession : s);
+      localStorage.setItem('dakshin_payment_sessions', JSON.stringify(updatedSessions));
+    }
+
+    return {
+      success: true,
+      message: `Order confirmed successfully with ${paymentMethod}!`,
+      order: createdOrder,
+      session: targetSession
+    };
+  },
+
   // Orders & Checkout (Supports Vercel Realtime Serverless Sync)
   createOrder: async (orderData) => {
     try {

@@ -199,10 +199,45 @@ const TrackOrderPage = () => {
               </div>
             )}
 
-            {/* Dynamic UPI Payment Module */}
+            {/* Dynamic UPI Payment or Cash on Delivery Module */}
             {order && (
               <div style={{ marginBottom: '1.8rem' }}>
-                <DynamicUpiPayment order={order} onPaymentSubmitted={(updated) => setOrder(updated)} />
+                {order.payment_method === 'Cash on Delivery' || order.payment_status === 'Cash on Delivery' ? (
+                  <div style={{
+                    backgroundColor: '#F0FDF4',
+                    border: '1.5px solid #86EFAC',
+                    borderRadius: '18px',
+                    padding: '1.4rem',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#166534', fontWeight: 900, fontSize: '1.15rem' }}>
+                      <Truck size={24} color="#16A34A" /> Cash on Delivery (COD) Order Confirmed ✓
+                    </div>
+                    <p style={{ margin: '0.4rem 0 0 0', color: '#15803D', fontSize: '0.92rem', fontWeight: 700 }}>
+                      कृपया डिलिव्हरी आल्यावर ₹{parseFloat(order.total_amount).toFixed(2)} रोख (Cash) किंवा UPI द्वारे डिलिव्हरी पार्टनरला द्या.
+                    </p>
+                    <span style={{ fontSize: '0.8rem', color: '#166534', marginTop: '4px', display: 'block' }}>
+                      (Please keep ₹{parseFloat(order.total_amount).toFixed(2)} cash ready upon delivery)
+                    </span>
+                  </div>
+                ) : order.payment_method === 'Pay at Counter' || order.payment_status === 'Pay at Counter' ? (
+                  <div style={{
+                    backgroundColor: '#FFFBEB',
+                    border: '1.5px solid #FCD34D',
+                    borderRadius: '18px',
+                    padding: '1.4rem',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#92400E', fontWeight: 900, fontSize: '1.15rem' }}>
+                      🏪 Pay at Counter Order Confirmed ✓
+                    </div>
+                    <p style={{ margin: '0.4rem 0 0 0', color: '#B45309', fontSize: '0.92rem', fontWeight: 700 }}>
+                      कृपया हॉटेल काऊंटरवर ₹{parseFloat(order.total_amount).toFixed(2)} रोख किंवा UPI द्वारे द्या.
+                    </p>
+                  </div>
+                ) : (
+                  <DynamicUpiPayment order={order} onPaymentSubmitted={(updated) => setOrder(updated)} />
+                )}
               </div>
             )}
 

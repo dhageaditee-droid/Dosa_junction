@@ -144,12 +144,31 @@ const CheckoutPage = () => {
         }))
       };
 
+      if (formData.paymentMethod === 'Cash on Delivery' || formData.paymentMethod === 'Pay at Counter') {
+        const orderRes = await apiService.createOrder({
+          ...payload,
+          paymentStatus: formData.paymentMethod === 'Cash on Delivery' ? 'Cash on Delivery' : 'Pay at Counter',
+          status: 'Confirmed'
+        });
+        if (orderRes && orderRes.success && orderRes.order) {
+          if (addToast) addToast(`Order confirmed with ${formData.paymentMethod}! 🎉`, 'success');
+          clearCart();
+          navigate(`/track-order?orderNumber=${orderRes.order.order_number}`, { state: { order: orderRes.order } });
+          return;
+        }
+      }
+
       const res = await apiService.createPaymentSession(payload);
 
       if (res.success) {
-        if (addToast) addToast('Order created! Please complete your UPI payment. ⚡', 'success');
+        if (addToast) addToast('Order created! Please complete your payment. ⚡', 'success');
         clearCart();
-        navigate(`/payment/${res.paymentRef}`, { state: { session: res.session } });
+        navigate(`/payment/${res.paymentRef}`, {
+          state: {
+            session: res.session,
+            initialMode: formData.paymentMethod === 'Cash on Delivery' ? 'cod' : formData.paymentMethod === 'Pay at Counter' ? 'counter' : 'online'
+          }
+        });
       }
     } catch (err) {
       if (addToast) addToast(err.message || 'Order submission failed.', 'error');
@@ -349,6 +368,50 @@ const CheckoutPage = () => {
                     </div>
                   )}
 
+                </div>
+              </div>
+
+              {/* 3. Choose Payment Method */}
+              <div style={{ backgroundColor: '#FFFFFF', padding: '1.8rem', borderRadius: '24px', border: '1px solid var(--color-border)', boxShadow: '0 6px 20px rgba(0,0,0,0.03)' }}>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 900, color: '#064E3B', marginBottom: '1.2rem' }}>
+                  3. Payment Method
+                </h3>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.85rem' }}>
+                  {[
+                    { id: 'Online UPI Payment', label: 'Online UPI / Apps', icon: Smartphone, desc: 'GPay, PhonePe, Paytm' },
+                    { id: 'Cash on Delivery', label: 'Cash on Delivery', icon: Truck, desc: 'Pay cash on delivery' },
+                    { id: 'Pay at Counter', label: 'Pay at Counter', icon: Store, desc: 'Pay cash at hotel counter' }
+                  ].map((pay) => {
+                    const IconComp = pay.icon;
+                    const isSelected = formData.paymentMethod === pay.id;
+                    return (
+                      <button
+                        key={pay.id}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, paymentMethod: pay.id })}
+                        style={{
+                          padding: '1rem 0.8rem',
+                          borderRadius: '16px',
+                          cursor: 'pointer',
+                          textAlign: 'center',
+                          border: isSelected ? '2px solid #EA580C' : '1.5px solid #E5E7EB',
+                          backgroundColor: isSelected ? '#FFFBEB' : '#FFFFFF',
+                          color: isSelected ? '#EA580C' : '#374151',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          gap: '6px',
+                          boxShadow: isSelected ? '0 4px 14px rgba(234, 88, 12, 0.15)' : 'none',
+                          transition: 'var(--transition-fast)'
+                        }}
+                      >
+                        <IconComp size={24} color={isSelected ? '#EA580C' : '#6B7280'} />
+                        <span style={{ fontSize: '0.88rem', fontWeight: 800 }}>{pay.label}</span>
+                        <span style={{ fontSize: '0.72rem', color: '#6B7280' }}>{pay.desc}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 

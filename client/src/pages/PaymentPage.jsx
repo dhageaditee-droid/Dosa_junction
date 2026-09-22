@@ -21,7 +21,11 @@ import {
   QrCode,
   Lock,
   RotateCcw,
-  CreditCard
+  CreditCard,
+  Truck,
+  Store,
+  Banknote,
+  Check
 } from 'lucide-react';
 import SEOHead from '../components/SEOHead';
 import { apiService } from '../services/api';
@@ -41,6 +45,7 @@ const PaymentPage = () => {
   const [errorMsg, setErrorMsg] = useState('');
   const [showOrderDetails, setShowOrderDetails] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [paymentMode, setPaymentMode] = useState(location.state?.initialMode || 'online'); // 'online' | 'cod' | 'counter'
 
   useEffect(() => {
     const checkMobile = () => {
@@ -79,6 +84,26 @@ const PaymentPage = () => {
   const totalAmountFormatted = totalAmountNum.toFixed(2);
   const upiId = 'Pos.11424716@indus';
   const cleanRef = (paymentRef || 'DJ1001').replace(/[^a-zA-Z0-9]/g, '');
+
+  const handleConfirmDirectOrder = async (methodName) => {
+    try {
+      setSubmitting(true);
+      setErrorMsg('');
+      const res = await apiService.confirmSessionOrder(paymentRef, methodName);
+      if (res && res.success && res.order) {
+        if (addToast) addToast(`Order confirmed successfully with ${methodName}! 🎉`, 'success');
+        setOrder(res.order);
+        if (res.session) setSession(res.session);
+        navigate(`/track-order?orderNumber=${res.order.order_number}`, { state: { order: res.order } });
+      }
+    } catch (err) {
+      const msg = err.message || 'Failed to confirm order.';
+      setErrorMsg(msg);
+      if (addToast) addToast(msg, 'error');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   // Safely construct standard UPI Payment URI using URLSearchParams
   // pa = Pos.11424716@indus, pn = Dosa Junction, tr = UNIQUE_REFERENCE, tn = Order UNIQUE_REFERENCE, am = EXACT_FINAL_AMOUNT, cu = INR
@@ -343,38 +368,94 @@ const PaymentPage = () => {
               </div>
             ) : null}
 
-            {/* Main Payment Card */}
+            {/* Main Payment Container */}
             {!isApproved && (
-              <div style={{
-                backgroundColor: '#FFFFFF',
-                borderRadius: '24px',
-                padding: '2rem',
-                boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
-                border: '1px solid #E5E7EB',
-                marginBottom: '1.5rem',
-                textAlign: 'center'
-              }}>
+              <div>
                 
-                {/* Payee Info & Dynamic Amount Display */}
+                {/* 3 Payment Mode Selection Tabs */}
                 <div style={{
-                  backgroundColor: '#FFFBEB',
-                  border: '2px dashed #FCD34D',
-                  borderRadius: '20px',
-                  padding: '1.2rem 1.6rem',
-                  marginBottom: '1.5rem'
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: '0.65rem',
+                  marginBottom: '1.4rem'
                 }}>
-                  <span style={{ fontSize: '0.8rem', color: '#B45309', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block' }}>
-                    Amount to Pay
-                  </span>
-                  <div style={{ fontSize: '2.6rem', fontWeight: 900, color: '#EA580C', letterSpacing: '-0.5px', margin: '2px 0' }}>
-                    ₹{totalAmountFormatted}
-                  </div>
-                  <div style={{ fontSize: '0.85rem', color: '#78350F', fontWeight: 700 }}>
-                    Payee: <strong>Dosa Junction</strong>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMode('online')}
+                    style={{
+                      padding: '0.9rem 0.4rem',
+                      borderRadius: '16px',
+                      border: paymentMode === 'online' ? '2.5px solid #EA580C' : '1.5px solid #E5E7EB',
+                      backgroundColor: paymentMode === 'online' ? '#FFFBEB' : '#FFFFFF',
+                      color: paymentMode === 'online' ? '#EA580C' : '#4B5563',
+                      fontWeight: 800,
+                      fontSize: '0.82rem',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '4px',
+                      boxShadow: paymentMode === 'online' ? '0 4px 14px rgba(234, 88, 12, 0.2)' : '0 2px 6px rgba(0,0,0,0.02)',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <Smartphone size={22} color={paymentMode === 'online' ? '#EA580C' : '#6B7280'} />
+                    <span style={{ fontWeight: 900 }}>Pay Online</span>
+                    <span style={{ fontSize: '0.7rem', color: paymentMode === 'online' ? '#B45309' : '#9CA3AF' }}>(UPI / Apps)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMode('cod')}
+                    style={{
+                      padding: '0.9rem 0.4rem',
+                      borderRadius: '16px',
+                      border: paymentMode === 'cod' ? '2.5px solid #16A34A' : '1.5px solid #BBF7D0',
+                      backgroundColor: paymentMode === 'cod' ? '#F0FDF4' : '#F8FAFC',
+                      color: paymentMode === 'cod' ? '#16A34A' : '#15803D',
+                      fontWeight: 800,
+                      fontSize: '0.82rem',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '4px',
+                      boxShadow: paymentMode === 'cod' ? '0 4px 14px rgba(22, 163, 74, 0.25)' : '0 2px 6px rgba(0,0,0,0.02)',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <Truck size={22} color={paymentMode === 'cod' ? '#16A34A' : '#15803D'} />
+                    <span style={{ fontWeight: 900 }}>Cash on Delivery</span>
+                    <span style={{ fontSize: '0.7rem', color: paymentMode === 'cod' ? '#166534' : '#15803D', fontWeight: 700 }}>(COD)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMode('counter')}
+                    style={{
+                      padding: '0.9rem 0.4rem',
+                      borderRadius: '16px',
+                      border: paymentMode === 'counter' ? '2.5px solid #D97706' : '1.5px solid #E5E7EB',
+                      backgroundColor: paymentMode === 'counter' ? '#FFFBEB' : '#FFFFFF',
+                      color: paymentMode === 'counter' ? '#D97706' : '#4B5563',
+                      fontWeight: 800,
+                      fontSize: '0.82rem',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '4px',
+                      boxShadow: paymentMode === 'counter' ? '0 4px 14px rgba(217, 119, 6, 0.2)' : '0 2px 6px rgba(0,0,0,0.02)',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <Store size={22} color={paymentMode === 'counter' ? '#D97706' : '#6B7280'} />
+                    <span style={{ fontWeight: 900 }}>Pay at Counter</span>
+                    <span style={{ fontSize: '0.7rem', color: paymentMode === 'counter' ? '#B45309' : '#9CA3AF' }}>(काऊंटर)</span>
+                  </button>
                 </div>
 
-                {/* Error Message if any */}
+                {/* Error Message */}
                 {errorMsg && (
                   <div style={{
                     backgroundColor: '#FEF2F2',
@@ -390,266 +471,510 @@ const PaymentPage = () => {
                   </div>
                 )}
 
-                {/* Helpful Bank Decline Notice for IndusInd POS VPAs */}
-                <div style={{
-                  backgroundColor: '#EFF6FF',
-                  border: '1.5px solid #BFDBFE',
-                  borderRadius: '16px',
-                  padding: '0.9rem 1.1rem',
-                  marginBottom: '1.2rem',
-                  textAlign: 'left',
-                  fontSize: '0.84rem',
-                  lineHeight: 1.45,
-                  color: '#1E40AF'
-                }}>
-                  <div style={{ fontWeight: 800, color: '#1D4ED8', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                    <Info size={16} color="#2563EB" /> Bank Declined Note for PhonePe / GPay:
-                  </div>
-                  If PhonePe shows <em>"Bank declined for security reasons"</em>, please click <strong>COPY UPI ID</strong> below to pay directly on PhonePe / GPay.
-                </div>
-
-                {/* Option 1: Large Primary "Pay Now" Button */}
-                <a
-                  href={exactUpiUri}
-                  style={{
-                    width: '100%',
-                    padding: '1.15rem 1.5rem',
-                    borderRadius: '18px',
-                    background: 'linear-gradient(135deg, #EA580C 0%, #D97706 100%)',
-                    color: '#FFFFFF',
-                    border: 'none',
-                    boxShadow: '0 8px 24px rgba(234, 88, 12, 0.35)',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    marginBottom: '1.2rem',
-                    textDecoration: 'none',
-                    boxSizing: 'border-box'
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div style={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.25)',
-                      borderRadius: '10px',
-                      width: '38px',
-                      height: '38px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}>
-                      <Smartphone size={22} color="#FFFFFF" />
-                    </div>
-                    <span style={{ fontSize: '1.3rem', fontWeight: 900, letterSpacing: '-0.2px' }}>
-                      Pay Now
-                    </span>
-                  </div>
-                  
+                {/* MODE 1: CASH ON DELIVERY (COD) */}
+                {paymentMode === 'cod' && (
                   <div style={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.25)',
-                    borderRadius: '50%',
-                    width: '36px',
-                    height: '36px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '24px',
+                    padding: '2rem',
+                    boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
+                    border: '1.5px solid #BBF7D0',
+                    marginBottom: '1.5rem',
+                    textAlign: 'center'
                   }}>
-                    <ArrowRight size={22} color="#FFFFFF" />
+                    <div style={{
+                      width: '64px',
+                      height: '64px',
+                      borderRadius: '50%',
+                      backgroundColor: '#DCFCE7',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      margin: '0 auto 1rem auto'
+                    }}>
+                      <Truck size={32} color="#16A34A" />
+                    </div>
+
+                    <h3 style={{ fontSize: '1.4rem', fontWeight: 900, color: '#064E3B', margin: '0 0 0.4rem 0' }}>
+                      Cash on Delivery (COD)
+                    </h3>
+                    <p style={{ color: '#4B5563', fontSize: '0.9rem', maxWidth: '380px', margin: '0 auto 1.4rem auto', lineHeight: 1.45 }}>
+                      घरी डिलिव्हरी आल्यावर डिलिव्हरी पार्टनरला रोख (Cash) किंवा UPI ने पैसे द्या.
+                    </p>
+
+                    {/* Amount Highlight */}
+                    <div style={{
+                      backgroundColor: '#F0FDF4',
+                      border: '1.5px dashed #86EFAC',
+                      borderRadius: '18px',
+                      padding: '1.2rem',
+                      marginBottom: '1.5rem'
+                    }}>
+                      <span style={{ fontSize: '0.8rem', color: '#166534', fontWeight: 800, textTransform: 'uppercase' }}>
+                        Amount to Pay upon Delivery
+                      </span>
+                      <div style={{ fontSize: '2.4rem', fontWeight: 900, color: '#15803D', margin: '2px 0' }}>
+                        ₹{totalAmountFormatted}
+                      </div>
+                      <span style={{ fontSize: '0.8rem', color: '#166534' }}>
+                        No advance payment needed
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      disabled={submitting}
+                      onClick={() => handleConfirmDirectOrder('Cash on Delivery')}
+                      style={{
+                        width: '100%',
+                        padding: '1.15rem 1.5rem',
+                        borderRadius: '18px',
+                        background: 'linear-gradient(135deg, #16A34A 0%, #15803D 100%)',
+                        color: '#FFFFFF',
+                        border: 'none',
+                        fontSize: '1.15rem',
+                        fontWeight: 900,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '10px',
+                        boxShadow: '0 8px 24px rgba(22, 163, 74, 0.35)'
+                      }}
+                    >
+                      {submitting ? 'Placing Order...' : 'Place Order with Cash on Delivery (COD)'} <ArrowRight size={20} />
+                    </button>
                   </div>
-                </a>
+                )}
 
-                {/* App Direct Launch Cards */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.65rem', marginBottom: '1.4rem' }}>
-                  <a
-                    href={phonepeUri}
-                    style={{
-                      backgroundColor: '#5F259F',
-                      color: '#FFFFFF',
-                      borderRadius: '14px',
-                      padding: '0.8rem 0.4rem',
-                      textDecoration: 'none',
+                {/* MODE 2: PAY AT COUNTER (CASH / CUSTOMER PAY) */}
+                {paymentMode === 'counter' && (
+                  <div style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '24px',
+                    padding: '2rem',
+                    boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
+                    border: '1.5px solid #FCD34D',
+                    marginBottom: '1.5rem',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{
+                      width: '64px',
+                      height: '64px',
+                      borderRadius: '50%',
+                      backgroundColor: '#FEF3C7',
                       display: 'flex',
-                      flexDirection: 'column',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      gap: '4px',
-                      boxShadow: '0 4px 12px rgba(95, 37, 159, 0.2)'
-                    }}
-                  >
-                    <span style={{ fontSize: '0.82rem', fontWeight: 800 }}>PhonePe</span>
-                  </a>
+                      margin: '0 auto 1rem auto'
+                    }}>
+                      <Store size={32} color="#D97706" />
+                    </div>
 
-                  <a
-                    href={gpayUri}
-                    style={{
-                      backgroundColor: '#FFFFFF',
-                      border: '1.5px solid #E5E7EB',
-                      color: '#374151',
-                      borderRadius: '14px',
-                      padding: '0.8rem 0.4rem',
-                      textDecoration: 'none',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '4px'
-                    }}
-                  >
-                    <span style={{ fontSize: '0.82rem', fontWeight: 800 }}>Google Pay</span>
-                  </a>
+                    <h3 style={{ fontSize: '1.4rem', fontWeight: 900, color: '#064E3B', margin: '0 0 0.4rem 0' }}>
+                      Pay at Restaurant Counter
+                    </h3>
+                    <p style={{ color: '#4B5563', fontSize: '0.9rem', maxWidth: '380px', margin: '0 auto 1.4rem auto', lineHeight: 1.45 }}>
+                      हॉटेल काऊंटरवर थेट रोख (Cash), QR कोड किंवा कार्डने पैसे द्या.
+                    </p>
 
-                  <a
-                    href={paytmUri}
-                    style={{
-                      backgroundColor: '#FFFFFF',
-                      border: '1.5px solid #E5E7EB',
-                      color: '#00BAF2',
-                      borderRadius: '14px',
-                      padding: '0.8rem 0.4rem',
-                      textDecoration: 'none',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '4px'
-                    }}
-                  >
-                    <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#00BAF2' }}>Paytm</span>
-                  </a>
-                </div>
+                    {/* Amount Highlight */}
+                    <div style={{
+                      backgroundColor: '#FFFBEB',
+                      border: '1.5px dashed #FCD34D',
+                      borderRadius: '18px',
+                      padding: '1.2rem',
+                      marginBottom: '1.5rem'
+                    }}>
+                      <span style={{ fontSize: '0.8rem', color: '#B45309', fontWeight: 800, textTransform: 'uppercase' }}>
+                        Amount to Pay at Counter
+                      </span>
+                      <div style={{ fontSize: '2.4rem', fontWeight: 900, color: '#D97706', margin: '2px 0' }}>
+                        ₹{totalAmountFormatted}
+                      </div>
+                      <span style={{ fontSize: '0.8rem', color: '#78350F' }}>
+                        Pay cash directly at Dosa Junction
+                      </span>
+                    </div>
 
-
-
-                {/* Copy UPI ID Bar */}
-                <div style={{
-                  backgroundColor: '#F3F4F6',
-                  borderRadius: '16px',
-                  padding: '0.85rem 1.2rem',
-                  marginBottom: '1.2rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: '0.5rem'
-                }}>
-                  <div style={{ textAlign: 'left' }}>
-                    <span style={{ fontSize: '0.72rem', color: '#6B7280', fontWeight: 700, display: 'block', textTransform: 'uppercase' }}>UPI ID</span>
-                    <strong style={{ fontSize: '1rem', color: '#111827', fontFamily: 'monospace' }}>{upiId}</strong>
+                    <button
+                      type="button"
+                      disabled={submitting}
+                      onClick={() => handleConfirmDirectOrder('Pay at Counter')}
+                      style={{
+                        width: '100%',
+                        padding: '1.15rem 1.5rem',
+                        borderRadius: '18px',
+                        background: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)',
+                        color: '#FFFFFF',
+                        border: 'none',
+                        fontSize: '1.15rem',
+                        fontWeight: 900,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '10px',
+                        boxShadow: '0 8px 24px rgba(217, 119, 6, 0.35)'
+                      }}
+                    >
+                      {submitting ? 'Confirming Order...' : 'Confirm & Pay at Counter'} <ArrowRight size={20} />
+                    </button>
                   </div>
+                )}
 
-                  <button
-                    type="button"
-                    onClick={handleCopyUpiId}
-                    style={{
-                      backgroundColor: '#EA580C',
-                      color: '#FFFFFF',
-                      border: 'none',
-                      borderRadius: '10px',
-                      padding: '0.45rem 1rem',
-                      fontSize: '0.82rem',
-                      fontWeight: 800,
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      boxShadow: '0 2px 8px rgba(234, 88, 12, 0.25)'
-                    }}
-                  >
-                    <Copy size={13} /> COPY
-                  </button>
-                </div>
+                {/* MODE 3: PAY ONLINE (UPI / APPS) */}
+                {paymentMode === 'online' && (
+                  <div>
+                    {/* Main Payment Card */}
+                    <div style={{
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '24px',
+                      padding: '2rem',
+                      boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
+                      border: '1px solid #E5E7EB',
+                      marginBottom: '1.5rem',
+                      textAlign: 'center'
+                    }}>
+                      
+                      {/* Payee Info & Dynamic Amount Display */}
+                      <div style={{
+                        backgroundColor: '#FFFBEB',
+                        border: '2px dashed #FCD34D',
+                        borderRadius: '20px',
+                        padding: '1.2rem 1.6rem',
+                        marginBottom: '1.5rem'
+                      }}>
+                        <span style={{ fontSize: '0.8rem', color: '#B45309', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block' }}>
+                          Amount to Pay
+                        </span>
+                        <div style={{ fontSize: '2.6rem', fontWeight: 900, color: '#EA580C', letterSpacing: '-0.5px', margin: '2px 0' }}>
+                          ₹{totalAmountFormatted}
+                        </div>
+                        <div style={{ fontSize: '0.85rem', color: '#78350F', fontWeight: 700 }}>
+                          Payee: <strong>Dosa Junction</strong>
+                        </div>
+                      </div>
 
-                {/* Trust Footnote */}
-                <div style={{ fontSize: '0.8rem', color: '#6B7280', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
-                  <ShieldCheck size={16} color="#16A34A" /> Your payment is securely processed through UPI.
-                </div>
+                      {/* Bank Declined Note */}
+                      <div style={{
+                        backgroundColor: '#EFF6FF',
+                        border: '1.5px solid #BFDBFE',
+                        borderRadius: '16px',
+                        padding: '0.9rem 1.1rem',
+                        marginBottom: '1.2rem',
+                        textAlign: 'left',
+                        fontSize: '0.84rem',
+                        lineHeight: 1.45,
+                        color: '#1E40AF'
+                      }}>
+                        <div style={{ fontWeight: 800, color: '#1D4ED8', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                          <Info size={16} color="#2563EB" /> Bank Declined Note for PhonePe / GPay:
+                        </div>
+                        If PhonePe shows <em>"Bank declined for security reasons"</em>, please click <strong>COPY UPI ID</strong> below to pay directly on PhonePe / GPay.
+                      </div>
+
+                      {/* Primary "Pay Now" Button */}
+                      <a
+                        href={exactUpiUri}
+                        style={{
+                          width: '100%',
+                          padding: '1.15rem 1.5rem',
+                          borderRadius: '18px',
+                          background: 'linear-gradient(135deg, #EA580C 0%, #D97706 100%)',
+                          color: '#FFFFFF',
+                          border: 'none',
+                          boxShadow: '0 8px 24px rgba(234, 88, 12, 0.35)',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          marginBottom: '1.2rem',
+                          textDecoration: 'none',
+                          boxSizing: 'border-box'
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <div style={{
+                            backgroundColor: 'rgba(255, 255, 255, 0.25)',
+                            borderRadius: '10px',
+                            width: '38px',
+                            height: '38px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}>
+                            <Smartphone size={22} color="#FFFFFF" />
+                          </div>
+                          <span style={{ fontSize: '1.3rem', fontWeight: 900, letterSpacing: '-0.2px' }}>
+                            Pay Now
+                          </span>
+                        </div>
+                        
+                        <div style={{
+                          backgroundColor: 'rgba(255, 255, 255, 0.25)',
+                          borderRadius: '50%',
+                          width: '36px',
+                          height: '36px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}>
+                          <ArrowRight size={22} color="#FFFFFF" />
+                        </div>
+                      </a>
+
+                      {/* App Direct Launch Cards */}
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.65rem', marginBottom: '1.4rem' }}>
+                        <a
+                          href={phonepeUri}
+                          style={{
+                            backgroundColor: '#5F259F',
+                            color: '#FFFFFF',
+                            borderRadius: '14px',
+                            padding: '0.8rem 0.4rem',
+                            textDecoration: 'none',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '4px',
+                            boxShadow: '0 4px 12px rgba(95, 37, 159, 0.2)'
+                          }}
+                        >
+                          <span style={{ fontSize: '0.82rem', fontWeight: 800 }}>PhonePe</span>
+                        </a>
+
+                        <a
+                          href={gpayUri}
+                          style={{
+                            backgroundColor: '#FFFFFF',
+                            border: '1.5px solid #E5E7EB',
+                            color: '#374151',
+                            borderRadius: '14px',
+                            padding: '0.8rem 0.4rem',
+                            textDecoration: 'none',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '4px'
+                          }}
+                        >
+                          <span style={{ fontSize: '0.82rem', fontWeight: 800 }}>Google Pay</span>
+                        </a>
+
+                        <a
+                          href={paytmUri}
+                          style={{
+                            backgroundColor: '#FFFFFF',
+                            border: '1.5px solid #E5E7EB',
+                            color: '#00BAF2',
+                            borderRadius: '14px',
+                            padding: '0.8rem 0.4rem',
+                            textDecoration: 'none',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '4px'
+                          }}
+                        >
+                          <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#00BAF2' }}>Paytm</span>
+                        </a>
+                      </div>
+
+                      {/* Copy UPI ID Bar */}
+                      <div style={{
+                        backgroundColor: '#F3F4F6',
+                        borderRadius: '16px',
+                        padding: '0.85rem 1.2rem',
+                        marginBottom: '1.2rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '0.5rem'
+                      }}>
+                        <div style={{ textAlign: 'left' }}>
+                          <span style={{ fontSize: '0.72rem', color: '#6B7280', fontWeight: 700, display: 'block', textTransform: 'uppercase' }}>UPI ID</span>
+                          <strong style={{ fontSize: '1rem', color: '#111827', fontFamily: 'monospace' }}>{upiId}</strong>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={handleCopyUpiId}
+                          style={{
+                            backgroundColor: '#EA580C',
+                            color: '#FFFFFF',
+                            border: 'none',
+                            borderRadius: '10px',
+                            padding: '0.45rem 1rem',
+                            fontSize: '0.82rem',
+                            fontWeight: 800,
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            boxShadow: '0 2px 8px rgba(234, 88, 12, 0.25)'
+                          }}
+                        >
+                          <Copy size={13} /> COPY
+                        </button>
+                      </div>
+
+                      {/* Instant Confirm Button after UPI Payment */}
+                      <button
+                        type="button"
+                        disabled={submitting}
+                        onClick={() => handleConfirmDirectOrder('Online UPI Payment')}
+                        style={{
+                          width: '100%',
+                          padding: '0.95rem 1.2rem',
+                          borderRadius: '14px',
+                          backgroundColor: '#064E3B',
+                          color: '#FFFFFF',
+                          border: 'none',
+                          fontSize: '0.95rem',
+                          fontWeight: 800,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '8px',
+                          marginBottom: '0.8rem',
+                          boxShadow: '0 4px 14px rgba(6, 78, 59, 0.25)'
+                        }}
+                      >
+                        <CheckCircle2 size={18} color="#4ADE80" /> I have completed UPI payment (Confirm Order)
+                      </button>
+
+                      {/* Cash on Delivery Direct Option Card */}
+                      <div style={{
+                        marginTop: '1.2rem',
+                        padding: '1.1rem 1rem',
+                        borderRadius: '16px',
+                        backgroundColor: '#F0FDF4',
+                        border: '1.5px solid #86EFAC',
+                        textAlign: 'center'
+                      }}>
+                        <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#166534', marginBottom: '0.6rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                          <Truck size={18} color="#16A34A" /> Prefer paying cash on delivery?
+                        </div>
+                        <button
+                          type="button"
+                          disabled={submitting}
+                          onClick={() => handleConfirmDirectOrder('Cash on Delivery')}
+                          style={{
+                            width: '100%',
+                            padding: '0.9rem 1.2rem',
+                            borderRadius: '14px',
+                            background: 'linear-gradient(135deg, #16A34A 0%, #15803D 100%)',
+                            color: '#FFFFFF',
+                            border: 'none',
+                            fontSize: '0.96rem',
+                            fontWeight: 900,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px',
+                            boxShadow: '0 4px 14px rgba(22, 163, 74, 0.3)'
+                          }}
+                        >
+                          <Truck size={18} color="#FFFFFF" /> Place Order with Cash on Delivery (COD)
+                        </button>
+                      </div>
+
+                      {/* Trust Footnote */}
+                      <div style={{ fontSize: '0.8rem', color: '#6B7280', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', marginTop: '1rem' }}>
+                        <ShieldCheck size={16} color="#16A34A" /> Your order is 100% verified & secure.
+                      </div>
+
+                    </div>
+
+                    {/* Screenshot Upload Form */}
+                    <form onSubmit={handleSubmitProof} style={{
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '24px',
+                      padding: '1.6rem',
+                      boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
+                      border: '1px solid #E5E7EB',
+                      marginBottom: '2rem'
+                    }}>
+                      <h3 style={{
+                        fontSize: '1.1rem',
+                        fontWeight: 800,
+                        color: '#064E3B',
+                        marginBottom: '0.3rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}>
+                        <FileCheck size={20} color="#D97706" /> Optional: Upload Payment Screenshot
+                      </h3>
+                      <p style={{ fontSize: '0.82rem', color: '#6B7280', marginBottom: '1.2rem' }}>
+                        You can attach payment screenshot proof for restaurant record.
+                      </p>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                        <div>
+                          <div style={{
+                            border: '2px dashed #D1D5DB',
+                            borderRadius: '14px',
+                            padding: '1.2rem',
+                            textAlign: 'center',
+                            backgroundColor: '#FAFAFA',
+                            cursor: 'pointer'
+                          }}>
+                            {screenshotPreview ? (
+                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.8rem' }}>
+                                <img
+                                  src={screenshotPreview}
+                                  alt="Payment Screenshot Preview"
+                                  style={{ maxHeight: '180px', borderRadius: '12px', objectFit: 'contain', border: '1px solid #E5E7EB' }}
+                                />
+                                <label className="btn btn-outline btn-sm" style={{ cursor: 'pointer', fontSize: '0.82rem' }}>
+                                  <Upload size={14} /> Change Screenshot
+                                  <input type="file" accept="image/*" onChange={handleImageChange} style={{ display: 'none' }} />
+                                </label>
+                              </div>
+                            ) : (
+                              <label style={{ cursor: 'pointer', display: 'block' }}>
+                                <Upload size={28} color="#D97706" style={{ margin: '0 auto 6px auto' }} />
+                                <span style={{ display: 'block', fontSize: '0.88rem', fontWeight: 800, color: '#064E3B' }}>
+                                  Click to upload payment screenshot
+                                </span>
+                                <span style={{ fontSize: '0.74rem', color: '#6B7280' }}>
+                                  JPG, PNG, WEBP (Max 5MB)
+                                </span>
+                                <input type="file" accept="image/*" onChange={handleImageChange} style={{ display: 'none' }} />
+                              </label>
+                            )}
+                          </div>
+                        </div>
+
+                        {screenshotPreview && (
+                          <button
+                            type="submit"
+                            disabled={submitting}
+                            className="btn btn-primary"
+                            style={{
+                              width: '100%',
+                              padding: '0.85rem',
+                              fontSize: '0.95rem',
+                              fontWeight: 800,
+                              borderRadius: '12px'
+                            }}
+                          >
+                            {submitting ? 'Submitting...' : 'Upload & Verify Screenshot'} <ShieldCheck size={18} />
+                          </button>
+                        )}
+                      </div>
+                    </form>
+                  </div>
+                )}
 
               </div>
-            )}
-
-            {/* Customer Proof Submission Form (Screenshot Upload) */}
-            {!isApproved && (
-              <form onSubmit={handleSubmitProof} style={{
-                backgroundColor: '#FFFFFF',
-                borderRadius: '24px',
-                padding: '1.6rem',
-                boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
-                border: '1px solid #E5E7EB',
-                marginBottom: '2rem'
-              }}>
-                <h3 style={{
-                  fontSize: '1.15rem',
-                  fontWeight: 800,
-                  color: '#064E3B',
-                  marginBottom: '0.3rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}>
-                  <FileCheck size={22} color="#D97706" /> Payment completed? Upload payment screenshot
-                </h3>
-                <p style={{ fontSize: '0.84rem', color: '#6B7280', marginBottom: '1.4rem' }}>
-                  Please upload your payment screenshot to verify your payment.
-                </p>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.86rem', fontWeight: 800, color: '#064E3B', marginBottom: '6px' }}>
-                      Payment Screenshot *
-                    </label>
-
-                    <div style={{
-                      border: '2px dashed #D1D5DB',
-                      borderRadius: '14px',
-                      padding: '1.2rem',
-                      textAlign: 'center',
-                      backgroundColor: '#FAFAFA',
-                      cursor: 'pointer'
-                    }}>
-                      {screenshotPreview ? (
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.8rem' }}>
-                          <img
-                            src={screenshotPreview}
-                            alt="Payment Screenshot Preview"
-                            style={{ maxHeight: '200px', borderRadius: '12px', objectFit: 'contain', border: '1px solid #E5E7EB' }}
-                          />
-                          <label className="btn btn-outline btn-sm" style={{ cursor: 'pointer', fontSize: '0.82rem' }}>
-                            <Upload size={14} /> Change Screenshot
-                            <input type="file" accept="image/*" onChange={handleImageChange} style={{ display: 'none' }} />
-                          </label>
-                        </div>
-                      ) : (
-                        <label style={{ cursor: 'pointer', display: 'block' }}>
-                          <Upload size={32} color="#D97706" style={{ margin: '0 auto 6px auto' }} />
-                          <span style={{ display: 'block', fontSize: '0.9rem', fontWeight: 800, color: '#064E3B' }}>
-                            Click to choose payment screenshot
-                          </span>
-                          <span style={{ fontSize: '0.76rem', color: '#6B7280' }}>
-                            JPG, PNG, WEBP (Max 5MB)
-                          </span>
-                          <input type="file" accept="image/*" onChange={handleImageChange} required style={{ display: 'none' }} />
-                        </label>
-                      )}
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="btn btn-primary"
-                    style={{
-                      width: '100%',
-                      padding: '0.85rem',
-                      fontSize: '1rem',
-                      fontWeight: 800,
-                      borderRadius: '12px',
-                      marginTop: '0.4rem'
-                    }}
-                  >
-                    {submitting ? 'Submitting Payment Proof...' : 'Submit Payment Proof'} <ShieldCheck size={18} />
-                  </button>
-
-                </div>
-              </form>
             )}
 
           </div>
