@@ -13,7 +13,7 @@ import {
   ArrowRight,
   Sparkles,
   Utensils,
-  ShoppingBag as BagIcon,
+  Package as BagIcon,
   Store,
   Check,
   Lock,

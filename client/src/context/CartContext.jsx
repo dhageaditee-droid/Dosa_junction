@@ -5,22 +5,37 @@ import { apiService } from '../services/api';
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  // Do not persist old added cart items across page refresh as requested by user
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem('dakshin_cart') || localStorage.getItem('dakshin_cart');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
+    }
+  });
   const [appliedCoupon, setAppliedCoupon] = useState(null);
 
   const { addToast } = useToast();
 
+  const persistCart = (items) => {
+    try {
+      sessionStorage.setItem('dakshin_cart', JSON.stringify(items));
+      localStorage.setItem('dakshin_cart', JSON.stringify(items));
+    } catch (e) {}
+  };
+
   const addToCart = (item, quantity = 1) => {
     setCartItems((prev) => {
       const existingIndex = prev.findIndex((i) => i.id === item.id);
+      let updated;
       if (existingIndex > -1) {
-        const updated = [...prev];
+        updated = [...prev];
         updated[existingIndex].quantity += quantity;
-        return updated;
       } else {
-        return [...prev, { ...item, price: parseFloat(item.price), quantity }];
+        updated = [...prev, { ...item, price: parseFloat(item.price), quantity }];
       }
+      persistCart(updated);
+      return updated;
     });
     if (addToast) addToast(`Added "${item.name}" to cart.`, 'success');
   };
@@ -31,7 +46,9 @@ export const CartProvider = ({ children }) => {
       if (target && addToast) {
         addToast(`Removed "${target.name}" from cart.`, 'info');
       }
-      return prev.filter((i) => i.id !== itemId);
+      const updated = prev.filter((i) => i.id !== itemId);
+      persistCart(updated);
+      return updated;
     });
   };
 
@@ -40,9 +57,11 @@ export const CartProvider = ({ children }) => {
       removeFromCart(itemId);
       return;
     }
-    setCartItems((prev) =>
-      prev.map((item) => (item.id === itemId ? { ...item, quantity: newQuantity } : item))
-    );
+    setCartItems((prev) => {
+      const updated = prev.map((item) => (item.id === itemId ? { ...item, quantity: newQuantity } : item));
+      persistCart(updated);
+      return updated;
+    });
   };
 
   const getItemQuantity = (itemId) => {
@@ -53,6 +72,10 @@ export const CartProvider = ({ children }) => {
   const clearCart = () => {
     setCartItems([]);
     setAppliedCoupon(null);
+    try {
+      sessionStorage.removeItem('dakshin_cart');
+      localStorage.removeItem('dakshin_cart');
+    } catch (e) {}
   };
 
   // Pricing derivation
