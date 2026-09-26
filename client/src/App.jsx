@@ -43,6 +43,8 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { LanguageProvider } from './context/LanguageContext';
 
+import ErrorBoundary from './components/ErrorBoundary';
+
 // Customer Layout Wrapper
 const CustomerLayout = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -51,7 +53,9 @@ const CustomerLayout = () => {
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', position: 'relative' }}>
       <Navbar onOpenAuthModal={() => setShowAuthModal(true)} />
       <main style={{ flexGrow: 1 }}>
-        <Outlet />
+        <ErrorBoundary>
+          <Outlet />
+        </ErrorBoundary>
       </main>
       <StickyMobileCartBar />
       <MobileBottomNav onOpenAuthModal={() => setShowAuthModal(true)} />

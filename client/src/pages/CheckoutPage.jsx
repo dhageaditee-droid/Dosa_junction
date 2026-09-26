@@ -28,18 +28,19 @@ import OrderConfirmationModal from '../components/OrderConfirmationModal';
 import { useToast } from '../context/ToastContext';
 
 const CheckoutPage = () => {
+  const cartContext = useCart() || {};
   const {
-    cartItems,
-    subtotal,
-    discountAmount,
-    appliedCoupon,
-    tax,
-    packingFee,
-    deliveryFee,
-    freeDeliveryThreshold,
-    grandTotal,
-    clearCart
-  } = useCart();
+    cartItems = [],
+    subtotal = 0,
+    discountAmount = 0,
+    appliedCoupon = null,
+    tax = 0,
+    packingFee = 15,
+    deliveryFee = 29,
+    freeDeliveryThreshold = 400,
+    grandTotal = 0,
+    clearCart = () => {}
+  } = cartContext;
 
   const navigate = useNavigate();
   const { addToast } = useToast();
@@ -62,13 +63,17 @@ const CheckoutPage = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const isSubmittingRef = useRef(false);
 
-  const progressToFreeDelivery = Math.min(100, (subtotal / freeDeliveryThreshold) * 100);
-  const remainingForFreeDelivery = Math.max(0, freeDeliveryThreshold - subtotal);
+  const currentSubtotal = parseFloat(subtotal || 0);
+  const threshold = parseFloat(freeDeliveryThreshold || 400);
+  const progressToFreeDelivery = threshold > 0 ? Math.min(100, (currentSubtotal / threshold) * 100) : 100;
+  const remainingForFreeDelivery = Math.max(0, threshold - currentSubtotal);
 
-  if (cartItems.length === 0) {
+  const safeCartItems = Array.isArray(cartItems) ? cartItems : [];
+
+  if (safeCartItems.length === 0) {
     return (
       <div style={{ backgroundColor: '#FAF8F5', padding: '5rem 0', minHeight: '80vh', textAlign: 'center' }}>
-        <SEOHead title="Checkout | Dosa Junction" />
+        <SEOHead title="Checkout" />
         <div className="container" style={{ maxWidth: '600px' }}>
           <ShoppingBag size={48} color="#D97706" style={{ marginBottom: '1rem' }} />
           <h2 style={{ color: '#064E3B', marginBottom: '0.5rem' }}>Your Cart is Empty</h2>
@@ -467,19 +472,19 @@ const CheckoutPage = () => {
               top: '90px'
             }}>
               <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.35rem', fontWeight: 900, color: '#064E3B', marginBottom: '1.2rem', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.6rem' }}>
-                Order Summary ({cartItems.length} {cartItems.length === 1 ? 'Item' : 'Items'})
+                Order Summary ({safeCartItems.length} {safeCartItems.length === 1 ? 'Item' : 'Items'})
               </h3>
 
               {/* Items List */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.2rem', maxHeight: '220px', overflowY: 'auto' }}>
-                {cartItems.map((item) => (
-                  <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.9rem' }}>
+                {safeCartItems.map((item, idx) => (
+                  <div key={item.id || idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.9rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontWeight: 800, color: '#064E3B' }}>{item.quantity}x</span>
-                      <span style={{ fontWeight: 700, color: '#1F2937' }}>{cleanDishName(item.name)}</span>
+                      <span style={{ fontWeight: 800, color: '#064E3B' }}>{item.quantity || 1}x</span>
+                      <span style={{ fontWeight: 700, color: '#1F2937' }}>{cleanDishName(item.name || item.item_name)}</span>
                     </div>
                     <span style={{ fontWeight: 800, color: '#111827' }}>
-                      ₹{(item.price * item.quantity).toFixed(2)}
+                      ₹{(parseFloat(item.price || 0) * parseInt(item.quantity || 1, 10)).toFixed(2)}
                     </span>
                   </div>
                 ))}
@@ -489,27 +494,25 @@ const CheckoutPage = () => {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem', fontSize: '0.9rem', color: 'var(--color-text)', borderTop: '1px solid var(--color-border)', paddingTop: '1rem', marginBottom: '1.2rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ color: 'var(--color-text-muted)' }}>Item Subtotal</span>
-                  <span>₹{subtotal.toFixed(2)}</span>
+                  <span>₹{currentSubtotal.toFixed(2)}</span>
                 </div>
 
-                {discountAmount > 0 && (
+                {parseFloat(discountAmount || 0) > 0 && (
                   <div style={{ display: 'flex', justifyContent: 'space-between', color: '#16A34A', fontWeight: 700 }}>
                     <span>Coupon Discount</span>
-                    <span>− ₹{discountAmount.toFixed(2)}</span>
+                    <span>− ₹{parseFloat(discountAmount || 0).toFixed(2)}</span>
                   </div>
                 )}
 
-
-
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ color: 'var(--color-text-muted)' }}>Packing Charge</span>
-                  <span>₹{(formData.orderType === 'Home Delivery' || formData.orderType === 'Takeaway' ? packingFee : 0).toFixed(2)}</span>
+                  <span>₹{(formData.orderType === 'Home Delivery' || formData.orderType === 'Takeaway' ? parseFloat(packingFee || 0) : 0).toFixed(2)}</span>
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ color: 'var(--color-text-muted)' }}>Delivery Charge</span>
                   <span>
-                    {formData.orderType !== 'Home Delivery' ? 'N/A' : (deliveryFee === 0 ? <strong style={{ color: '#16A34A' }}>FREE</strong> : `₹${deliveryFee.toFixed(2)}`)}
+                    {formData.orderType !== 'Home Delivery' ? 'N/A' : (parseFloat(deliveryFee || 0) === 0 ? <strong style={{ color: '#16A34A' }}>FREE</strong> : `₹${parseFloat(deliveryFee || 0).toFixed(2)}`)}
                   </span>
                 </div>
 
@@ -524,7 +527,7 @@ const CheckoutPage = () => {
                   marginTop: '0.4rem'
                 }}>
                   <span>Total Amount</span>
-                  <span style={{ color: '#EA580C' }}>₹{grandTotal.toFixed(2)}</span>
+                  <span style={{ color: '#EA580C' }}>₹{parseFloat(grandTotal || 0).toFixed(2)}</span>
                 </div>
               </div>
 
