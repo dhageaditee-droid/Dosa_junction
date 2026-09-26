@@ -136,7 +136,7 @@ module.exports = async function handler(req, res) {
         });
       }
 
-      // 2. Create Temporary Payment Session (Proceed to Payment)
+      // 2. Direct Order Creation (Cash on Delivery / Pay at Counter / Confirmed Orders)
       const rawItems = payload.items || [];
       const items = rawItems.map(i => {
         const itemName = i.item_name || i.name || 'South Indian Dish';
@@ -160,6 +160,59 @@ module.exports = async function handler(req, res) {
       const discount_amount = parseFloat(payload.discountAmount || payload.discount_amount) || 0;
       const total_amount = subtotal + tax + packing_charge + delivery_charge - discount_amount;
 
+      const fullDeliveryAddr = [payload.deliveryAddress || payload.address || payload.delivery_address, payload.landmark, payload.city, payload.pincode].filter(Boolean).join(', ');
+
+      const isDirectOrder = payload.paymentMethod === 'Cash on Delivery' || 
+                            payload.paymentMethod === 'Pay at Counter' || 
+                            payload.status === 'Confirmed' ||
+                            payload.order_number;
+
+      if (isDirectOrder) {
+        const orderNum = payload.order_number || `DJ-${Math.floor(1000 + Math.random() * 9000)}`;
+        const directOrder = {
+          id: Date.now(),
+          order_number: orderNum,
+          customer_name: payload.customerName || payload.customer_name || 'Customer',
+          customer_phone: payload.phone || payload.customerPhone || payload.customer_phone || '',
+          customer_email: payload.email || payload.customerEmail || '',
+          delivery_address: fullDeliveryAddr || payload.deliveryAddress || payload.address || '',
+          order_type: payload.orderType || payload.order_type || 'Home Delivery',
+          payment_method: payload.paymentMethod || 'Cash on Delivery',
+          payment_status: payload.paymentStatus || (payload.paymentMethod === 'Cash on Delivery' ? 'Cash on Delivery' : 'Pay at Counter'),
+          status: payload.status || 'Confirmed',
+          subtotal,
+          tax,
+          packing_charge,
+          delivery_charge,
+          discount_amount,
+          total_amount,
+          items,
+          created_at: new Date().toISOString()
+        };
+
+        memoryOrdersStore.unshift(directOrder);
+
+        // Push directly to CrudCrud cloud DB
+        for (const token of CRUDCRUD_TOKENS) {
+          try {
+            await fetch(`https://crudcrud.com/api/${token}/orders`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(directOrder)
+            });
+            break;
+          } catch (e) {}
+        }
+
+        return res.status(201).json({
+          success: true,
+          message: `Order confirmed successfully with ${directOrder.payment_method}!`,
+          orderNumber: orderNum,
+          order: directOrder
+        });
+      }
+
+      // 3. Create Temporary Payment Session (Proceed to Online Payment)
       const paymentRef = payload.paymentRef || `PAY-DJ-${Math.floor(1000 + Math.random() * 9000)}`;
       const upiId = 'Pos.11424716@indus';
       const formattedAmount = total_amount.toFixed(2);
@@ -176,7 +229,6 @@ module.exports = async function handler(req, res) {
 
       console.log('[UPI Deep Link Generated]:', upiUri);
 
-      const fullDeliveryAddr = [payload.deliveryAddress || payload.address || payload.delivery_address, payload.landmark, payload.city, payload.pincode].filter(Boolean).join(', ');
       const newSession = {
         id: Date.now(),
         payment_ref: paymentRef,

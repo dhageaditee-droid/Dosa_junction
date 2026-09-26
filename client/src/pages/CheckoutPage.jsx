@@ -150,23 +150,24 @@ const CheckoutPage = () => {
           paymentStatus: formData.paymentMethod === 'Cash on Delivery' ? 'Cash on Delivery' : 'Pay at Counter',
           status: 'Confirmed'
         });
-        if (orderRes && orderRes.success && orderRes.order) {
-          if (addToast) addToast(`Order confirmed with ${formData.paymentMethod}! 🎉`, 'success');
-          clearCart();
-          navigate(`/track-order?orderNumber=${orderRes.order.order_number}`, { state: { order: orderRes.order } });
-          return;
-        }
+        const finalOrder = orderRes?.order || orderRes;
+        const ordNumber = finalOrder?.order_number || orderRes?.orderNumber || `DJ-${Math.floor(1000 + Math.random() * 9000)}`;
+        if (addToast) addToast(`Order confirmed with ${formData.paymentMethod}! 🎉`, 'success');
+        clearCart();
+        navigate(`/track-order?orderNumber=${ordNumber}`, { state: { order: finalOrder } });
+        return;
       }
 
       const res = await apiService.createPaymentSession(payload);
 
-      if (res.success) {
+      if (res && res.success) {
+        const pRef = res.paymentRef || res.session?.payment_ref;
         if (addToast) addToast('Order created! Please complete your payment. ⚡', 'success');
         clearCart();
-        navigate(`/payment/${res.paymentRef}`, {
+        navigate(`/payment/${pRef}`, {
           state: {
             session: res.session,
-            initialMode: formData.paymentMethod === 'Cash on Delivery' ? 'cod' : formData.paymentMethod === 'Pay at Counter' ? 'counter' : 'online'
+            initialMode: 'online'
           }
         });
       }
