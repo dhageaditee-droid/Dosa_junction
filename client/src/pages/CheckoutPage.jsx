@@ -15,6 +15,7 @@ import {
   Utensils,
   Package as BagIcon,
   Store,
+  Smartphone,
   Check,
   Lock,
   Leaf,
